@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UsesMSBuildLocator>true</UsesMSBuildLocator>
+    <RootNamespace>VsLike.Engine</RootNamespace>
+    <AssemblyName>VsLikeEngine</AssemblyName>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>en;de</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="VsLike.Engine.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VsLike.Core\VsLike.Core.csproj" />
+    <ProjectReference Include="..\VsLike.Roslyn\VsLike.Roslyn.csproj" />
+    <ProjectReference Include="..\VsLike.Diagram\VsLike.Diagram.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,7 @@
+<Project>
+  <!-- MSBuild-Assemblies kommen zur Laufzeit über Microsoft.Build.Locator aus dem installierten SDK. -->
+  <ItemGroup Condition="'$(UsesMSBuildLocator)' == 'true'">
+    <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.StringTools" ExcludeAssets="runtime" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

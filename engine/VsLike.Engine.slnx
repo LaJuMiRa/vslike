@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VsLike.Core/VsLike.Core.csproj" />
+    <Project Path="src/VsLike.Roslyn/VsLike.Roslyn.csproj" />
+    <Project Path="src/VsLike.Diagram/VsLike.Diagram.csproj" />
+    <Project Path="src/VsLike.Engine/VsLike.Engine.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/VsLike.Roslyn.Tests/VsLike.Roslyn.Tests.csproj" />
+    <Project Path="tests/VsLike.Diagram.Tests/VsLike.Diagram.Tests.csproj" />
+    <Project Path="tests/VsLike.Engine.Tests/VsLike.Engine.Tests.csproj" />
+  </Folder>
+</Solution>

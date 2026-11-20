@@ -9,3 +9,10 @@ TestResults/
 .DS_Store
 /dist/
 artifacts.nosync/
+.build/
+build/
+dist/
+.swiftpm/
+*.xcodeproj
+xcuserdata/
+DerivedData/
