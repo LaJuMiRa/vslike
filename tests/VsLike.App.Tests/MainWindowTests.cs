@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VsLike.App.Services;
 using VsLike.App.Shell;
@@ -42,10 +43,12 @@ public sealed class MainWindowTests : IDisposable
     {
         var (window, _) = Show();
         Loc.SetCulture("en");
+        Dispatcher.UIThread.RunJobs();
         var menu = window.FindControl<Menu>("InWindowMenu")!;
         Assert.Contains(menu.Items.OfType<MenuItem>(), i => (string?)i.Header == "View");
 
         Loc.SetCulture("de");
+        Dispatcher.UIThread.RunJobs();
 
         Assert.Contains(menu.Items.OfType<MenuItem>(), i => (string?)i.Header == "Ansicht");
         Loc.SetCulture("en");
