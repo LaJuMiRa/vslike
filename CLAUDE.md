@@ -1,41 +1,34 @@
 # VsLike – Projektgedächtnis
 
-C#-IDE für macOS (arm64 + x64), danach Linux. Funktional auf VS-Niveau für C#/.NET, eigenes Design.
-Anzeigename „VsLike“, Cask `vslike`, Lizenz MIT, UI Deutsch + Englisch (resx).
+Native C#-IDE für macOS (arm64, macOS 26). Funktional auf VS-Niveau für C#/.NET, eigenes Design.
+Anzeigename „VsLike“, Cask `vslike`, Lizenz MIT, UI Deutsch + Englisch (Localizable.strings).
 `VsLike.*` ist nur der interne Namespace der IDE; Nutzerprojekte bekommen ihre eigenen Namen/Namespaces.
 Keine Microsoft-Marken/Assets/Farben/Icons, keine Telemetrie, keine Secrets.
 
 Stand und nächster Schritt: `docs/STATUS.md`. Entscheidungen: `docs/DECISIONS.md`. Offene Punkte: `docs/OPEN_QUESTIONS.md`.
 
-## Tech-Stack (verbindlich)
-- C# 14 / .NET 10 (LTS)
-- Avalonia UI 11.x, MVVM mit CommunityToolkit.Mvvm, Docking mit Dock.Avalonia
-- Editor: AvaloniaEdit + AvaloniaEdit.TextMate
-- Roslyn als Bibliothek (Microsoft.CodeAnalysis.*, Workspaces.MSBuild, Build.Locator, CSharp.Features); instabile Features-API immer hinter eigenen Interfaces in `VsLike.Core`
-- StyleCop.Analyzers über `AnalyzerFileReference`
-- Debugger: netcoredbg via DAP (`--interpreter=vscode`). **vsdbg verboten.**
-- Tests: xUnit, Avalonia.Headless.XUnit, Verify (Snapshots)
-- CI: GitHub Actions (macOS arm64, macOS x64, ubuntu)
-- Nutzer braucht installiertes .NET SDK; IDE prüft das beim Start.
+## Tech-Stack (verbindlich, seit 2026-11-21)
+- Native macOS-App (nur macOS 26, arm64): Swift 6.2, SwiftUI + AppKit (Editor: NSTextView/TextKit 1), SwiftPM ohne Xcode-Projekt
+- Terminal: SwiftTerm 1.11.2 (gepinnt)
+- C#-Analyse: .NET-10-Prozess `engine/` (Roslyn als Bibliothek, StyleCop.Analyzers, Diagramm-Writer) hinter JSON-RPC (stdin/stdout)
+- Debugger: netcoredbg via DAP, im App-Paket. **vsdbg verboten.**
+- Tests: Swift Testing (`swift test`), xUnit für die Engine (`dotnet test engine/VsLike.Engine.slnx`)
+- Build/Release: `./build.sh`, `./release.sh` (wie Projekt Seasons), Workflow auf macos-26
+- Nutzer braucht installiertes .NET SDK 10; der Startbildschirm prüft das.
 
 ## Architektur
 ```
-src/VsLike.App        Avalonia-Host, Views, ViewModels, Shell
-src/VsLike.Core       Interfaces, Services, Events, Settings (kein Avalonia, kein Roslyn)
-src/VsLike.Editor     AvaloniaEdit-Integration, Highlighting, Completion-Popup
-src/VsLike.Roslyn     Workspace, Completion, Diagnostics, Refactorings, Analyzer
-src/VsLike.Projects   Solution/Projekt-Modell, Templates, NuGet, Build/Run
-src/VsLike.Diagram    Modell, Canvas-Control, Roslyn-Codegenerierung
-src/VsLike.Debugging  DAP-Client, netcoredbg
-tests/                je Projekt ein Testprojekt
-packaging/ docs/
+Sources/VsLike      macOS-App (App, Workspace-Modell, Editor, Sidebar, Panels, Diagram, Sheets)
+Sources/VsLikeKit   Swift ohne AppKit: Engine-Client, dotnet-CLI, Solution/Projekt, DAP, Lexer, Diagramm-Layout
+engine/             VsLike.Core/Roslyn/Diagram/Engine (C#) + Tests + TestAssets
+Tests/              VsLikeKitTests, VsLikeTests
+packaging/ scripts/ docs/
 ```
-Abhängigkeiten: App → alle; alle anderen → Core. Plattformspezifisches hinter `IPlatformService`.
 
 ## Arbeitsregeln
-- Nullable an, TreatWarningsAsErrors, `.editorconfig`, zentrale Versionen in `Directory.Packages.props`, eigener Code folgt StyleCop.
+- Swift: strict concurrency (Swift 6), UI-Klassen `@MainActor`, keine Warnungen. C# in `engine/`: Nullable, TreatWarningsAsErrors, StyleCop.
 - UI-Thread nie blockieren: Roslyn im Hintergrund, CancellationToken, debounced. Ziel Completion < 150 ms.
-- Pro Phase: planen → umsetzen → Tests → `dotnet build` + `dotnet test` grün → `docs/CHANGELOG.md` → Commit (Conventional Commits) → nächste Phase.
+- Pro Schritt: planen → umsetzen → Tests → `./release.sh` bzw. `swift test` + `dotnet test` grün → `CHANGELOG.md` → Commit (Conventional Commits).
 - Unsichere APIs: Version/Doku prüfen oder Spike bauen, nicht raten. Offenes nach `docs/OPEN_QUESTIONS.md`.
 - Entscheidungen ohne Rückfrage treffen und in `docs/DECISIONS.md` festhalten.
 
@@ -59,4 +52,4 @@ Abhängigkeiten: App → alle; alle anderen → Core. Plattformspezifisches hint
 - Code-Fixes inkl. Fix all in Document/Project.
 
 ## Phasen
-0 Gerüst · 1 Shell · 2 Editor · 3 Roslyn-Workspace · 4 IntelliSense · 5 Solution/Projekte/NuGet · 6 Build/Run/Test · 7 StyleCop · 8 Klassendiagramm · 9 Debugger · 10 Packaging/Homebrew (Tap `LaJuMiRa/homebrew-tap`, nur `Casks/vslike.rb` ergänzen) · 11 Linux (Formula `Formula/vslike.rb`)
+Avalonia-Version (Phasen 0–11) abgeschlossen und ersetzt durch den nativen Neubau (Branch `native-macos`). Homebrew: Tap `LaJuMiRa/homebrew-tap`, nur `Casks/vslike.rb` ergänzen.

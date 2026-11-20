@@ -191,7 +191,7 @@ struct DiagramEditorView: View {
     private func fit(in size: CGSize) {
         guard !boxes.isEmpty else { return }
         let bounds = DiagramGeometry.bounds(boxes, margin: 40)
-        let scale = min(2, max(0.2, min(size.width / bounds.width, (size.height - 60) / bounds.height)))
+        let scale = min(1.25, max(0.2, min(size.width / bounds.width, (size.height - 60) / bounds.height)))
         withAnimation(.snappy) {
             zoom = scale
             offset = CGSize(width: (size.width - bounds.width * scale) / 2 - bounds.minX * scale, height: 60 + (size.height - 60 - bounds.height * scale) / 2 - bounds.minY * scale)
@@ -314,9 +314,9 @@ struct RelationsLayer: View {
                 }
                 var diamond = Path()
                 diamond.move(to: start)
-                diamond.addLine(to: diamondPoint(-size * 0.8, size * 0.45))
-                diamond.addLine(to: diamondPoint(-size * 1.6, 0))
-                diamond.addLine(to: diamondPoint(-size * 0.8, -size * 0.45))
+                diamond.addLine(to: diamondPoint(size * 0.8, size * 0.45))
+                diamond.addLine(to: diamondPoint(size * 1.6, 0))
+                diamond.addLine(to: diamondPoint(size * 0.8, -size * 0.45))
                 diamond.closeSubpath()
                 context.fill(diamond, with: .color(ink))
             }

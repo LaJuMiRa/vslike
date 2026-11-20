@@ -2,7 +2,8 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    tags:
+      - "v*.*.*"
 
 permissions:
   contents: write
@@ -12,107 +13,58 @@ env:
   DOTNET_NOLOGO: "1"
 
 jobs:
-  macos:
-    name: Package ${{ matrix.rid }}
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - os: macos-15
-            rid: osx-arm64
-          - os: macos-15-intel
-            rid: osx-x64
-    runs-on: ${{ matrix.os }}
-    env:
-      MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Version from tag
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-      - name: Optional signing certificate
-        if: ${{ env.MACOS_CERT_P12 != '' }}
-        env:
-          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
-        run: |
-          echo "$MACOS_CERT_P12" | base64 --decode > cert.p12
-          security create-keychain -p ci build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p ci build.keychain
-          security import cert.p12 -k build.keychain -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple: -s -k ci build.keychain
-          rm cert.p12
-      - name: Build app bundle
-        env:
-          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
-          MACOS_NOTARY_TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
-          MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
-        run: packaging/macos/build-app.sh "${{ matrix.rid }}" "$VERSION" "$PWD/dist"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.rid }}
-          path: |
-            dist/*.zip
-            dist/*.dmg
-            dist/*.sha256
-
-  linux:
-    name: Package ${{ matrix.rid }}
-    strategy:
-      fail-fast: true
-      matrix:
-        rid: [linux-x64, linux-arm64]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Version from tag
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-      - name: Build tarball
-        run: packaging/linux/build-tarball.sh "${{ matrix.rid }}" "$VERSION" "$PWD/dist"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.rid }}
-          path: |
-            dist/*.tar.gz
-            dist/*.sha256
-
   release:
-    name: GitHub release
-    needs: [macos, linux]
-    runs-on: ubuntu-24.04
+    # Apple Silicon runner with Xcode 26 (the app targets macOS 26).
+    runs-on: macos-26
     outputs:
       version: ${{ steps.version.outputs.version }}
-      sha_arm64: ${{ steps.sums.outputs.arm64 }}
-      sha_x64: ${{ steps.sums.outputs.x64 }}
-      sha_linux_x64: ${{ steps.sums.outputs.linux_x64 }}
-      sha_linux_arm64: ${{ steps.sums.outputs.linux_arm64 }}
+      sha256: ${{ steps.package.outputs.sha256 }}
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Check out
+        uses: actions/checkout@v6
         with:
-          path: dist
-          merge-multiple: true
-      - id: version
-        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-      - id: sums
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: engine/global.json
+
+      - name: Derive version from tag
+        id: version
         run: |
-          v="${{ steps.version.outputs.version }}"
-          echo "arm64=$(sha256sum "dist/VsLike-$v-osx-arm64.zip" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-          echo "x64=$(sha256sum "dist/VsLike-$v-osx-x64.zip" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-          echo "linux_x64=$(sha256sum "dist/vslike-$v-linux-x64.tar.gz" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-          echo "linux_arm64=$(sha256sum "dist/vslike-$v-linux-arm64.tar.gz" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-      - name: Create release
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag must look like v1.2.3 (got $GITHUB_REF_NAME)" >&2
+            exit 1
+          fi
+          if [[ "$(tr -d '[:space:]' < VERSION)" != "$VERSION" ]]; then
+            echo "VERSION file does not match tag $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Test, build and package
+        id: package
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: ./release.sh
+
+      - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/*.zip dist/*.dmg dist/*.tar.gz dist/*.sha256 --repo "$GITHUB_REPOSITORY" --title "VsLike ${{ steps.version.outputs.version }}" --generate-notes
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          NOTES="$(awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {f=1; next} /^## \[/ {f=0} f' CHANGELOG.md)"
+          printf '%s\n\nSHA-256: `%s`\n' "$NOTES" "${{ steps.package.outputs.sha256 }}" > release-notes.md
+          gh release create "$GITHUB_REF_NAME" \
+            "${{ steps.package.outputs.zip }}" \
+            "${{ steps.package.outputs.zip }}.sha256" \
+            --title "VsLike $VERSION" \
+            --notes-file release-notes.md
 
   tap:
-    name: Update Homebrew cask and formula (pull request)
+    name: Update the Homebrew cask (pull request)
     needs: release
     runs-on: ubuntu-24.04
     env:
@@ -121,26 +73,24 @@ jobs:
       - name: Skip without tap token
         if: ${{ env.TAP_GITHUB_TOKEN == '' }}
         run: echo "TAP_GITHUB_TOKEN is not set; the cask is not updated."
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         if: ${{ env.TAP_GITHUB_TOKEN != '' }}
         with:
           path: vslike
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         if: ${{ env.TAP_GITHUB_TOKEN != '' }}
         with:
           repository: LaJuMiRa/homebrew-tap
           token: ${{ secrets.TAP_GITHUB_TOKEN }}
           path: tap
-      - name: Write Casks/vslike.rb and Formula/vslike.rb only
+      - name: Write Casks/vslike.rb only
         if: ${{ env.TAP_GITHUB_TOKEN != '' }}
         run: |
-          vslike/packaging/homebrew/render-cask.sh "${{ needs.release.outputs.version }}" "${{ needs.release.outputs.sha_arm64 }}" "${{ needs.release.outputs.sha_x64 }}" tap/Casks/vslike.rb
-          mkdir -p tap/Formula
-          vslike/packaging/homebrew/render-formula.sh "${{ needs.release.outputs.version }}" "${{ needs.release.outputs.sha_linux_x64 }}" "${{ needs.release.outputs.sha_linux_arm64 }}" tap/Formula/vslike.rb
+          vslike/packaging/homebrew/render-cask.sh "${{ needs.release.outputs.version }}" "${{ needs.release.outputs.sha256 }}" tap/Casks/vslike.rb
           cd tap
           git status --porcelain --untracked-files=all
-          # Nur diese beiden Dateien dürfen sich ändern; vorhandene Casks/Formeln bleiben unberührt.
-          test "$(git status --porcelain --untracked-files=all | grep -vE ' (Casks|Formula)/vslike.rb$' | wc -l)" -eq 0
+          # Only this file may change; existing casks and formulae stay untouched.
+          test "$(git status --porcelain --untracked-files=all | grep -vE ' Casks/vslike.rb$' | wc -l)" -eq 0
       - name: Open pull request
         if: ${{ env.TAP_GITHUB_TOKEN != '' }}
         env:
@@ -151,7 +101,7 @@ jobs:
           git config user.name "vslike-release"
           git config user.email "vslike-release@users.noreply.github.com"
           git checkout -b "$branch"
-          git add Casks/vslike.rb Formula/vslike.rb
+          git add Casks/vslike.rb
           git commit -m "vslike ${{ needs.release.outputs.version }}"
           git push --force origin "$branch"
-          gh pr create --repo LaJuMiRa/homebrew-tap --head "$branch" --title "vslike ${{ needs.release.outputs.version }}" --body "Automatic update of Casks/vslike.rb (macOS) and Formula/vslike.rb (Linux) from the VsLike release workflow." || echo "PR already exists"
+          gh pr create --repo LaJuMiRa/homebrew-tap --head "$branch" --title "vslike ${{ needs.release.outputs.version }}" --body "Automatic update of Casks/vslike.rb from the VsLike release workflow." || echo "PR already exists"

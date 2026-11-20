@@ -48,3 +48,23 @@
 | 2026-11-20 | Bundle-ID `io.github.lajumira.vslike` | Bezug auf das GitHub-Konto statt auf Personennamen. |
 | 2026-11-20 | Zip per `ditto` mit erweiterten Attributen; vor dem Signieren `xattr -cr` | Signaturen der DLLs in `Contents/MacOS` liegen in erweiterten Attributen (ohne sie ist das Zip unsigniert, geprüft); Finder-/iCloud-Attribute lassen `codesign` dagegen scheitern. |
 
+
+## Neubau als native macOS-App (2026-11-21)
+
+| Thema | Entscheidung | Grund |
+|---|---|---|
+| Oberfläche | Swift 6.2, SwiftUI für Fenster, Seitenleiste, Panels, Dialoge; AppKit (NSTextView, TextKit 1) für den Editor | Native Optik und flüssiges Scrollen; TextKit 1 ist bei langen Dateien vorhersehbar schnell und erlaubt temporäre Attribute für Farben und Fehler ohne Undo-Einträge. |
+| C#-Analyse | Bleibt in .NET: Prozess `VsLikeEngine` (Roslyn, StyleCop, Diagramm-Writer), JSON-RPC mit Content-Length-Framing über stdin/stdout | Roslyn und StyleCop.Analyzers gibt es nur für .NET; jede Alternative (eigener Parser, fremder Sprachserver) wäre schlechter oder ebenfalls .NET. Der Prozess läuft auf dem installierten SDK (framework-dependent), das App-Paket bleibt bei rund 50 MB. |
+| Was in Swift ist | Build, Run, Tests (TRX), NuGet-API, Vorlagen, Solution-/Projektdateien, Debugger-Client (DAP), Lexer, Diagramm-Layout, SVG | Alles, was kein Roslyn braucht, ohne Prozessgrenze und testbar in `VsLikeKit`. |
+| Plattform | nur macOS 26, nur arm64 | Auftrag „macOS build only“, Vorbild Seasons; erlaubt die aktuellen SwiftUI-APIs (Glass-Effekt der Diagramm-Werkzeugleiste). |
+| Offsets | UTF-16 überall | Roslyn (`string`) und NSString zählen beide UTF-16; keine Umrechnung nötig. |
+| Text-Sync | Volltext-Benachrichtigung `document/update` 120 ms nach der letzten Änderung, sofort vor jeder Anfrage | Einfach und robust; Benachrichtigungen verarbeitet die Engine in Reihenfolge, Anfragen parallel. |
+| Highlighting | Lexer sofort, Roslyn-Klassifizierung des sichtbaren Bereichs entprellt; Roslyn-Spans werden bei Änderungen verschoben statt verworfen | Kein Flackern beim Tippen. |
+| Terminal | SwiftTerm 1.11.2 (MIT), fest gepinnt | Ab 1.12 enthält SwiftTerm Metal-Shader, die nur mit der separat zu ladenden Metal-Toolchain bauen. |
+| Run | `dotnet run` im Terminal-Tab | Programme bekommen Standardeingabe; offene Lücke der Avalonia-Version geschlossen. |
+| Debugger | netcoredbg 3.2.0-1092 im App-Paket (`Contents/Resources/netcoredbg`), SHA-256 geprüft in `build.sh` | vsdbg ist lizenzrechtlich ausgeschlossen. |
+| Quick-Actions | ⇧⌘. öffnet ein Menü an der Schreibmarke (Korrekturen, „Alle beheben“, Refactorings); ⌘. bleibt „Stoppen“ wie in Xcode | Wunsch des Nutzers; Mac-Konvention für ⌘. bleibt erhalten. |
+| Tastenkürzel | ⌘R mit Debugger starten, ⌃⌘R ohne, ⌘B bauen, ⌘U Tests, F9-Ersatz ⌘\\ für Haltepunkte, F10/F11/⇧F11 Schritte, F12/⇧F12, F2 | Mac-übliche Kürzel, Debug-Schritte wie gewohnt auf F-Tasten. |
+| Inspektor | eigene rechte Spalte statt `.inspector` | `.inspector` verschiebt die rechten Toolbar-Knöpfe in seine (verborgene) Spalte. |
+| Lokalisierung | Englische Texte als Schlüssel, `de.lproj/Localizable.strings`, von `build.sh` ins Paket kopiert | SwiftPM-Ressourcenbündel neben dem Executable brechen die Code-Signatur; Muster aus Seasons. |
+| Bundle-ID | `io.github.lajumira.vslike` | Unverändert zur Avalonia-Version. |

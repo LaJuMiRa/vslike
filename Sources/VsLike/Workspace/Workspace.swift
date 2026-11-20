@@ -127,6 +127,8 @@ final class Workspace {
     @ObservationIgnored private var watcher: FolderWatcher?
     @ObservationIgnored private var treeRefresh: Task<Void, Never>?
     @ObservationIgnored var documentListeners: [(CodeDocument) -> Void] = []
+    /// Replaces the "save changes?" alert (tests).
+    @ObservationIgnored var confirmSaveHandler: (([String]) -> SaveChoice)?
     /// The editor that has (or last had) keyboard focus, for menu commands.
     @ObservationIgnored weak var activeEditor: CodeTextView?
 
@@ -247,6 +249,9 @@ final class Workspace {
     enum SaveChoice { case save, discard, cancel }
 
     func confirmSave(_ names: [String]) -> SaveChoice {
+        if let confirmSaveHandler {
+            return confirmSaveHandler(names)
+        }
         let alert = NSAlert()
         alert.messageText = names.count == 1
             ? String(localized: "Save changes to \(names[0])?")

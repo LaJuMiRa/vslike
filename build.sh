@@ -53,7 +53,7 @@ echo "$NETCOREDBG_SHA256  $ARCHIVE" | shasum -a 256 -c - >/dev/null
 # Also unpack into the cache, where the tests and `swift run` find it.
 if [[ ! -x "$CACHE/netcoredbg/$NETCOREDBG_VERSION/netcoredbg/netcoredbg" ]]; then
     mkdir -p "$CACHE/netcoredbg/$NETCOREDBG_VERSION"
-    unzip -q -o "$ARCHIVE" -d "$CACHE/netcoredbg/$NETCOREDBG_VERSION"
+    unzip -q -o "$ARCHIVE" -d "$CACHE/netcoredbg/$NETCOREDBG_VERSION" -x "__MACOSX/*"
 fi
 
 echo "==> Assembling app bundle"
@@ -69,7 +69,8 @@ sed -e "s/__VERSION__/$VERSION/" -e "s/__BUILD__/$BUILD_NUMBER/" packaging/Info.
 plutil -lint -s "$CONTENTS/Info.plist"
 cp -R Sources/VsLike/Resources/*.lproj "$CONTENTS/Resources/"
 cp -R "$WORK/engine" "$CONTENTS/Resources/engine"
-unzip -q "$ARCHIVE" -d "$CONTENTS/Resources"
+# The archive carries Finder metadata in __MACOSX/; it must not end up in the signed bundle.
+unzip -q "$ARCHIVE" -d "$CONTENTS/Resources" -x "__MACOSX/*"
 chmod +x "$CONTENTS/Resources/netcoredbg/netcoredbg"
 
 echo "==> Drawing app icon"

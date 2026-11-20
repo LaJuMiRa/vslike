@@ -1,65 +1,69 @@
 # VsLike
 
-Eine eigenständige C#-IDE für macOS (Apple Silicon und Intel) und Linux, gebaut mit .NET 10, Avalonia und Roslyn. Lizenz: MIT.
+Eine native C#-IDE für macOS (Apple Silicon, macOS 26 oder neuer). Die Oberfläche ist in Swift geschrieben
+(SwiftUI und AppKit). Die C#-Analyse übernimmt Roslyn in einem unsichtbaren Hintergrundprozess. Lizenz: MIT.
 
-## Voraussetzungen
-
-- .NET SDK 10.0.400 oder neuer (`dotnet --list-sdks`). VsLike nutzt das installierte SDK für MSBuild, Build, Tests und Templates.
-
-## Installation (macOS)
+## Installation
 
 ```sh
 brew install --cask LaJuMiRa/tap/vslike
 ```
 
-VsLike ist nicht von Apple notarisiert. Beim ersten Start blockiert macOS (Gatekeeper) die App. Entweder unter
-*Systemeinstellungen › Datenschutz & Sicherheit › „Dennoch öffnen“* erlauben oder einmalig die Quarantäne entfernen:
+Nötig ist ein installiertes .NET SDK 10 oder neuer (`brew install --cask dotnet-sdk`). Der Startbildschirm zeigt an, ob
+ein passendes SDK gefunden wurde.
+
+VsLike ist ad-hoc signiert, aber nicht von Apple notarisiert. Deshalb blockiert macOS den ersten Start. Erlaube ihn
+einmal unter *Systemeinstellungen › Datenschutz & Sicherheit › „Dennoch öffnen“* oder entferne die Quarantäne:
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/VsLike.app
 ```
 
-Alternativ das `.zip` oder `.dmg` von der Release-Seite laden und `VsLike.app` nach `/Programme` ziehen. Der Debugger
-(netcoredbg, MIT) ist im App-Paket enthalten. Dateizuordnungen: `.sln`, `.slnx`, `.csproj`, `.cs`.
-
-## Installation (Linux)
-
-```sh
-brew install LaJuMiRa/tap/vslike
-```
-
-Oder das Tarball (`vslike-<version>-linux-x64.tar.gz` bzw. `-linux-arm64`) entpacken und `./vslike` starten. Nötig sind ein
-.NET SDK (10.0+) und ein X11-/XWayland-Desktop mit fontconfig. Tastenkürzel nutzen dort Ctrl statt ⌘, das Menü sitzt im
-Fenster.
-
 ## Funktionen
 
-Editor mit TextMate- und Roslyn-Highlighting, IntelliSense (Completion, Signaturhilfe, Hover, Code-Fixes, Refactorings,
-Rename, Go to Definition, Find References, Snippets), Solution Explorer, NuGet-Manager, Build/Run mit Startprofilen,
-Test-Explorer, StyleCop (pro Solution schaltbar), bidirektionaler Klassendiagramm-Editor und Debugger. Bedienung über die
-Befehlspalette (⇧⌘P).
+| Bereich | Was es gibt |
+|---|---|
+| Editor | Highlighting sofort beim Tippen, danach semantische Farben von Roslyn, Zeilennummern, Klammerpaare, automatische Einrückung, Snippets (`prop`, `ctor`, `for` … mit Tab), Kommentar umschalten (⌘/), Suchen und Ersetzen (⌘F) |
+| IntelliSense | Vervollständigung mit Dokumentation, Parameterhilfe, Hover-Infos, Fehler und Warnungen live beim Tippen, Gehe zu Definition (F12 oder ⌘-Klick), Verweise suchen (⇧F12), Umbenennen (F2), Formatieren (⌥⇧F) |
+| Quick-Actions (⇧⌘.) | Menü an der Schreibmarke mit Korrekturen (fehlende `using`-Direktive, Methode, Klasse oder Property erzeugen, StyleCop-Korrekturen), „Alle beheben“ im Dokument oder Projekt und Refactorings |
+| StyleCop | Pro Solution schaltbar (Knopf in der Toolbar, gespeichert in `.vslike/settings.json`), dazu ein globaler Standard. „Alle StyleCop-Meldungen der Datei beheben“ mit ⌥⇧⌘. |
+| Probleme | Tabelle mit Schweregrad, Code, Meldung, Datei und Projekt, Filter nach Fehlern, Warnungen oder StyleCop, Doppelklick springt zur Stelle |
+| Terminal | Eingebaute Terminals mit Login-Shell (⌃\`). „Ohne Debugger starten“ läuft ebenfalls im Terminal, deshalb kann das Programm Eingaben lesen |
+| Build und Tests | Bauen (⌘B), Neu bauen, Bereinigen, Startprojekt, Konfiguration und Startprofil in der Toolbar, Test-Explorer mit Baum, Ergebnissen und Sprung zur Fehlerstelle (⌘U) |
+| Debugger | netcoredbg (im App-Paket). Haltepunkte (Klick auf die Zeilennummer, Rechtsklick für eine Bedingung), Schritte (F10, F11, ⇧F11), Variablen, Überwachen, Aufrufliste, Threads, Debug-Konsole, Werte beim Hovern |
+| Klassendiagramm | Grafische Fläche (⇧⌘D) mit Zoom, Verschieben, Raster und automatischer Anordnung. Typen anlegen, Mitglieder hinzufügen und bearbeiten, Vererbung per Ziehen, Umbenennen und Löschen über Roslyn. Jede Änderung wird direkt in den Code geschrieben und lässt sich zusammen mit dem Layout widerrufen. Export als SVG und PNG |
+| Projekte | Neue Solution oder neues Projekt aus Vorlagen, NuGet-Pakete (Durchsuchen, Installiert, Updates), Projekteigenschaften und Projektverweise |
+| Navigation | Schnell öffnen (⌘P), Befehlspalette (⇧⌘P), Suche in allen Dateien (⇧⌘F) |
+
+Die Oberfläche gibt es auf Deutsch und Englisch; sie richtet sich nach der Systemsprache oder nach den Einstellungen.
 
 ## Aus dem Quellcode bauen
 
+Nötig sind Xcode 26 (oder die Command Line Tools mit Swift 6.2) und das .NET SDK 10.
+
 ```sh
-dotnet build VsLike.slnx
-dotnet test VsLike.slnx
-dotnet run --project src/VsLike.App
+./build.sh      # baut build/VsLike.app
+./release.sh    # testet alles, baut und packt dist/VsLike-<version>-arm64.zip
 ```
 
-App-Paket bauen (`.app`, `.zip`, `.dmg`): `packaging/macos/build-app.sh osx-arm64 0.1.0`. Releases entstehen per Tag `v*`
-(`.github/workflows/release.yml`), der Cask im Tap wird dabei per Pull Request aktualisiert.
+`release.sh` führt nacheinander aus:
 
-## Projektstruktur
+1. die Engine-Tests (`dotnet test`)
+2. die Swift-Tests (`swift test`), auch gegen echte Beispiel-Solutions, den Analyse-Prozess und den Debugger
+3. den App-Build
+4. einen Kurztest des fertigen App-Pakets
+5. das Packen des Zips samt SHA-256
+
+Ein Release entsteht über einen Tag `v<version>`; die Schritte stehen in `RELEASING.md`.
+
+## Aufbau
 
 | Ordner | Inhalt |
 |---|---|
-| `src/VsLike.App` | Avalonia-Host, Views, ViewModels, Shell |
-| `src/VsLike.Core` | Interfaces, Services, Settings (ohne Avalonia und Roslyn) |
-| `src/VsLike.Editor` | Editor-Integration (AvaloniaEdit, TextMate) |
-| `src/VsLike.Roslyn` | Workspace, IntelliSense, Diagnostics, Analyzer |
-| `src/VsLike.Projects` | Solution-/Projektmodell, Templates, NuGet, Build/Run |
-| `src/VsLike.Diagram` | Klassendiagramm-Modell, Canvas, Codegenerierung |
-| `src/VsLike.Debugging` | DAP-Client für netcoredbg |
+| `Sources/VsLike` | Die macOS-App: Fenster, Editor (AppKit), Seitenleiste, Panels, Terminal, Klassendiagramm, Dialoge |
+| `Sources/VsLikeKit` | Swift ohne AppKit: Client für den Analyse-Prozess, dotnet-CLI (Build, Tests, Vorlagen, NuGet), Solution- und Projektdateien, Debugger-Client, C#-Lexer, Diagramm-Layout und SVG-Export |
+| `engine/` | Der C#-Analyse-Prozess `VsLikeEngine`: Roslyn, StyleCop und der Klassendiagramm-Writer hinter JSON-RPC auf stdin/stdout |
+| `Tests/` | Swift-Tests (`swift test`) |
+| `packaging/` | `Info.plist` und Homebrew-Cask |
 
-Entscheidungen stehen in `docs/DECISIONS.md`, der Fortschritt in `docs/STATUS.md`.
+Entscheidungen stehen in `docs/DECISIONS.md`, der Stand in `docs/STATUS.md`.

@@ -1,17 +1,11 @@
-# Offene Fragen
+# Offene Punkte
 
-- **Repo liegt in iCloud Drive** (`~/Documents` wird synchronisiert). iCloud lagert Dateien aus („dataless“); am 2026-11-20 war dadurch die Git-Pack-Datei mit dem ersten Commit unlesbar („far too short to be a packfile“). Behoben durch Zurückladen (`brctl download .git`), aber das kann jederzeit wieder passieren, auch mit `obj/`/`bin/`. Empfehlung: Repo außerhalb von iCloud ablegen (z. B. `~/Developer/vslike`) oder für `Documents` „Mac-Speicher optimieren“ abschalten, und regelmäßig nach `origin` pushen.
-- StyleCop 1.3.180 meldet mehrzeilige Collection-Expressions (`[.. x
- .Where()]`) als SA1500; mehrzeilig daher `.ToList()` verwenden.
-- Gestartete Programme bekommen keine Standardeingabe (`Console.ReadLine` liefert sofort `null`). Ein Eingabefeld im Ausgabefenster wäre der nächste Schritt; der Debugger (Phase 9) bringt eine Debug-Konsole.
-- Test-Explorer unterstützt VSTest-basierte Projekte; reine Microsoft.Testing.Platform-Projekte (z. B. TUnit ohne VSTest-Brücke) werden erkannt, aber evtl. nicht gefunden.
-- Klassendiagramm: Typparameter und Constraints lassen sich beim Anlegen setzen, an bestehenden Typen aber nur im Code ändern. Beziehungen werden als gerade Linien gezeichnet (keine Kantenführung um Boxen herum).
-- PNG-Export ist nur in der echten App geprüft (Headless-Tests haben keinen Skia-Renderer).
-- netcoredbg 3.2 wertet Member-Ketten auf Property-Ergebnissen nicht aus (`Name.Length` → Fehler, `Name` geht). Betrifft Überwachen/Hover/Konsole; Variablenbaum zeigt die Werte trotzdem.
-- Debugger: die Debug-Konsole zeigt Programmausgabe, nimmt aber keine Standardeingabe entgegen. Haltepunkte werden nicht über Neustarts hinweg gespeichert.
-- Intel-Macs bekommen netcoredbg 3.1.3 (älter als 3.2.0); nicht auf echter x64-Hardware getestet.
-- Homebrew: `Casks/vslike.rb` liegt noch nicht im Tap. Er entsteht beim ersten Release-Tag per Pull Request (Secret `TAP_GITHUB_TOKEN` im vslike-Repo nötig). `brew install --cask LaJuMiRa/tap/vslike` ist deshalb noch nicht Ende-zu-Ende geprüft; lokal geprüft sind Bundle, Signatur und Start.
-- Das osx-x64-Bundle wird nur in CI (macos-15-intel) gebaut, nicht lokal getestet.
-- Notarisierung braucht eine Apple-Developer-ID (Secrets `MACOS_CERT_P12`, `MACOS_CERT_PASSWORD`, `MACOS_SIGN_IDENTITY`, `MACOS_NOTARY_*`); ohne sie bleibt der Gatekeeper-Hinweis nötig.
-- Linux: lokal nur das arm64-Tarball gebaut und geprüft (Struktur, Rechte); gestartet und getestet wird unter Linux nur in CI (ubuntu-24.04, Headless). Ein Start auf einem echten Linux-Desktop steht aus; `.deb`/AppImage sind nicht umgesetzt (optional laut Auftrag).
-
+- **Repo liegt in iCloud Drive.** iCloud lagert Dateien aus; am 2026-11-20 war dadurch schon einmal eine Git-Pack-Datei unlesbar. Build-Ausgaben liegen deshalb außerhalb (`$TMPDIR`, `artifacts.nosync`). Empfehlung: Repo nach `~/Developer/vslike` verschieben.
+- **Bedienung per Maus und Tastatur nicht automatisiert geprüft.** Ohne Bedienungshilfen-Rechte kann ich in der echten App nicht tippen oder klicken. Geprüft sind die Abläufe über Tests am App-Modell (`WorkspaceTests`) gegen den echten Analyse-Prozess und per Fenster-Screenshots (Editor mit Roslyn-Farben, Toolbar, Klassendiagramm).
+- Mehrfach-Cursor und Code-Faltung der Avalonia-Version sind im neuen Editor noch nicht umgesetzt.
+- Klassendiagramm: Kanten sind gerade Linien (keine Führung um Boxen); Typparameter bestehender Typen nur im Code änderbar.
+- netcoredbg 3.2 wertet Member-Ketten auf Property-Ergebnissen teils nicht aus (`Name.Length`); `car.Name` geht.
+- Test-Explorer nutzt VSTest; reine Microsoft.Testing.Platform-Projekte (TUnit ohne VSTest-Brücke) werden evtl. nicht gefunden.
+- Homebrew: `Casks/vslike.rb` entsteht beim ersten Release-Tag per Pull Request (Secret `TAP_GITHUB_TOKEN`). `brew install` ist erst danach Ende-zu-Ende prüfbar.
+- Keine Notarisierung (kein Apple-Developer-Konto); Gatekeeper-Hinweis im README und im Cask.
+- Der Release-Workflow (macos-26-Runner) ist noch nie gelaufen, weil nichts gepusht ist.

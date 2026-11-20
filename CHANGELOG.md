@@ -1,6 +1,21 @@
 # Changelog
 
-Format: je Phase ein Eintrag.
+## [0.2.0] - 2026-11-21
+
+Neubau als native macOS-App (nur macOS 26, Apple Silicon).
+
+- Oberfläche komplett in Swift (SwiftUI und AppKit): neues Fenster mit Seitenleiste (Solution, Dateien, Suche, Tests), schlanke Tabs mit Breadcrumb, Toolbar mit Starten/Stoppen/Bauen links, Zielprojekt, Konfiguration und Status-Kapsel in der Mitte, StyleCop, Klassendiagramm, Terminal, Panel und Inspektor rechts.
+- Code-Editor auf NSTextView-Basis: Lexer-Highlighting ohne Verzögerung plus semantische Farben von Roslyn, Zeilenleiste mit Haltepunkten und Fehlermarken, Markierungen in der Scrollleiste, Klammerpaare, automatische Einrückung und Klammern, Snippets, Kommentar umschalten.
+- IntelliSense-Popups nativ: Vervollständigung mit Symbolen und Dokumentation, Parameterhilfe, Hover-Karten mit Fehlern.
+- Quick-Actions auf ⇧⌘. (Menü an der Schreibmarke: Korrekturen, „Alle beheben“, Refactorings) und „Alle StyleCop-Meldungen der Datei beheben“ (⌥⇧⌘.).
+- Eingebautes Terminal (SwiftTerm); „Ohne Debugger starten“ läuft im Terminal, das Programm kann also Eingaben lesen.
+- Klassendiagramm als grafische Fläche mit Zoom, Verschieben, Raster, schwebender Werkzeugleiste, Inspektor zum Bearbeiten von Typen und Mitgliedern, Export als SVG/PNG. Öffnet direkt über die Toolbar (⇧⌘D) mit allen Typen der Solution.
+- Haltepunkte werden pro Solution gespeichert und wandern beim Bearbeiten mit.
+- C#-Analyse als Hintergrundprozess `VsLikeEngine` (Roslyn, StyleCop, Diagramm-Writer) hinter JSON-RPC; Build, Tests, NuGet, Vorlagen, Solution-Dateien und Debugger-Anbindung (netcoredbg) sind neu in Swift.
+- `build.sh` und `release.sh` wie im Projekt Seasons; `release.sh` führt alle Tests aus, baut und packt das Zip.
+- Entfernt: Avalonia-Oberfläche, Linux-Pakete und Intel-Build.
+
+## Avalonia-Version (Phasen 0–11, nicht veröffentlicht)
 
 ## Phase 0 – Gerüst (2026-11-20)
 - `VsLike.slnx` mit 7 Quell- und 7 Testprojekten, zentrale Paketversionen, `.editorconfig`, StyleCop 1.3.180 für eigenen Code, `global.json` (SDK 10.0.400+).
