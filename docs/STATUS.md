@@ -5,7 +5,7 @@
 - [x] Phase 2 Editor
 - [x] Phase 3 Roslyn-Workspace
 - [x] Phase 4 IntelliSense
-- [ ] Phase 5 Solution/Projekte/NuGet
+- [x] Phase 5 Solution/Projekte/NuGet
 - [ ] Phase 6 Build/Run/Test
 - [ ] Phase 7 StyleCop
 - [ ] Phase 8 Klassendiagramm
@@ -13,7 +13,7 @@
 - [ ] Phase 10 Packaging & Homebrew
 - [ ] Phase 11 Linux
 
-Nächster Schritt: Phase 5 (Solution/Projekte/NuGet).
+Nächster Schritt: Phase 6 (Build/Run/Test).
 
 ## Wiedereinstieg
 - Prüfen: `tools/check.sh` (Build + alle Tests, Exit-Code ≠ 0 bei Fehlern). Commit nur in einem separaten Schritt danach.

@@ -1,5 +1,4 @@
 using Avalonia.Headless.XUnit;
-using Avalonia.Threading;
 using VsLike.App.Services;
 using VsLike.Core.Documents;
 
@@ -114,7 +113,7 @@ public sealed class DocumentManagerTests : IDisposable
         window.Show();
 
         await workbench.Documents.OpenAsync(path, 3, 1);
-        Dispatcher.UIThread.RunJobs();
+        await UiWait.UntilAsync(() => workbench.Documents.Active?.Session is not null, TimeSpan.FromSeconds(5), "editor session");
 
         Assert.Equal((3, 1), workbench.Documents.Active?.Session?.Caret);
     }

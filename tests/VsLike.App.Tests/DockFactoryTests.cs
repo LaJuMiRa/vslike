@@ -48,7 +48,7 @@ public class DockFactoryTests
     public void Build_OmitsEmptyAreas()
     {
         var factory = CreateFactory();
-        var input = new LayoutState { Panels = [new PanelPlacement("explorer", "left", 0, false, false)] };
+        var input = new LayoutState { Panels = [new PanelPlacement("explorer", "left", 0, false, false), new PanelPlacement("solution", "left", 1, false, false)] };
 
         var root = factory.Build(input, [], null);
 

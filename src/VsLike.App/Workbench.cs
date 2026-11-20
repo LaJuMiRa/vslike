@@ -7,11 +7,15 @@ using VsLike.App.References;
 using VsLike.App.Search;
 using VsLike.App.Services;
 using VsLike.App.Shell;
+using VsLike.App.SolutionExplorer;
 using VsLike.Core.Build;
 using VsLike.Core.Code;
 using VsLike.Core.Documents;
+using VsLike.Core.Files;
 using VsLike.Core.Localization;
+using VsLike.Projects;
 using VsLike.Projects.Cli;
+using VsLike.Projects.NuGet;
 using VsLike.Roslyn;
 
 namespace VsLike.App;
@@ -30,9 +34,13 @@ public sealed class Workbench : IDisposable
         Problems = new ProblemsViewModel(Documents);
         References = new ReferencesViewModel(Documents);
         Cli = cli ?? new DotnetCli();
+        ProjectService = new ProjectService(Cli);
+        NuGet = new NuGetClient(new HttpClient { Timeout = TimeSpan.FromSeconds(30) });
+        SolutionExplorer = new SolutionExplorerViewModel(this);
         Shell = new ShellViewModel(
             services,
             [
+                (ShellPanels.Solution, SolutionExplorer),
                 (ShellPanels.Explorer, Explorer),
                 (ShellPanels.Problems, Problems),
                 (ShellPanels.Output, new EmptyPanelViewModel()),
@@ -55,7 +63,9 @@ public sealed class Workbench : IDisposable
                 TrackActiveDocument();
             }
         };
+        Explorer.FilesChanged += (_, _) => SolutionExplorer.Refresh();
         WorkbenchCommands.Register(this);
+        SolutionCommands.Register(this);
         LanguageCommands.Register(this);
     }
 
@@ -81,14 +91,27 @@ public sealed class Workbench : IDisposable
 
     public IDotnetCli Cli { get; }
 
+    public ProjectService ProjectService { get; }
+
+    public NuGetClient NuGet { get; }
+
+    public SolutionExplorerViewModel SolutionExplorer { get; }
+
     public CodeIntelligence Intelligence { get; }
 
     /// <summary>Opens a .sln/.slnx/.csproj: shows its folder in the explorer and loads it into the workspace.</summary>
     public async Task<bool> OpenSolutionAsync(string path)
     {
-        Explorer.OpenFolder(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        Services.UpdateSettings(s => s.WithRecentSolution(Path.GetFullPath(path)));
-        return await Intelligence.OpenSolutionAsync(path).ConfigureAwait(true);
+        var fullPath = RealPath.Resolve(path);
+        Explorer.OpenFolder(Path.GetDirectoryName(fullPath)!);
+        Services.UpdateSettings(s => s.WithRecentSolution(fullPath));
+        if (!fullPath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
+        {
+            SolutionExplorer.Load(fullPath);
+            Shell.ShowPanel(ShellPanels.Solution.Id);
+        }
+
+        return await Intelligence.OpenSolutionAsync(fullPath).ConfigureAwait(true);
     }
 
     public void Dispose()

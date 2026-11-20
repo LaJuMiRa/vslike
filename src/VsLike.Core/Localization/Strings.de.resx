@@ -126,4 +126,63 @@
   <data name="Status.NoDefinition" xml:space="preserve"><value>Keine Definition im Quellcode gefunden</value></data>
   <data name="Status.NoCodeActions" xml:space="preserve"><value>Hier gibt es keine Schnellkorrekturen oder Refactorings</value></data>
   <data name="Status.Formatted" xml:space="preserve"><value>„{0}“ formatiert</value></data>
+  <data name="Panel.Solution" xml:space="preserve"><value>Solution</value></data>
+  <data name="Solution.None" xml:space="preserve"><value>Keine Solution geöffnet. Nutze „Solution öffnen…“ oder „Neue Solution…“.</value></data>
+  <data name="Solution.Dependencies" xml:space="preserve"><value>Abhängigkeiten</value></data>
+  <data name="Solution.Projects" xml:space="preserve"><value>Projekte</value></data>
+  <data name="Solution.Packages" xml:space="preserve"><value>Pakete</value></data>
+  <data name="Command.File.NewSolution" xml:space="preserve"><value>Neue Solution…</value></data>
+  <data name="Command.Solution.AddNewProject" xml:space="preserve"><value>Neues Projekt hinzufügen…</value></data>
+  <data name="Command.Solution.AddExistingProject" xml:space="preserve"><value>Vorhandenes Projekt hinzufügen…</value></data>
+  <data name="Command.Solution.RemoveProject" xml:space="preserve"><value>Aus Solution entfernen</value></data>
+  <data name="Command.Solution.AddClass" xml:space="preserve"><value>Klasse hinzufügen…</value></data>
+  <data name="Command.Solution.AddFolder" xml:space="preserve"><value>Ordner hinzufügen…</value></data>
+  <data name="Command.Solution.AddReference" xml:space="preserve"><value>Projektverweis hinzufügen…</value></data>
+  <data name="Command.Solution.RemoveReference" xml:space="preserve"><value>Verweis entfernen</value></data>
+  <data name="Command.Solution.ManagePackages" xml:space="preserve"><value>NuGet-Pakete verwalten…</value></data>
+  <data name="Command.Solution.RemovePackage" xml:space="preserve"><value>Paket entfernen</value></data>
+  <data name="Command.Solution.Properties" xml:space="preserve"><value>Eigenschaften</value></data>
+  <data name="Command.Solution.Rename" xml:space="preserve"><value>Umbenennen…</value></data>
+  <data name="Command.Solution.Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Command.Solution.Open" xml:space="preserve"><value>Öffnen</value></data>
+  <data name="Command.Solution.Reload" xml:space="preserve"><value>Solution neu laden</value></data>
+  <data name="NewProject.TitleSolution" xml:space="preserve"><value>Neue Solution</value></data>
+  <data name="NewProject.TitleProject" xml:space="preserve"><value>Neues Projekt hinzufügen</value></data>
+  <data name="NewProject.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="NewProject.SolutionName" xml:space="preserve"><value>Name der Solution</value></data>
+  <data name="NewProject.Location" xml:space="preserve"><value>Speicherort</value></data>
+  <data name="NewProject.Browse" xml:space="preserve"><value>Durchsuchen…</value></data>
+  <data name="NewProject.Template" xml:space="preserve"><value>Vorlage</value></data>
+  <data name="NewProject.Framework" xml:space="preserve"><value>Framework</value></data>
+  <data name="NewProject.Format" xml:space="preserve"><value>Solution-Format</value></data>
+  <data name="NewProject.Folder" xml:space="preserve"><value>Solution-Ordner (optional)</value></data>
+  <data name="NewProject.Create" xml:space="preserve"><value>Erstellen</value></data>
+  <data name="NewProject.Creating" xml:space="preserve"><value>Wird erstellt…</value></data>
+  <data name="NewProject.InvalidName" xml:space="preserve"><value>Nur Buchstaben, Ziffern, „.“ und „_“ verwenden.</value></data>
+  <data name="NewProject.Exists" xml:space="preserve"><value>„{0}“ existiert bereits.</value></data>
+  <data name="Reference.Title" xml:space="preserve"><value>Projektverweise von {0}</value></data>
+  <data name="Reference.Apply" xml:space="preserve"><value>Übernehmen</value></data>
+  <data name="Prompt.ClassName" xml:space="preserve"><value>Klassenname</value></data>
+  <data name="Prompt.FolderName" xml:space="preserve"><value>Ordnername</value></data>
+  <data name="Prompt.NewName" xml:space="preserve"><value>Neuer Name</value></data>
+  <data name="Confirm.Delete.Title" xml:space="preserve"><value>„{0}“ löschen?</value></data>
+  <data name="Confirm.Delete.Body" xml:space="preserve"><value>Die Datei bzw. der Ordner wird von der Festplatte gelöscht.</value></data>
+  <data name="Confirm.RemoveProject" xml:space="preserve"><value>„{0}“ aus der Solution entfernen? Die Projektdateien bleiben erhalten.</value></data>
+  <data name="Properties.Title" xml:space="preserve"><value>{0} – Eigenschaften</value></data>
+  <data name="Properties.Save" xml:space="preserve"><value>Speichern</value></data>
+  <data name="Properties.Saved" xml:space="preserve"><value>Projekteigenschaften von {0} gespeichert</value></data>
+  <data name="NuGet.Title" xml:space="preserve"><value>NuGet – {0}</value></data>
+  <data name="NuGet.Browse" xml:space="preserve"><value>Durchsuchen</value></data>
+  <data name="NuGet.Installed" xml:space="preserve"><value>Installiert</value></data>
+  <data name="NuGet.Search" xml:space="preserve"><value>Pakete suchen</value></data>
+  <data name="NuGet.Prerelease" xml:space="preserve"><value>Vorabversionen einbeziehen</value></data>
+  <data name="NuGet.Install" xml:space="preserve"><value>Installieren</value></data>
+  <data name="NuGet.Update" xml:space="preserve"><value>Aktualisieren</value></data>
+  <data name="NuGet.Uninstall" xml:space="preserve"><value>Deinstallieren</value></data>
+  <data name="NuGet.Version" xml:space="preserve"><value>Version</value></data>
+  <data name="NuGet.Downloads" xml:space="preserve"><value>{0:N0} Downloads</value></data>
+  <data name="NuGet.Working" xml:space="preserve"><value>dotnet läuft…</value></data>
+  <data name="NuGet.Done" xml:space="preserve"><value>{0} {1}: fertig</value></data>
+  <data name="NuGet.Error" xml:space="preserve"><value>NuGet-Fehler: {0}</value></data>
+  <data name="Operation.Failed" xml:space="preserve"><value>{0} fehlgeschlagen</value></data>
 </root>

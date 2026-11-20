@@ -36,3 +36,14 @@ Format: je Phase ein Eintrag.
 - SDK-Prüfung beim Start (`dotnet --list-sdks`, mindestens 10.0) mit Installationshinweis; `dotnet`-Aufrufe ohne geerbte MSBuild-Umgebungsvariablen.
 - Messungen: Test-Solution mit 3 Projekten lädt in 1,0–1,4 s; Fehler erscheint 654 ms nach der Eingabe in der Fehlerliste (App-Test) bzw. < 1 s im Workspace-Test.
 - Behoben: Tabs zeigten nach dem ersten Rendern den Inhalt des vorherigen Tabs (eigener `ViewLocator`); Absturz beim Neuaufbau des nativen macOS-Menüs; Fluent-Akzentfarbe.
+
+## Phase 5 – Solution/Projekte/NuGet (2026-11-20)
+- Solution Explorer: Solution → Solution-Ordner → Projekte → Abhängigkeiten (Projekte, Pakete) → Ordner/Dateien; Aufklappzustand bleibt bei Aktualisierung erhalten, bin/obj ausgeblendet.
+- Kontextmenü: Neue Klasse (file-scoped Namespace aus RootNamespace + Ordner), Neuer Ordner, Umbenennen, Löschen mit Rückfrage, Verschieben per Ziehen; Workspace und offene Tabs ziehen mit.
+- „Neue Solution“ und „Neues Projekt“ mit Vorlagenauswahl aus `dotnet new list` (Konsole, Klassenbibliothek, xUnit, Web …), Ziel-Framework, `.slnx` oder `.sln`; „Vorhandenes Projekt hinzufügen“, „Projekt entfernen“, „Solution neu laden“.
+- Projektverweise per Dialog (mehrere auf einmal), Projekteigenschaften als Formular (OutputType, TargetFramework, Nullable, ImplicitUsings, LangVersion, TreatWarningsAsErrors, GenerateDocumentationFile, InvariantGlobalization), XML-Formatierung der csproj bleibt erhalten.
+- NuGet-Manager: Suche über die NuGet-v3-API, Versionsauswahl, installierte und aktualisierbare Pakete (`dotnet list package --format json`), Installieren/Entfernen/Aktualisieren über `dotnet add/remove package`.
+- Lesen von `.slnx` und `.sln` (inkl. Solution-Ordner) in `SolutionReader`.
+- Abnahme (Integrationstest): neue Solution mit 2 Projekten + Projektverweis baut und läuft mit `dotnet run`.
+- Behoben: FileSystemWatcher-Ereignisse eines bereits geschlossenen Ordners liefen noch auf dem UI-Thread und brachen ab, wenn die Solution-Datei gelöscht war.
+

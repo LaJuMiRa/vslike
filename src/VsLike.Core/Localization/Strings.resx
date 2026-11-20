@@ -126,4 +126,63 @@
   <data name="Status.NoDefinition" xml:space="preserve"><value>No definition in source code found</value></data>
   <data name="Status.NoCodeActions" xml:space="preserve"><value>No quick fixes or refactorings here</value></data>
   <data name="Status.Formatted" xml:space="preserve"><value>Formatted &quot;{0}&quot;</value></data>
+  <data name="Panel.Solution" xml:space="preserve"><value>Solution</value></data>
+  <data name="Solution.None" xml:space="preserve"><value>No solution open. Use &quot;Open Solution…&quot; or &quot;New Solution…&quot;.</value></data>
+  <data name="Solution.Dependencies" xml:space="preserve"><value>Dependencies</value></data>
+  <data name="Solution.Projects" xml:space="preserve"><value>Projects</value></data>
+  <data name="Solution.Packages" xml:space="preserve"><value>Packages</value></data>
+  <data name="Command.File.NewSolution" xml:space="preserve"><value>New Solution…</value></data>
+  <data name="Command.Solution.AddNewProject" xml:space="preserve"><value>Add New Project…</value></data>
+  <data name="Command.Solution.AddExistingProject" xml:space="preserve"><value>Add Existing Project…</value></data>
+  <data name="Command.Solution.RemoveProject" xml:space="preserve"><value>Remove from Solution</value></data>
+  <data name="Command.Solution.AddClass" xml:space="preserve"><value>Add Class…</value></data>
+  <data name="Command.Solution.AddFolder" xml:space="preserve"><value>Add Folder…</value></data>
+  <data name="Command.Solution.AddReference" xml:space="preserve"><value>Add Project Reference…</value></data>
+  <data name="Command.Solution.RemoveReference" xml:space="preserve"><value>Remove Reference</value></data>
+  <data name="Command.Solution.ManagePackages" xml:space="preserve"><value>Manage NuGet Packages…</value></data>
+  <data name="Command.Solution.RemovePackage" xml:space="preserve"><value>Remove Package</value></data>
+  <data name="Command.Solution.Properties" xml:space="preserve"><value>Properties</value></data>
+  <data name="Command.Solution.Rename" xml:space="preserve"><value>Rename…</value></data>
+  <data name="Command.Solution.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Command.Solution.Open" xml:space="preserve"><value>Open</value></data>
+  <data name="Command.Solution.Reload" xml:space="preserve"><value>Reload Solution</value></data>
+  <data name="NewProject.TitleSolution" xml:space="preserve"><value>New Solution</value></data>
+  <data name="NewProject.TitleProject" xml:space="preserve"><value>Add New Project</value></data>
+  <data name="NewProject.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="NewProject.SolutionName" xml:space="preserve"><value>Solution name</value></data>
+  <data name="NewProject.Location" xml:space="preserve"><value>Location</value></data>
+  <data name="NewProject.Browse" xml:space="preserve"><value>Browse…</value></data>
+  <data name="NewProject.Template" xml:space="preserve"><value>Template</value></data>
+  <data name="NewProject.Framework" xml:space="preserve"><value>Framework</value></data>
+  <data name="NewProject.Format" xml:space="preserve"><value>Solution format</value></data>
+  <data name="NewProject.Folder" xml:space="preserve"><value>Solution folder (optional)</value></data>
+  <data name="NewProject.Create" xml:space="preserve"><value>Create</value></data>
+  <data name="NewProject.Creating" xml:space="preserve"><value>Creating…</value></data>
+  <data name="NewProject.InvalidName" xml:space="preserve"><value>Use letters, digits, &quot;.&quot; and &quot;_&quot; only.</value></data>
+  <data name="NewProject.Exists" xml:space="preserve"><value>&quot;{0}&quot; already exists.</value></data>
+  <data name="Reference.Title" xml:space="preserve"><value>Project References of {0}</value></data>
+  <data name="Reference.Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="Prompt.ClassName" xml:space="preserve"><value>Class name</value></data>
+  <data name="Prompt.FolderName" xml:space="preserve"><value>Folder name</value></data>
+  <data name="Prompt.NewName" xml:space="preserve"><value>New name</value></data>
+  <data name="Confirm.Delete.Title" xml:space="preserve"><value>Delete &quot;{0}&quot;?</value></data>
+  <data name="Confirm.Delete.Body" xml:space="preserve"><value>This deletes the file or folder from disk.</value></data>
+  <data name="Confirm.RemoveProject" xml:space="preserve"><value>Remove &quot;{0}&quot; from the solution? The project files stay on disk.</value></data>
+  <data name="Properties.Title" xml:space="preserve"><value>{0} – Properties</value></data>
+  <data name="Properties.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Properties.Saved" xml:space="preserve"><value>Saved project properties of {0}</value></data>
+  <data name="NuGet.Title" xml:space="preserve"><value>NuGet – {0}</value></data>
+  <data name="NuGet.Browse" xml:space="preserve"><value>Browse</value></data>
+  <data name="NuGet.Installed" xml:space="preserve"><value>Installed</value></data>
+  <data name="NuGet.Search" xml:space="preserve"><value>Search packages</value></data>
+  <data name="NuGet.Prerelease" xml:space="preserve"><value>Include prerelease</value></data>
+  <data name="NuGet.Install" xml:space="preserve"><value>Install</value></data>
+  <data name="NuGet.Update" xml:space="preserve"><value>Update</value></data>
+  <data name="NuGet.Uninstall" xml:space="preserve"><value>Uninstall</value></data>
+  <data name="NuGet.Version" xml:space="preserve"><value>Version</value></data>
+  <data name="NuGet.Downloads" xml:space="preserve"><value>{0:N0} downloads</value></data>
+  <data name="NuGet.Working" xml:space="preserve"><value>Running dotnet…</value></data>
+  <data name="NuGet.Done" xml:space="preserve"><value>{0} {1}: done</value></data>
+  <data name="NuGet.Error" xml:space="preserve"><value>NuGet error: {0}</value></data>
+  <data name="Operation.Failed" xml:space="preserve"><value>{0} failed</value></data>
 </root>

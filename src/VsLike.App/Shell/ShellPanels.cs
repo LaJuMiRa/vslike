@@ -3,6 +3,7 @@ namespace VsLike.App.Shell;
 /// <summary>Die Panel-Definitionen der Shell.</summary>
 public static class ShellPanels
 {
+    public static readonly PanelDescriptor Solution = new("solution", "Panel.Solution", LayoutAreas.Left, "Cmd+Alt+L");
     public static readonly PanelDescriptor Explorer = new("explorer", "Panel.Explorer", LayoutAreas.Left, "Cmd+Shift+E");
     public static readonly PanelDescriptor Problems = new("problems", "Panel.Errors", LayoutAreas.Bottom, "Cmd+Shift+M");
     public static readonly PanelDescriptor Output = new("output", "Panel.Output", LayoutAreas.Bottom, "Cmd+Shift+U");
@@ -13,6 +14,7 @@ public static class ShellPanels
     /// <summary>Panels with placeholder content (used by layout tests).</summary>
     public static IReadOnlyList<(PanelDescriptor Descriptor, object Content)> CreateDefault() =>
     [
+        (Solution, new EmptyPanelViewModel()),
         (Explorer, new EmptyPanelViewModel()),
         (Problems, new EmptyPanelViewModel()),
         (Output, new EmptyPanelViewModel()),

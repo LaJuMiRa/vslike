@@ -32,9 +32,15 @@ public sealed partial class ExplorerViewModel : ObservableObject, IDisposable
         _watcher?.Dispose();
         RootPath = Path.GetFullPath(path);
         Refresh();
-        _watcher = new FolderWatcher(RootPath);
-        _watcher.Changed += (_, paths) => Dispatcher.UIThread.Post(() =>
+        var watcher = _watcher = new FolderWatcher(RootPath);
+        watcher.Changed += (_, paths) => Dispatcher.UIThread.Post(() =>
         {
+            // Events queued before the folder was switched or the explorer disposed are stale.
+            if (!ReferenceEquals(_watcher, watcher) || !Directory.Exists(RootPath))
+            {
+                return;
+            }
+
             Refresh();
             FilesChanged?.Invoke(this, paths);
         });
@@ -70,7 +76,11 @@ public sealed partial class ExplorerViewModel : ObservableObject, IDisposable
         return _navigator.OpenAsync(node.FullPath);
     }
 
-    public void Dispose() => _watcher?.Dispose();
+    public void Dispose()
+    {
+        _watcher?.Dispose();
+        _watcher = null;
+    }
 
     partial void OnRootPathChanged(string? value) => OnPropertyChanged(nameof(HasFolder));
 }

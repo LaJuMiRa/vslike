@@ -120,3 +120,62 @@ Rename.NotPossible	Cannot rename: {0}	Umbenennen nicht möglich: {0}
 Status.NoDefinition	No definition in source code found	Keine Definition im Quellcode gefunden
 Status.NoCodeActions	No quick fixes or refactorings here	Hier gibt es keine Schnellkorrekturen oder Refactorings
 Status.Formatted	Formatted "{0}"	„{0}“ formatiert
+Panel.Solution	Solution	Solution
+Solution.None	No solution open. Use "Open Solution…" or "New Solution…".	Keine Solution geöffnet. Nutze „Solution öffnen…“ oder „Neue Solution…“.
+Solution.Dependencies	Dependencies	Abhängigkeiten
+Solution.Projects	Projects	Projekte
+Solution.Packages	Packages	Pakete
+Command.File.NewSolution	New Solution…	Neue Solution…
+Command.Solution.AddNewProject	Add New Project…	Neues Projekt hinzufügen…
+Command.Solution.AddExistingProject	Add Existing Project…	Vorhandenes Projekt hinzufügen…
+Command.Solution.RemoveProject	Remove from Solution	Aus Solution entfernen
+Command.Solution.AddClass	Add Class…	Klasse hinzufügen…
+Command.Solution.AddFolder	Add Folder…	Ordner hinzufügen…
+Command.Solution.AddReference	Add Project Reference…	Projektverweis hinzufügen…
+Command.Solution.RemoveReference	Remove Reference	Verweis entfernen
+Command.Solution.ManagePackages	Manage NuGet Packages…	NuGet-Pakete verwalten…
+Command.Solution.RemovePackage	Remove Package	Paket entfernen
+Command.Solution.Properties	Properties	Eigenschaften
+Command.Solution.Rename	Rename…	Umbenennen…
+Command.Solution.Delete	Delete	Löschen
+Command.Solution.Open	Open	Öffnen
+Command.Solution.Reload	Reload Solution	Solution neu laden
+NewProject.TitleSolution	New Solution	Neue Solution
+NewProject.TitleProject	Add New Project	Neues Projekt hinzufügen
+NewProject.Name	Name	Name
+NewProject.SolutionName	Solution name	Name der Solution
+NewProject.Location	Location	Speicherort
+NewProject.Browse	Browse…	Durchsuchen…
+NewProject.Template	Template	Vorlage
+NewProject.Framework	Framework	Framework
+NewProject.Format	Solution format	Solution-Format
+NewProject.Folder	Solution folder (optional)	Solution-Ordner (optional)
+NewProject.Create	Create	Erstellen
+NewProject.Creating	Creating…	Wird erstellt…
+NewProject.InvalidName	Use letters, digits, "." and "_" only.	Nur Buchstaben, Ziffern, „.“ und „_“ verwenden.
+NewProject.Exists	"{0}" already exists.	„{0}“ existiert bereits.
+Reference.Title	Project References of {0}	Projektverweise von {0}
+Reference.Apply	Apply	Übernehmen
+Prompt.ClassName	Class name	Klassenname
+Prompt.FolderName	Folder name	Ordnername
+Prompt.NewName	New name	Neuer Name
+Confirm.Delete.Title	Delete "{0}"?	„{0}“ löschen?
+Confirm.Delete.Body	This deletes the file or folder from disk.	Die Datei bzw. der Ordner wird von der Festplatte gelöscht.
+Confirm.RemoveProject	Remove "{0}" from the solution? The project files stay on disk.	„{0}“ aus der Solution entfernen? Die Projektdateien bleiben erhalten.
+Properties.Title	{0} – Properties	{0} – Eigenschaften
+Properties.Save	Save	Speichern
+Properties.Saved	Saved project properties of {0}	Projekteigenschaften von {0} gespeichert
+NuGet.Title	NuGet – {0}	NuGet – {0}
+NuGet.Browse	Browse	Durchsuchen
+NuGet.Installed	Installed	Installiert
+NuGet.Search	Search packages	Pakete suchen
+NuGet.Prerelease	Include prerelease	Vorabversionen einbeziehen
+NuGet.Install	Install	Installieren
+NuGet.Update	Update	Aktualisieren
+NuGet.Uninstall	Uninstall	Deinstallieren
+NuGet.Version	Version	Version
+NuGet.Downloads	{0:N0} downloads	{0:N0} Downloads
+NuGet.Working	Running dotnet…	dotnet läuft…
+NuGet.Done	{0} {1}: done	{0} {1}: fertig
+NuGet.Error	NuGet error: {0}	NuGet-Fehler: {0}
+Operation.Failed	{0} failed	{0} fehlgeschlagen

@@ -99,6 +99,21 @@ public sealed partial class DocumentManager : ObservableObject, IDocumentNavigat
         }
     }
 
+    /// <summary>Shows a non-editor document (properties, NuGet …); an open tab with the same id is reused.</summary>
+    public void ShowDocument(Dock.Model.Core.IDockable document)
+    {
+        var dock = Shell.Factory.DocumentDock ?? throw new InvalidOperationException("No document dock.");
+        var existing = dock.VisibleDockables?.FirstOrDefault(d => d.Id == document.Id);
+        if (existing is null)
+        {
+            Shell.Factory.AddDockable(dock, document);
+            existing = document;
+        }
+
+        Shell.Factory.SetActiveDockable(existing);
+        Shell.Factory.SetFocusedDockable(dock, existing);
+    }
+
     public EditorDocumentViewModel New()
     {
         var document = new EditorDocumentViewModel(null, string.Empty, new UTF8Encoding(false), ++_untitledCounter);
@@ -168,6 +183,20 @@ public sealed partial class DocumentManager : ObservableObject, IDocumentNavigat
         }
 
         return true;
+    }
+
+    /// <summary>Updates an open tab after its file was moved or renamed on disk.</summary>
+    public void OnFileMoved(string oldPath, string newPath)
+    {
+        foreach (var document in OpenDocuments.Where(d => d.FilePath == oldPath).ToList())
+        {
+            var dirty = document.IsDirty;
+            document.MarkSaved(newPath);
+            if (dirty)
+            {
+                document.TextDocument.UndoStack.DiscardOriginalFileMarker();
+            }
+        }
     }
 
     /// <summary>Reloads unmodified open documents whose file changed on disk.</summary>
