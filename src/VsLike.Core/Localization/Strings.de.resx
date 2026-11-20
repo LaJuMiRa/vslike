@@ -185,4 +185,45 @@
   <data name="NuGet.Done" xml:space="preserve"><value>{0} {1}: fertig</value></data>
   <data name="NuGet.Error" xml:space="preserve"><value>NuGet-Fehler: {0}</value></data>
   <data name="Operation.Failed" xml:space="preserve"><value>{0} fehlgeschlagen</value></data>
+  <data name="Panel.Tests" xml:space="preserve"><value>Tests</value></data>
+  <data name="Output.Clear" xml:space="preserve"><value>Leeren</value></data>
+  <data name="Command.Build.Solution" xml:space="preserve"><value>Solution erstellen</value></data>
+  <data name="Command.Build.Rebuild" xml:space="preserve"><value>Solution neu erstellen</value></data>
+  <data name="Command.Build.Clean" xml:space="preserve"><value>Solution bereinigen</value></data>
+  <data name="Command.Build.Project" xml:space="preserve"><value>Projekt erstellen</value></data>
+  <data name="Command.Build.ToggleConfiguration" xml:space="preserve"><value>Debug/Release umschalten</value></data>
+  <data name="Command.Run.Start" xml:space="preserve"><value>Ohne Debugger starten</value></data>
+  <data name="Command.Run.Stop" xml:space="preserve"><value>Beenden</value></data>
+  <data name="Command.Run.SetStartup" xml:space="preserve"><value>Als Startprojekt festlegen</value></data>
+  <data name="Command.Tests.Discover" xml:space="preserve"><value>Tests suchen</value></data>
+  <data name="Command.Tests.RunAll" xml:space="preserve"><value>Alle Tests ausführen</value></data>
+  <data name="Command.Tests.RunFailed" xml:space="preserve"><value>Fehlgeschlagene Tests ausführen</value></data>
+  <data name="Command.Tests.RunProject" xml:space="preserve"><value>Tests ausführen</value></data>
+  <data name="Build.Started" xml:space="preserve"><value>Erstellen: {0} ({1})</value></data>
+  <data name="Build.RebuildStarted" xml:space="preserve"><value>Neu erstellen: {0} ({1})</value></data>
+  <data name="Build.CleanStarted" xml:space="preserve"><value>Bereinigen: {0} ({1})</value></data>
+  <data name="Build.Running" xml:space="preserve"><value>{0} wird erstellt …</value></data>
+  <data name="Build.Succeeded" xml:space="preserve"><value>Build erfolgreich – {0} Fehler, {1} Warnungen ({2:0.0} s)</value></data>
+  <data name="Build.Failed" xml:space="preserve"><value>Build fehlgeschlagen – {0} Fehler, {1} Warnungen ({2:0.0} s)</value></data>
+  <data name="Build.Cancelled" xml:space="preserve"><value>Build abgebrochen</value></data>
+  <data name="Build.Configuration" xml:space="preserve"><value>Konfiguration</value></data>
+  <data name="Run.Starting" xml:space="preserve"><value>{0} wird gestartet (Profil: {1}) …</value></data>
+  <data name="Run.Running" xml:space="preserve"><value>{0} läuft</value></data>
+  <data name="Run.Exited" xml:space="preserve"><value>{0} beendet mit Code {1}</value></data>
+  <data name="Run.Stopped" xml:space="preserve"><value>{0} wurde beendet</value></data>
+  <data name="Run.NoProfile" xml:space="preserve"><value>(ohne Startprofil)</value></data>
+  <data name="Run.NoStartupProject" xml:space="preserve"><value>Kein Startprojekt – Solution mit Konsolen- oder Webprojekt öffnen</value></data>
+  <data name="Run.NotRunnable" xml:space="preserve"><value>Dieses Projekt kann nicht gestartet werden (kein Exe-/Webprojekt)</value></data>
+  <data name="Run.StartupProject" xml:space="preserve"><value>Startprojekt</value></data>
+  <data name="Run.Profile" xml:space="preserve"><value>Startprofil</value></data>
+  <data name="Tests.Discover" xml:space="preserve"><value>Suchen</value></data>
+  <data name="Tests.RunAll" xml:space="preserve"><value>Alle</value></data>
+  <data name="Tests.RunSelected" xml:space="preserve"><value>Auswahl</value></data>
+  <data name="Tests.RunFailed" xml:space="preserve"><value>Fehlgeschlagene</value></data>
+  <data name="Tests.Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Tests.Discovering" xml:space="preserve"><value>Tests werden gesucht …</value></data>
+  <data name="Tests.Running" xml:space="preserve"><value>Tests laufen …</value></data>
+  <data name="Tests.Summary" xml:space="preserve"><value>{0} bestanden, {1} fehlgeschlagen, {2} übersprungen von {3}</value></data>
+  <data name="Tests.None" xml:space="preserve"><value>Keine Testprojekte in dieser Solution.</value></data>
+  <data name="Tests.NotTestProject" xml:space="preserve"><value>Das ist kein Testprojekt</value></data>
 </root>

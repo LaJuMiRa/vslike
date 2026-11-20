@@ -14,6 +14,7 @@
       <Color x:Key="VsErrorColor">#F07167</Color>
       <Color x:Key="VsWarningColor">#E9C46A</Color>
       <Color x:Key="VsInfoColor">#6CA6F0</Color>
+      <Color x:Key="VsSuccessColor">#6FC28B</Color>
       <Color x:Key="VsSelectionColor">#33E2A63B</Color>
     </ResourceDictionary>
     <ResourceDictionary x:Key="Light">
@@ -28,6 +29,7 @@
       <Color x:Key="VsErrorColor">#C4362B</Color>
       <Color x:Key="VsWarningColor">#A67A00</Color>
       <Color x:Key="VsInfoColor">#2F6FC4</Color>
+      <Color x:Key="VsSuccessColor">#2E8A4F</Color>
       <Color x:Key="VsSelectionColor">#33B4741A</Color>
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
@@ -42,6 +44,7 @@
   <SolidColorBrush x:Key="VsError" Color="{DynamicResource VsErrorColor}" />
   <SolidColorBrush x:Key="VsWarning" Color="{DynamicResource VsWarningColor}" />
   <SolidColorBrush x:Key="VsInfo" Color="{DynamicResource VsInfoColor}" />
+  <SolidColorBrush x:Key="VsSuccess" Color="{DynamicResource VsSuccessColor}" />
   <SolidColorBrush x:Key="VsSelection" Color="{DynamicResource VsSelectionColor}" />
   <!-- Dock-Theme auf die VsLike-Tokens umlenken -->
   <SolidColorBrush x:Key="DockThemeAccentBrush" Color="{DynamicResource VsAccentColor}" />

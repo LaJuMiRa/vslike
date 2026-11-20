@@ -73,6 +73,9 @@ public sealed class RoslynLanguageFeatures : ILanguageFeatures
     public Task<WorkspaceEdit> RenameAsync(string filePath, int offset, string newName, CancellationToken cancellationToken)
         => _workspace.GetDocument(filePath) is { } document ? NavigationFeature.RenameAsync(document, offset, newName, cancellationToken) : Task.FromResult(WorkspaceEdit.Empty);
 
+    public Task<SourceLocation?> FindDeclarationAsync(string typeName, string? memberName, CancellationToken cancellationToken)
+        => _workspace.CurrentSolution is { } solution ? NavigationFeature.FindDeclarationAsync(solution, typeName, memberName, cancellationToken) : Task.FromResult<SourceLocation?>(null);
+
     public Task<string?> GetEnclosingTypeNameAsync(string filePath, int offset, CancellationToken cancellationToken)
         => _workspace.GetDocument(filePath) is { } document ? NavigationFeature.EnclosingTypeNameAsync(document, offset, cancellationToken) : Task.FromResult<string?>(null);
 }

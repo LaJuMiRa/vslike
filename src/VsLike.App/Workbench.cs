@@ -1,21 +1,26 @@
 using Avalonia.Controls;
+using VsLike.App.Build;
 using VsLike.App.Editor;
 using VsLike.App.Explorer;
 using VsLike.App.Intelligence;
+using VsLike.App.Output;
 using VsLike.App.Problems;
 using VsLike.App.References;
 using VsLike.App.Search;
 using VsLike.App.Services;
 using VsLike.App.Shell;
 using VsLike.App.SolutionExplorer;
+using VsLike.App.Testing;
 using VsLike.Core.Build;
 using VsLike.Core.Code;
 using VsLike.Core.Documents;
 using VsLike.Core.Files;
 using VsLike.Core.Localization;
 using VsLike.Projects;
+using VsLike.Projects.Build;
 using VsLike.Projects.Cli;
 using VsLike.Projects.NuGet;
+using VsLike.Projects.Testing;
 using VsLike.Roslyn;
 
 namespace VsLike.App;
@@ -33,6 +38,7 @@ public sealed class Workbench : IDisposable
         Search = new FindInFilesViewModel(Explorer.AllFiles, () => Explorer.RootPath, Documents, Documents);
         Problems = new ProblemsViewModel(Documents);
         References = new ReferencesViewModel(Documents);
+        Output = new OutputViewModel(Documents);
         Cli = cli ?? new DotnetCli();
         ProjectService = new ProjectService(Cli);
         NuGet = new NuGetClient(new HttpClient { Timeout = TimeSpan.FromSeconds(30) });
@@ -43,14 +49,27 @@ public sealed class Workbench : IDisposable
                 (ShellPanels.Solution, SolutionExplorer),
                 (ShellPanels.Explorer, Explorer),
                 (ShellPanels.Problems, Problems),
-                (ShellPanels.Output, new EmptyPanelViewModel()),
+                (ShellPanels.Output, Output),
                 (ShellPanels.Search, Search),
                 (ShellPanels.References, References),
                 (ShellPanels.Properties, new EmptyPanelViewModel()),
+                (ShellPanels.Tests, new EmptyPanelViewModel()),
             ]);
         Documents.Attach(Shell);
         var workspace = new RoslynWorkspace();
         Intelligence = new CodeIntelligence(workspace, new RoslynLanguageFeatures(workspace), Cli, Documents, Problems, Shell);
+        Build = new BuildController(new BuildService(Cli), Output, Problems, Shell, Documents.SaveAllAsync);
+        Tests = new TestExplorerViewModel(new TestService(Cli), Output, Shell, Intelligence.Features, Documents, Documents.SaveAllAsync, () => Build.Configuration);
+        Shell.Factory.Panels.Single(p => p.Id == ShellPanels.Tests.Id).Content = Tests;
+        SolutionExplorer.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SolutionExplorerViewModel.Solution) && SolutionExplorer.Solution is { } solution)
+            {
+                var projects = solution.Projects.Select(p => p.FilePath).ToList();
+                Build.Load(solution.FilePath, projects);
+                Tests.SetProjects(projects);
+            }
+        };
         Language = new LanguageActions(Intelligence, Documents, References, Shell, dialogs, () => Explorer.RootPath);
         Problems.CountsChanged += (_, _) => Shell.ProblemsText = Problems.ErrorCount + Problems.WarningCount == 0
             ? string.Empty
@@ -66,8 +85,12 @@ public sealed class Workbench : IDisposable
         Explorer.FilesChanged += (_, _) => SolutionExplorer.Refresh();
         WorkbenchCommands.Register(this);
         SolutionCommands.Register(this);
+        BuildCommands.Register(this);
         LanguageCommands.Register(this);
     }
+
+    /// <summary>Raised at the start of <see cref="Dispose"/>; the main window closes itself.</summary>
+    public event EventHandler? Disposing;
 
     public AppServices Services { get; }
 
@@ -97,6 +120,12 @@ public sealed class Workbench : IDisposable
 
     public SolutionExplorerViewModel SolutionExplorer { get; }
 
+    public OutputViewModel Output { get; }
+
+    public BuildController Build { get; }
+
+    public TestExplorerViewModel Tests { get; }
+
     public CodeIntelligence Intelligence { get; }
 
     /// <summary>Opens a .sln/.slnx/.csproj: shows its folder in the explorer and loads it into the workspace.</summary>
@@ -110,12 +139,20 @@ public sealed class Workbench : IDisposable
             SolutionExplorer.Load(fullPath);
             Shell.ShowPanel(ShellPanels.Solution.Id);
         }
+        else
+        {
+            Build.Load(fullPath, [fullPath]);
+            Tests.SetProjects([fullPath]);
+        }
 
         return await Intelligence.OpenSolutionAsync(fullPath).ConfigureAwait(true);
     }
 
     public void Dispose()
     {
+        Disposing?.Invoke(this, EventArgs.Empty);
+        Build.Stop();
+        Tests.Cancel();
         Explorer.Dispose();
         Intelligence.Dispose();
     }

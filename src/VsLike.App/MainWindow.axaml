@@ -2,18 +2,42 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="using:VsLike.App.Shell"
         xmlns:l="using:VsLike.App.Localization"
+        xmlns:b="using:VsLike.App.Build"
         x:Class="VsLike.App.MainWindow"
         x:DataType="shell:ShellViewModel"
         Title="VsLike"
         MinWidth="720" MinHeight="480">
-  <Grid RowDefinitions="Auto,*,Auto">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
     <Menu x:Name="InWindowMenu" Grid.Row="0" IsVisible="False" />
-    <DockControl x:Name="DockHost" Grid.Row="1"
+    <Border x:Name="Toolbar" Grid.Row="1" Classes="toolbar" x:DataType="b:BuildController">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <ComboBox x:Name="ConfigurationBox" MinWidth="96" ToolTip.Tip="{l:Loc Build.Configuration}"
+                  ItemsSource="{x:Static b:BuildController.Configurations}"
+                  SelectedItem="{Binding Configuration}" IsEnabled="{Binding !IsBusy}" />
+        <ComboBox x:Name="StartupBox" MinWidth="160" ToolTip.Tip="{l:Loc Run.StartupProject}"
+                  ItemsSource="{Binding StartupProjects}"
+                  SelectedItem="{Binding StartupProject}" IsEnabled="{Binding !IsBusy}" />
+        <ComboBox x:Name="ProfileBox" MinWidth="140" ToolTip.Tip="{l:Loc Run.Profile}"
+                  ItemsSource="{Binding LaunchProfiles}"
+                  SelectedItem="{Binding LaunchProfile}" IsEnabled="{Binding !IsBusy}" />
+        <Button x:Name="RunButton" Classes="accent" IsEnabled="{Binding CanRun}" ToolTip.Tip="{l:Loc Command.Run.Start}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="▶" FontSize="11" VerticalAlignment="Center" />
+            <TextBlock Text="{l:Loc Command.Run.Start}" />
+          </StackPanel>
+        </Button>
+        <Button x:Name="StopButton" IsEnabled="{Binding IsBusy}" ToolTip.Tip="{l:Loc Command.Run.Stop}">
+          <TextBlock Text="■" FontSize="11" />
+        </Button>
+        <Button x:Name="BuildButton" IsEnabled="{Binding CanBuild}" Content="{l:Loc Command.Build.Solution}" />
+      </StackPanel>
+    </Border>
+    <DockControl x:Name="DockHost" Grid.Row="2"
                  Layout="{Binding Layout}"
                  Factory="{Binding Factory}"
                  InitializeFactory="True"
                  InitializeLayout="False" />
-    <Border Grid.Row="2" Classes="statusbar">
+    <Border Grid.Row="3" Classes="statusbar">
       <Grid ColumnDefinitions="*,Auto,Auto">
         <TextBlock Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
         <TextBlock Grid.Column="1" Text="{Binding ProblemsText}" Margin="0,0,16,0" />
@@ -21,7 +45,7 @@
       </Grid>
     </Border>
 
-    <Panel x:Name="PaletteOverlay" Grid.Row="0" Grid.RowSpan="3"
+    <Panel x:Name="PaletteOverlay" Grid.Row="0" Grid.RowSpan="4"
            IsVisible="{Binding Palette.IsOpen}" Background="#30000000">
       <Border Classes="palette" Width="640" MaxHeight="440" VerticalAlignment="Top" Margin="16,72,16,0">
         <DockPanel>

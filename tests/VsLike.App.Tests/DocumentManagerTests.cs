@@ -20,7 +20,7 @@ public sealed class DocumentManagerTests : IDisposable
     {
         var path = Path.Combine(_folder, "a.cs");
         File.WriteAllBytes(path, [0xEF, 0xBB, 0xBF, (byte)'x']);
-        var workbench = CreateWorkbench();
+        using var workbench = CreateWorkbench();
 
         await workbench.Documents.OpenAsync(path);
         await workbench.Documents.OpenAsync(path);
@@ -35,7 +35,7 @@ public sealed class DocumentManagerTests : IDisposable
     [AvaloniaFact]
     public async Task New_ThenSave_AsksForPathAndWritesFile()
     {
-        var workbench = CreateWorkbench();
+        using var workbench = CreateWorkbench();
         var document = workbench.Documents.New();
         document.TextDocument.Insert(0, "hello");
         Assert.True(document.IsDirty);
@@ -51,7 +51,7 @@ public sealed class DocumentManagerTests : IDisposable
     [AvaloniaFact]
     public async Task Close_DirtyDocument_CancelKeepsTabDiscardCloses()
     {
-        var workbench = CreateWorkbench();
+        using var workbench = CreateWorkbench();
         var document = workbench.Documents.New();
         document.TextDocument.Insert(0, "x");
 
@@ -71,7 +71,7 @@ public sealed class DocumentManagerTests : IDisposable
         var dirty = Path.Combine(_folder, "dirty.cs");
         File.WriteAllText(clean, "old");
         File.WriteAllText(dirty, "old");
-        var workbench = CreateWorkbench();
+        using var workbench = CreateWorkbench();
         await workbench.Documents.OpenAsync(clean);
         await workbench.Documents.OpenAsync(dirty);
         var dirtyDocument = workbench.Documents.OpenDocuments.Single(d => d.FilePath == dirty);
@@ -90,7 +90,7 @@ public sealed class DocumentManagerTests : IDisposable
     {
         File.WriteAllText(Path.Combine(_folder, "a.cs"), "class Foo {}\n");
         File.WriteAllText(Path.Combine(_folder, "b.cs"), "// Foo Foo\n");
-        var workbench = CreateWorkbench();
+        using var workbench = CreateWorkbench();
         workbench.Explorer.OpenFolder(_folder);
         workbench.Search.Query = "Foo";
 
@@ -108,7 +108,7 @@ public sealed class DocumentManagerTests : IDisposable
     {
         var path = Path.Combine(_folder, "lines.cs");
         File.WriteAllText(path, "a\nb\nc\n");
-        var workbench = CreateWorkbench();
+        using var workbench = CreateWorkbench();
         var window = new MainWindow(workbench);
         window.Show();
 

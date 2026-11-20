@@ -10,6 +10,7 @@ public static class ShellPanels
     public static readonly PanelDescriptor Search = new("search", "Panel.Search", LayoutAreas.Bottom);
     public static readonly PanelDescriptor References = new("references", "Panel.References", LayoutAreas.Bottom);
     public static readonly PanelDescriptor Properties = new("properties", "Panel.Properties", LayoutAreas.Right);
+    public static readonly PanelDescriptor Tests = new("tests", "Panel.Tests", LayoutAreas.Left, "Cmd+Alt+T");
 
     /// <summary>Panels with placeholder content (used by layout tests).</summary>
     public static IReadOnlyList<(PanelDescriptor Descriptor, object Content)> CreateDefault() =>
@@ -21,5 +22,6 @@ public static class ShellPanels
         (Search, new EmptyPanelViewModel()),
         (References, new EmptyPanelViewModel()),
         (Properties, new EmptyPanelViewModel()),
+        (Tests, new EmptyPanelViewModel()),
     ];
 }

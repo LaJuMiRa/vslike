@@ -20,5 +20,6 @@ public sealed class PanelViewModel : Tool
 
     public PanelDescriptor Descriptor { get; }
 
-    public object Content { get; }
+    /// <summary>Gets the panel's view model; set once during composition for panels created after the shell.</summary>
+    public object Content { get; internal set; }
 }

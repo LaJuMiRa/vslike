@@ -179,3 +179,44 @@ NuGet.Working	Running dotnet…	dotnet läuft…
 NuGet.Done	{0} {1}: done	{0} {1}: fertig
 NuGet.Error	NuGet error: {0}	NuGet-Fehler: {0}
 Operation.Failed	{0} failed	{0} fehlgeschlagen
+Panel.Tests	Tests	Tests
+Output.Clear	Clear	Leeren
+Command.Build.Solution	Build Solution	Solution erstellen
+Command.Build.Rebuild	Rebuild Solution	Solution neu erstellen
+Command.Build.Clean	Clean Solution	Solution bereinigen
+Command.Build.Project	Build Project	Projekt erstellen
+Command.Build.ToggleConfiguration	Switch Debug/Release	Debug/Release umschalten
+Command.Run.Start	Run Without Debugging	Ohne Debugger starten
+Command.Run.Stop	Stop	Beenden
+Command.Run.SetStartup	Set as Startup Project	Als Startprojekt festlegen
+Command.Tests.Discover	Discover Tests	Tests suchen
+Command.Tests.RunAll	Run All Tests	Alle Tests ausführen
+Command.Tests.RunFailed	Run Failed Tests	Fehlgeschlagene Tests ausführen
+Command.Tests.RunProject	Run Tests	Tests ausführen
+Build.Started	Build {0} ({1})	Erstellen: {0} ({1})
+Build.RebuildStarted	Rebuild {0} ({1})	Neu erstellen: {0} ({1})
+Build.CleanStarted	Clean {0} ({1})	Bereinigen: {0} ({1})
+Build.Running	Building {0} …	{0} wird erstellt …
+Build.Succeeded	Build succeeded – {0} errors, {1} warnings ({2:0.0} s)	Build erfolgreich – {0} Fehler, {1} Warnungen ({2:0.0} s)
+Build.Failed	Build failed – {0} errors, {1} warnings ({2:0.0} s)	Build fehlgeschlagen – {0} Fehler, {1} Warnungen ({2:0.0} s)
+Build.Cancelled	Build cancelled	Build abgebrochen
+Build.Configuration	Configuration	Konfiguration
+Run.Starting	Starting {0} (profile: {1}) …	{0} wird gestartet (Profil: {1}) …
+Run.Running	{0} is running	{0} läuft
+Run.Exited	{0} exited with code {1}	{0} beendet mit Code {1}
+Run.Stopped	{0} was stopped	{0} wurde beendet
+Run.NoProfile	(no launch profile)	(ohne Startprofil)
+Run.NoStartupProject	No startup project – open a solution with a console or web project	Kein Startprojekt – Solution mit Konsolen- oder Webprojekt öffnen
+Run.NotRunnable	This project cannot be started (no Exe/Web project)	Dieses Projekt kann nicht gestartet werden (kein Exe-/Webprojekt)
+Run.StartupProject	Startup project	Startprojekt
+Run.Profile	Launch profile	Startprofil
+Tests.Discover	Discover	Suchen
+Tests.RunAll	Run all	Alle
+Tests.RunSelected	Run selected	Auswahl
+Tests.RunFailed	Run failed	Fehlgeschlagene
+Tests.Cancel	Cancel	Abbrechen
+Tests.Discovering	Discovering tests …	Tests werden gesucht …
+Tests.Running	Running tests …	Tests laufen …
+Tests.Summary	{0} passed, {1} failed, {2} skipped of {3}	{0} bestanden, {1} fehlgeschlagen, {2} übersprungen von {3}
+Tests.None	No test projects in this solution.	Keine Testprojekte in dieser Solution.
+Tests.NotTestProject	This is not a test project	Das ist kein Testprojekt

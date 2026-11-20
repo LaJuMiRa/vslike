@@ -4,11 +4,13 @@ using Avalonia.Layout;
 using VsLike.App.Editor;
 using VsLike.App.Explorer;
 using VsLike.App.Localization;
+using VsLike.App.Output;
 using VsLike.App.Problems;
 using VsLike.App.ProjectSystem;
 using VsLike.App.References;
 using VsLike.App.Search;
 using VsLike.App.SolutionExplorer;
+using VsLike.App.Testing;
 
 namespace VsLike.App.Shell;
 
@@ -29,6 +31,8 @@ public sealed class ViewLocator : IDataTemplate
         [typeof(SolutionExplorerViewModel)] = _ => new SolutionExplorerView(),
         [typeof(ProjectPropertiesViewModel)] = _ => new ProjectPropertiesView(),
         [typeof(NuGetManagerViewModel)] = _ => new NuGetManagerView(),
+        [typeof(OutputViewModel)] = _ => new OutputView(),
+        [typeof(TestExplorerViewModel)] = _ => new TestExplorerView(),
         [typeof(WelcomeViewModel)] = _ => new WelcomeView(),
         [typeof(PanelViewModel)] = data => new ContentControl { Content = ((PanelViewModel)data).Content },
         [typeof(EmptyPanelViewModel)] = _ => new TextBlock

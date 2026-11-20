@@ -98,6 +98,35 @@ internal static class NavigationFeature
         return root?.FindToken(Math.Max(0, offset - 1)).Parent?.AncestorsAndSelf().OfType<BaseTypeDeclarationSyntax>().FirstOrDefault()?.Identifier.Text;
     }
 
+    /// <summary>Finds a type by metadata name (<c>Ns.Outer+Inner</c> or dotted) and optionally one of its members in source.</summary>
+    public static async Task<SourceLocation?> FindDeclarationAsync(Solution solution, string typeName, string? memberName, CancellationToken cancellationToken)
+    {
+        foreach (var project in solution.Projects)
+        {
+            if (await project.GetCompilationAsync(cancellationToken).ConfigureAwait(false) is not { } compilation)
+            {
+                continue;
+            }
+
+            var type = compilation.GetTypeByMetadataName(typeName) ?? compilation.GetTypeByMetadataName(NestedName(typeName));
+            if (type is null || !type.Locations.Any(l => l.IsInSource))
+            {
+                continue;
+            }
+
+            var symbol = memberName is null ? type : type.GetMembers(memberName).FirstOrDefault(m => m.Locations.Any(l => l.IsInSource)) ?? (ISymbol)type;
+            return await ToSourceLocationAsync(symbol.Locations.First(l => l.IsInSource), cancellationToken).ConfigureAwait(false);
+        }
+
+        return null;
+    }
+
+    private static string NestedName(string typeName)
+    {
+        var dot = typeName.LastIndexOf('.');
+        return dot < 0 ? typeName : typeName[..dot] + "+" + typeName[(dot + 1)..];
+    }
+
     private static async Task<SourceLocation> ToSourceLocationAsync(Location location, CancellationToken cancellationToken)
     {
         var span = location.GetLineSpan();

@@ -14,6 +14,7 @@ namespace VsLike.App.Tests;
 public sealed class MainWindowTests : IDisposable
 {
     private readonly TestPlatform _platform = new(PlatformKind.Linux);
+    private readonly List<Workbench> _workbenches = [];
 
     [AvaloniaFact]
     public void Window_ShowsDockAndInWindowMenuOnLinux()
@@ -54,13 +55,34 @@ public sealed class MainWindowTests : IDisposable
         Loc.SetCulture("en");
     }
 
-    public void Dispose() => _platform.Dispose();
+    [AvaloniaFact]
+    public void DisposingWorkbench_ClosesItsWindow()
+    {
+        var (window, _) = Show();
+        Assert.True(window.IsVisible);
+
+        _workbenches[^1].Dispose();
+
+        Assert.False(window.IsVisible);
+    }
+
+    public void Dispose()
+    {
+        _workbenches.ForEach(w => w.Dispose());
+        _platform.Dispose();
+    }
 
     private (MainWindow Window, ShellViewModel Shell) Show()
     {
-        var workbench = new Workbench(new AppServices(_platform), new FakeDialogService(), () => null);
+        var workbench = Track(new Workbench(new AppServices(_platform), new FakeDialogService(), () => null));
         var window = new MainWindow(workbench);
         window.Show();
         return (window, workbench.Shell);
+    }
+
+    private Workbench Track(Workbench workbench)
+    {
+        _workbenches.Add(workbench);
+        return workbench;
     }
 }

@@ -22,6 +22,7 @@ public sealed class CodeIntelligence : IDisposable
     private readonly ShellViewModel _shell;
     private readonly Dictionary<EditorDocumentViewModel, DocumentBinding> _bindings = [];
     private CancellationTokenSource? _loadCancellation;
+    private bool _disposed;
 
     public CodeIntelligence(ICodeWorkspace workspace, ILanguageFeatures features, IDotnetCli cli, DocumentManager documents, ProblemsViewModel problems, ShellViewModel shell)
     {
@@ -104,11 +105,14 @@ public sealed class CodeIntelligence : IDisposable
 
     public void Dispose()
     {
+        _disposed = true;
         _loadCancellation?.Cancel();
         foreach (var binding in _bindings.Values)
         {
             binding.Dispose();
         }
+
+        _bindings.Clear();
 
         _workspace.Dispose();
     }
@@ -164,6 +168,12 @@ public sealed class CodeIntelligence : IDisposable
 
     private void OnDiagnosticsChanged(DiagnosticsChangedEventArgs e)
     {
+        // Background analysis may still report after the workbench was closed.
+        if (_disposed)
+        {
+            return;
+        }
+
         if (e.FilePath is null)
         {
             _problems.ReplaceSource(ProblemsViewModel.LiveSource, e.Diagnostics);

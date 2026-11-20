@@ -30,6 +30,7 @@ public partial class MainWindow : Window
         var services = _services = workbench.Services;
         var shell = _shell = workbench.Shell;
         DataContext = shell;
+
         InitializeComponent();
 
         Width = shell.LayoutState.WindowWidth;
@@ -58,6 +59,16 @@ public partial class MainWindow : Window
             }
         };
         PaletteInput.AddHandler(KeyDownEvent, OnPaletteKeyDown, RoutingStrategies.Tunnel);
+        Toolbar.DataContext = workbench.Build;
+        workbench.Disposing += (_, _) =>
+        {
+            // Das Fenster lebt nicht länger als sein Workbench; sonst schreiben Hintergrund-Ergebnisse in ein verwaistes Fenster.
+            _closeConfirmed = true;
+            Close();
+        };
+        RunButton.Click += async (_, _) => await workbench.Build.RunAsync().ConfigureAwait(true);
+        StopButton.Click += (_, _) => workbench.Build.Stop();
+        BuildButton.Click += async (_, _) => await workbench.Build.BuildAsync(VsLike.Projects.Build.BuildKind.Build).ConfigureAwait(true);
         PaletteList.DoubleTapped += async (_, _) => await shell.Palette.ExecuteSelectedAsync().ConfigureAwait(true);
         PaletteOverlay.PointerPressed += (_, e) =>
         {

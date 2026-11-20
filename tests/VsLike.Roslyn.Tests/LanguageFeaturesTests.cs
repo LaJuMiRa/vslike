@@ -147,6 +147,18 @@ public sealed class LanguageFeaturesTests(SampleSolutionFixture fixture) : IDisp
         Assert.Equal("Car", await Features.GetEnclosingTypeNameAsync(path, text.IndexOf("Drive", StringComparison.Ordinal), CancellationToken.None));
     }
 
+    [Fact]
+    public async Task FindDeclaration_LocatesTypeAndMemberByFullName()
+    {
+        var type = await Features.FindDeclarationAsync("Lib1.Car", null, CancellationToken.None);
+        var member = await Features.FindDeclarationAsync("Lib1.Car", "Drive", CancellationToken.None);
+
+        Assert.Equal(fixture.PathOf("Lib1/Car.cs"), type?.FilePath);
+        Assert.Equal(5, type?.Line);
+        Assert.Equal(11, member?.Line);
+        Assert.Null(await Features.FindDeclarationAsync("Lib1.Missing", null, CancellationToken.None));
+    }
+
     public void Dispose()
     {
         foreach (var file in new[] { "App/Program.cs", "Lib1/Car.cs", "Lib2/Engine.cs" })

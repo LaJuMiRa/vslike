@@ -11,6 +11,22 @@
     <Setter Property="FontSize" Value="26" />
     <Setter Property="FontWeight" Value="SemiBold" />
   </Style>
+  <Style Selector="Border.toolbar">
+    <Setter Property="Background" Value="{DynamicResource VsSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VsBorder}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="10,5" />
+  </Style>
+  <Style Selector="Border.toolbar ComboBox">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="MinHeight" Value="26" />
+    <Setter Property="Padding" Value="8,2" />
+  </Style>
+  <Style Selector="Border.toolbar Button">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="MinHeight" Value="26" />
+    <Setter Property="Padding" Value="10,3" />
+  </Style>
   <Style Selector="Border.statusbar">
     <Setter Property="Background" Value="{DynamicResource VsSurface}" />
     <Setter Property="BorderBrush" Value="{DynamicResource VsBorder}" />

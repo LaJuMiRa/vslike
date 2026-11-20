@@ -58,6 +58,10 @@ public static class SolutionCommands
             ],
             SolutionItemKind.Project =>
             [
+                ("Command.Build.Project", () => workbench.Build.BuildAsync(VsLike.Projects.Build.BuildKind.Build, item.Path)),
+                ("Command.Run.SetStartup", () => SetStartup(workbench, item.Path)),
+                ("Command.Tests.RunProject", () => RunProjectTests(workbench, item.Path)),
+                ("-", NoOp),
                 ("Command.Solution.AddClass", () => explorer.AddClassAsync(item)),
                 ("Command.Solution.AddFolder", () => explorer.AddFolderAsync(item)),
                 ("-", NoOp),
@@ -97,6 +101,29 @@ public static class SolutionCommands
     }
 
     private static Task NoOp() => Task.CompletedTask;
+
+    private static Task SetStartup(Workbench workbench, string project)
+    {
+        workbench.Build.SetStartupProject(project);
+        if (workbench.Build.StartupProject?.Path != project)
+        {
+            workbench.Shell.StatusText = VsLike.Core.Localization.Loc.Get("Run.NotRunnable");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task RunProjectTests(Workbench workbench, string project)
+    {
+        if (workbench.Tests.Roots.FirstOrDefault(r => r.ProjectPath == project) is not { } node)
+        {
+            workbench.Shell.StatusText = VsLike.Core.Localization.Loc.Get("Tests.NotTestProject");
+            return Task.CompletedTask;
+        }
+
+        workbench.Shell.ShowPanel(ShellPanels.Tests.Id);
+        return workbench.Tests.RunAsync(node);
+    }
 
     private static async Task EditReferencesAsync(Workbench workbench, string project)
     {

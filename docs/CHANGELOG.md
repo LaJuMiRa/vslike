@@ -47,3 +47,12 @@ Format: je Phase ein Eintrag.
 - Abnahme (Integrationstest): neue Solution mit 2 Projekten + Projektverweis baut und läuft mit `dotnet run`.
 - Behoben: FileSystemWatcher-Ereignisse eines bereits geschlossenen Ordners liefen noch auf dem UI-Thread und brachen ab, wenn die Solution-Datei gelöscht war.
 
+## Phase 6 – Build/Run/Test (2026-11-20)
+- Build, Neu erstellen, Bereinigen (Solution oder einzelnes Projekt) über `dotnet build/clean` mit Live-Ausgabe im Ausgabefenster; Abbrechen beendet den ganzen Prozessbaum.
+- MSBuild-Diagnosen (`Datei(Zeile,Spalte): error CS…`, Projekt- und NuGet-Meldungen) landen dedupliziert in der Fehlerliste (Quelle „Build“); Ausgabezeilen mit Diagnose sind farbig und per Doppelklick anspringbar. Eine Live-Analyse ersetzt veraltete Compilerfehler des letzten Builds für dieselbe Datei.
+- Werkzeugleiste: Konfiguration Debug/Release, Startprojekt (Exe/WinExe/Web/Worker, ohne Testprojekte), Startprofil aus `Properties/launchSettings.json` (Argumente, Umgebungsvariablen, Arbeitsordner), Starten ohne Debugger (⌘R), Beenden (⇧⌘.), Build (⌘B).
+- Auswahl pro Solution in `.vslike/settings.json` (relativ, nur bei Änderung geschrieben); „Als Startprojekt festlegen“ im Solution Explorer.
+- Test-Explorer: findet Tests aller Testprojekte (`dotnet test --list-tests`), Baum Projekt → Namespace → Klasse → Methode → Datenfall, Alle/Auswahl/Fehlgeschlagene ausführen, Ergebnisse aus TRX mit Dauer, Meldung und Stacktrace; Doppelklick springt zur fehlschlagenden Zeile bzw. zur Testmethode (Roslyn-Symbolsuche).
+- Abnahme (App-Test): Build-Fehler in einer Console-App springt per Klick zur Zeile; nach der Korrektur baut und läuft die App mit Ausgabe.
+- Behoben: UI-Tests scheiterten zufällig (siehe DECISIONS); das Hauptfenster schließt sich jetzt mit seinem Workbench, und Hintergrund-Diagnosen nach dem Schließen werden verworfen.
+

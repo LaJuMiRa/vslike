@@ -80,9 +80,18 @@ public sealed partial class ProblemsViewModel : ObservableObject
     }
 
     /// <summary>Replaces the diagnostics of one file from one source.</summary>
+    /// <remarks>
+    /// A live update supersedes the compiler errors of the last build for that file (they would be stale or duplicates);
+    /// other build diagnostics (NuGet, MSBuild, analyzers that only run in the build) stay.
+    /// </remarks>
     public void ReplaceFile(string source, string filePath, IReadOnlyList<DiagnosticInfo> diagnostics)
     {
         _entries[(source, filePath)] = diagnostics;
+        if (source == LiveSource && _entries.TryGetValue((BuildSource, filePath), out var build))
+        {
+            _entries[(BuildSource, filePath)] = [.. build.Where(d => !d.Id.StartsWith("CS", StringComparison.Ordinal))];
+        }
+
         Rebuild();
     }
 
@@ -105,7 +114,7 @@ public sealed partial class ProblemsViewModel : ObservableObject
 
     private void Rebuild()
     {
-        var all = _entries.Values.SelectMany(v => v).DistinctBy(d => (d.Id, d.FilePath, d.Start, d.Message)).ToList();
+        var all = _entries.Values.SelectMany(v => v).DistinctBy(d => (d.Id, d.FilePath, d.StartLine, d.StartColumn, d.Message)).ToList();
         ErrorCount = all.Count(d => d.Severity == DiagnosticSeverityKind.Error);
         WarningCount = all.Count(d => d.Severity == DiagnosticSeverityKind.Warning);
         MessageCount = all.Count(d => d.Severity == DiagnosticSeverityKind.Info);

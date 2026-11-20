@@ -9,6 +9,7 @@ namespace VsLike.App.Tests;
 public sealed class IntelliSenseTests : IDisposable
 {
     private readonly TestPlatform _platform = new();
+    private readonly List<Workbench> _workbenches = [];
     private readonly TestSolution _solution = new();
     private readonly FakeDialogService _dialogs = new();
 
@@ -67,6 +68,7 @@ public sealed class IntelliSenseTests : IDisposable
 
     public void Dispose()
     {
+        _workbenches.ForEach(w => w.Dispose());
         _platform.Dispose();
         _solution.Dispose();
     }
@@ -82,10 +84,16 @@ public sealed class IntelliSenseTests : IDisposable
 
     private async Task<(Workbench Workbench, MainWindow Window)> OpenAsync()
     {
-        var workbench = new Workbench(new AppServices(_platform), _dialogs, () => null);
+        var workbench = Track(new Workbench(new AppServices(_platform), _dialogs, () => null));
         var window = new MainWindow(workbench);
         window.Show();
         Assert.True(await workbench.OpenSolutionAsync(_solution.SolutionPath), workbench.Shell.StatusText);
         return (workbench, window);
+    }
+
+    private Workbench Track(Workbench workbench)
+    {
+        _workbenches.Add(workbench);
+        return workbench;
     }
 }

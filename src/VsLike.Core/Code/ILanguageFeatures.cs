@@ -31,6 +31,9 @@ public interface ILanguageFeatures
 
     Task<WorkspaceEdit> RenameAsync(string filePath, int offset, string newName, CancellationToken cancellationToken);
 
+    /// <summary>Finds the source declaration of a type (full name) or one of its members, e.g. for the test explorer.</summary>
+    Task<SourceLocation?> FindDeclarationAsync(string typeName, string? memberName, CancellationToken cancellationToken);
+
     /// <summary>Returns the name of the type enclosing the offset (for snippets such as ctor).</summary>
     Task<string?> GetEnclosingTypeNameAsync(string filePath, int offset, CancellationToken cancellationToken);
 }
