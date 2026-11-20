@@ -41,4 +41,7 @@
 | 2026-11-20 | Komposition = readonly-Feld bzw. get-only/init-Property eines Solution-Typs, sonst Assoziation | Aus dem Code ableitbar ohne Annotationen; dokumentierte Heuristik. |
 | 2026-11-20 | Mitglieder werden in UML-Notation eingegeben, wie sie in der Box stehen | Eine Notation für Anzeige und Eingabe; Parser (`MemberSpec`) ist getestet. |
 | 2026-11-20 | Entf-Taste entfernt einen Typ nur aus dem Diagramm; Löschen aus dem Code ist ein eigener Befehl mit Bestätigung | Verhindert versehentliches Löschen von Code. |
+| 2026-11-20 | netcoredbg wird bei Bedarf von GitHub geladen (gepinnte Version, SHA-256 aus den Release-Daten im Code) und im Benutzer-Cache abgelegt; im App-Paket (Phase 10) liegt er bereits bei | Lizenz MIT erlaubt Weitergabe; Prüfsumme verhindert manipulierte Downloads; kein vsdbg. |
+| 2026-11-20 | Breakpoint-Pfade werden vor dem Senden mit `RealPath` aufgelöst | netcoredbg vergleicht mit dem Pfad aus der PDB; unter macOS ist `/var` ein Symlink auf `/private/var`, sonst bindet der Breakpoint nie (im Test nachgewiesen). |
+| 2026-11-20 | Event-Handler einer Debug-Sitzung werden vor `configurationDone` angehängt (`attach`-Callback) | Sonst kann ein früher Halt (Breakpoint in den ersten Zeilen) verloren gehen. |
 
