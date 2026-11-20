@@ -22,6 +22,16 @@ xattr -dr com.apple.quarantine /Applications/VsLike.app
 Alternativ das `.zip` oder `.dmg` von der Release-Seite laden und `VsLike.app` nach `/Programme` ziehen. Der Debugger
 (netcoredbg, MIT) ist im App-Paket enthalten. Dateizuordnungen: `.sln`, `.slnx`, `.csproj`, `.cs`.
 
+## Installation (Linux)
+
+```sh
+brew install LaJuMiRa/tap/vslike
+```
+
+Oder das Tarball (`vslike-<version>-linux-x64.tar.gz` bzw. `-linux-arm64`) entpacken und `./vslike` starten. Nötig sind ein
+.NET SDK (10.0+) und ein X11-/XWayland-Desktop mit fontconfig. Tastenkürzel nutzen dort Ctrl statt ⌘, das Menü sitzt im
+Fenster.
+
 ## Funktionen
 
 Editor mit TextMate- und Roslyn-Highlighting, IntelliSense (Completion, Signaturhilfe, Hover, Code-Fixes, Refactorings,

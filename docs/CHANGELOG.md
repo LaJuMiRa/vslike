@@ -89,3 +89,9 @@ Format: je Phase ein Eintrag.
 - Cask-Vorlage `packaging/homebrew/vslike.rb.template` (arm/intel, `zap`, Hinweise zu .NET SDK und Gatekeeper); README mit Installation und Gatekeeper-Hinweis.
 - Geprüft: arm64-Bundle lokal gebaut, Signatur des ausgelieferten Zips gültig, entpackte App startet und lädt eine Solution über das installierte SDK.
 
+## Phase 11 – Linux (2026-11-20)
+- `packaging/linux/build-tarball.sh <linux-x64|linux-arm64> <version>`: self-contained Tarball mit App in `lib/`, gebündeltem netcoredbg (SHA-256 geprüft), Starter `vslike`, `.desktop`-Datei und Icon.
+- Homebrew-Formula-Vorlage `packaging/homebrew/vslike-formula.rb.template` (x64/arm64, `depends_on :linux`, Desktop-Eintrag, Test); der Release-Workflow baut beide Tarballs und aktualisiert `Formula/vslike.rb` im selben Tap-PR wie den Cask.
+- Plattformunterschiede geprüft: Menü im Fenster (Test), Ctrl statt ⌘ (KeyChord), Dateidialoge über Avalonias StorageProvider, Einstellungen/Cache nach XDG, Schriften mit DejaVu-Rückfall, dotnet-Suche in `/usr/share/dotnet` und `~/.dotnet`; CI baut und testet auf ubuntu-24.04.
+- Behoben: Der Starter `vslike` hätte auf case-insensitiven Dateisystemen die App-Binärdatei `VsLike` überschrieben (daher `lib/`).
+

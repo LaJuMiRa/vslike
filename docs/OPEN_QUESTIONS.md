@@ -13,4 +13,5 @@
 - Homebrew: `Casks/vslike.rb` liegt noch nicht im Tap. Er entsteht beim ersten Release-Tag per Pull Request (Secret `TAP_GITHUB_TOKEN` im vslike-Repo nötig). `brew install --cask LaJuMiRa/tap/vslike` ist deshalb noch nicht Ende-zu-Ende geprüft; lokal geprüft sind Bundle, Signatur und Start.
 - Das osx-x64-Bundle wird nur in CI (macos-15-intel) gebaut, nicht lokal getestet.
 - Notarisierung braucht eine Apple-Developer-ID (Secrets `MACOS_CERT_P12`, `MACOS_CERT_PASSWORD`, `MACOS_SIGN_IDENTITY`, `MACOS_NOTARY_*`); ohne sie bleibt der Gatekeeper-Hinweis nötig.
+- Linux: lokal nur das arm64-Tarball gebaut und geprüft (Struktur, Rechte); gestartet und getestet wird unter Linux nur in CI (ubuntu-24.04, Headless). Ein Start auf einem echten Linux-Desktop steht aus; `.deb`/AppImage sind nicht umgesetzt (optional laut Auftrag).
 

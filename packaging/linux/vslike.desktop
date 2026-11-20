@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=VsLike
+Comment=C# IDE with Roslyn IntelliSense, class diagrams and debugger
+Exec=vslike %F
+Icon=vslike
+Terminal=false
+Categories=Development;IDE;
+MimeType=text/x-csharp;application/x-sln;
+StartupWMClass=VsLike

@@ -1,0 +1,41 @@
+class Vslike < Formula
+  desc "C# IDE with Roslyn IntelliSense, class diagrams, StyleCop and a debugger"
+  homepage "https://github.com/LaJuMiRa/vslike"
+  version "@VERSION@"
+  license "MIT"
+
+  on_linux do
+    on_intel do
+      url "https://github.com/LaJuMiRa/vslike/releases/download/v#{version}/vslike-#{version}-linux-x64.tar.gz"
+      sha256 "@SHA256_X64@"
+    end
+    on_arm do
+      url "https://github.com/LaJuMiRa/vslike/releases/download/v#{version}/vslike-#{version}-linux-arm64.tar.gz"
+      sha256 "@SHA256_ARM64@"
+    end
+  end
+
+  depends_on :linux
+
+  def install
+    libexec.install Dir["*"]
+    bin.install_symlink libexec/"vslike"
+    (share/"applications").install libexec/"vslike.desktop"
+    (share/"icons/hicolor/256x256/apps").install libexec/"vslike.png"
+  end
+
+  def caveats
+    <<~EOS
+      VsLike needs an installed .NET SDK (10.0 or newer) to load, build and debug projects:
+        https://learn.microsoft.com/dotnet/core/install/linux
+      It also needs an X11 or XWayland desktop with fontconfig (present on common desktops).
+      To show VsLike in your desktop menu, link the desktop entry once:
+        ln -sf #{opt_share}/applications/vslike.desktop ~/.local/share/applications/
+    EOS
+  end
+
+  test do
+    assert_predicate libexec/"lib/VsLike", :executable?
+    assert_predicate libexec/"lib/netcoredbg/netcoredbg", :executable?
+  end
+end

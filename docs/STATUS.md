@@ -11,9 +11,9 @@
 - [x] Phase 8 Klassendiagramm
 - [x] Phase 9 Debugger
 - [x] Phase 10 Packaging & Homebrew
-- [ ] Phase 11 Linux
+- [x] Phase 11 Linux
 
-Nächster Schritt: Phase 11 (Linux).
+Nächster Schritt: Abschluss (End-to-End-Test, `docs/RELEASE_CHECKLIST.md`).
 
 ## Wiedereinstieg
 - Prüfen: `tools/check.sh` (Build + alle Tests, Exit-Code ≠ 0 bei Fehlern). Commit nur in einem separaten Schritt danach.
