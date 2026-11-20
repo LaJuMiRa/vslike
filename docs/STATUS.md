@@ -7,13 +7,13 @@
 - [x] Phase 4 IntelliSense
 - [x] Phase 5 Solution/Projekte/NuGet
 - [x] Phase 6 Build/Run/Test
-- [ ] Phase 7 StyleCop
+- [x] Phase 7 StyleCop
 - [ ] Phase 8 Klassendiagramm
 - [ ] Phase 9 Debugger
 - [ ] Phase 10 Packaging & Homebrew
 - [ ] Phase 11 Linux
 
-Nächster Schritt: Phase 7 (StyleCop).
+Nächster Schritt: Phase 8 (Klassendiagramm; Writer zuerst per Snapshot-Tests).
 
 ## Wiedereinstieg
 - Prüfen: `tools/check.sh` (Build + alle Tests, Exit-Code ≠ 0 bei Fehlern). Commit nur in einem separaten Schritt danach.

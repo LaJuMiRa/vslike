@@ -7,8 +7,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.CodeAnalysis.QuickInfo;
 using Microsoft.CodeAnalysis.Text;
+using VsLike.Core.Build;
 using VsLike.Core.Code;
 using VsLike.Core.Files;
+using VsLike.Roslyn.Analyzers;
 using ClassifiedSpan = VsLike.Core.Code.ClassifiedSpan;
 
 namespace VsLike.Roslyn;
@@ -29,6 +31,7 @@ public sealed class RoslynWorkspace : ICodeWorkspace
     private Solution? _solution;
     private IReadOnlyList<WorkspaceProject> _projects = [];
     private ImmutableArray<DiagnosticAnalyzer> _analyzers = [];
+    private bool _styleCopEnabled;
 
     public event EventHandler<DiagnosticsChangedEventArgs>? DiagnosticsChanged;
 
@@ -50,6 +53,11 @@ public sealed class RoslynWorkspace : ICodeWorkspace
         get => _analyzers;
         set => _analyzers = value;
     }
+
+    public bool StyleCopEnabled => _styleCopEnabled;
+
+    /// <summary>Gets the code fix providers that belong to the active additional analyzers.</summary>
+    public ImmutableArray<Microsoft.CodeAnalysis.CodeFixes.CodeFixProvider> AdditionalFixProviders => _styleCopEnabled ? StyleCopAnalyzers.FixProviders : [];
 
     public async Task<WorkspaceLoadResult> LoadAsync(string path, CancellationToken cancellationToken)
     {
@@ -76,7 +84,7 @@ public sealed class RoslynWorkspace : ICodeWorkspace
         {
             previous = _msbuild;
             _msbuild = workspace;
-            _solution = solution;
+            _solution = _styleCopEnabled ? StyleCopConfiguration.AddStyleCopJson(solution, fullPath) : solution;
             SolutionPath = fullPath;
             _projects = [.. solution.Projects.Select(ToWorkspaceProject)];
         }
@@ -85,6 +93,27 @@ public sealed class RoslynWorkspace : ICodeWorkspace
         var result = new WorkspaceLoadResult(fullPath, _projects, [.. warnings], stopwatch.Elapsed);
         Loaded?.Invoke(this, result);
         return result;
+    }
+
+    public async Task<bool> SetStyleCopEnabledAsync(bool enabled, IDotnetCli cli, CancellationToken cancellationToken)
+    {
+        if (enabled && !await StyleCopPackage.EnsureInCacheAsync(cli, cancellationToken).ConfigureAwait(false))
+        {
+            return false;
+        }
+
+        lock (_gate)
+        {
+            _styleCopEnabled = enabled;
+            _analyzers = enabled ? StyleCopAnalyzers.Analyzers : [];
+            if (_solution is { } solution)
+            {
+                _solution = enabled ? StyleCopConfiguration.AddStyleCopJson(solution, SolutionPath) : StyleCopConfiguration.RemoveStyleCopJson(solution);
+            }
+        }
+
+        await RefreshAllDiagnosticsAsync(cancellationToken).ConfigureAwait(false);
+        return true;
     }
 
     /// <summary>Adds a new file on disk to the project whose folder contains it (deepest match).</summary>

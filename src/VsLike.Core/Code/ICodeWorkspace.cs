@@ -17,6 +17,9 @@ public interface ICodeWorkspace : IDisposable
 
     IReadOnlyList<WorkspaceProject> Projects { get; }
 
+    /// <summary>Gets a value indicating whether StyleCop analyzers run on top of the compiler.</summary>
+    bool StyleCopEnabled { get; }
+
     /// <summary>Loads a .sln, .slnx or .csproj. Earlier state is discarded.</summary>
     Task<WorkspaceLoadResult> LoadAsync(string path, CancellationToken cancellationToken);
 
@@ -37,6 +40,12 @@ public interface ICodeWorkspace : IDisposable
     Task RefreshAllDiagnosticsAsync(CancellationToken cancellationToken);
 
     Task<IReadOnlyList<ClassifiedSpan>> ClassifyAsync(string filePath, int start, int length, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Loads (or unloads) StyleCop from the NuGet cache, downloading the fixed version first if needed, and re-analyses
+    /// the solution. Returns false if the package could not be obtained.
+    /// </summary>
+    Task<bool> SetStyleCopEnabledAsync(bool enabled, Build.IDotnetCli cli, CancellationToken cancellationToken);
 
     Task<QuickInfo?> GetQuickInfoAsync(string filePath, int offset, CancellationToken cancellationToken);
 }

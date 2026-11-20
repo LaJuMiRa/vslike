@@ -14,11 +14,15 @@ public sealed class SampleSolutionFixture : IAsyncLifetime
 
     public TimeSpan LoadDuration { get; private set; }
 
+    /// <summary>Gets or sets a hook that changes the copied files before restore and load (e.g. adds .editorconfig).</summary>
+    public Action<string>? BeforeLoad { get; set; }
+
     public string PathOf(string relative) => Path.Combine(Root, relative.Replace('/', Path.DirectorySeparatorChar));
 
     public async Task InitializeAsync()
     {
         CopyDirectory(Path.Combine(AppContext.BaseDirectory, "TestAssets", "ThreeProjects"), Root);
+        BeforeLoad?.Invoke(Root);
         await RunDotnetAsync("restore", SolutionPath);
         var result = await Workspace.LoadAsync(SolutionPath, CancellationToken.None);
         LoadDuration = result.Duration;

@@ -31,6 +31,9 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private string _problemsText = string.Empty;
 
+    [ObservableProperty]
+    private string _analyzerText = string.Empty;
+
     public ShellViewModel(AppServices services, IEnumerable<(PanelDescriptor Descriptor, object Content)> panels)
     {
         _services = services;

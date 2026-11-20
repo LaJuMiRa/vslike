@@ -226,4 +226,17 @@
   <data name="Tests.Summary" xml:space="preserve"><value>{0} passed, {1} failed, {2} skipped of {3}</value></data>
   <data name="Tests.None" xml:space="preserve"><value>No test projects in this solution.</value></data>
   <data name="Tests.NotTestProject" xml:space="preserve"><value>This is not a test project</value></data>
+  <data name="CodeAction.FixAllDocument" xml:space="preserve"><value>Fix all in document: {0}</value></data>
+  <data name="CodeAction.FixAllProject" xml:space="preserve"><value>Fix all in project: {0}</value></data>
+  <data name="Command.StyleCop.Toggle" xml:space="preserve"><value>Toggle StyleCop for This Solution</value></data>
+  <data name="Command.StyleCop.ToggleDefault" xml:space="preserve"><value>Toggle StyleCop Default for New Solutions</value></data>
+  <data name="Command.StyleCop.AddPackage" xml:space="preserve"><value>Add StyleCop as Package Reference</value></data>
+  <data name="StyleCop.On" xml:space="preserve"><value>StyleCop enabled for this solution</value></data>
+  <data name="StyleCop.Off" xml:space="preserve"><value>StyleCop disabled for this solution</value></data>
+  <data name="StyleCop.DefaultOn" xml:space="preserve"><value>StyleCop is now on by default</value></data>
+  <data name="StyleCop.DefaultOff" xml:space="preserve"><value>StyleCop is now off by default</value></data>
+  <data name="StyleCop.Loading" xml:space="preserve"><value>Loading StyleCop …</value></data>
+  <data name="StyleCop.Unavailable" xml:space="preserve"><value>StyleCop.Analyzers {0} could not be loaded (offline?)</value></data>
+  <data name="StyleCop.AddPackageConfirm" xml:space="preserve"><value>Add StyleCop.Analyzers {1} as a package reference to {0} projects? The projects will then also be analysed during builds.</value></data>
+  <data name="StyleCop.PackageAdded" xml:space="preserve"><value>StyleCop added to {0} projects</value></data>
 </root>

@@ -220,3 +220,16 @@ Tests.Running	Running tests …	Tests laufen …
 Tests.Summary	{0} passed, {1} failed, {2} skipped of {3}	{0} bestanden, {1} fehlgeschlagen, {2} übersprungen von {3}
 Tests.None	No test projects in this solution.	Keine Testprojekte in dieser Solution.
 Tests.NotTestProject	This is not a test project	Das ist kein Testprojekt
+CodeAction.FixAllDocument	Fix all in document: {0}	Alle im Dokument beheben: {0}
+CodeAction.FixAllProject	Fix all in project: {0}	Alle im Projekt beheben: {0}
+Command.StyleCop.Toggle	Toggle StyleCop for This Solution	StyleCop für diese Solution umschalten
+Command.StyleCop.ToggleDefault	Toggle StyleCop Default for New Solutions	StyleCop-Standard für neue Solutions umschalten
+Command.StyleCop.AddPackage	Add StyleCop as Package Reference	StyleCop als Paketverweis übernehmen
+StyleCop.On	StyleCop enabled for this solution	StyleCop für diese Solution aktiviert
+StyleCop.Off	StyleCop disabled for this solution	StyleCop für diese Solution deaktiviert
+StyleCop.DefaultOn	StyleCop is now on by default	StyleCop ist jetzt standardmäßig an
+StyleCop.DefaultOff	StyleCop is now off by default	StyleCop ist jetzt standardmäßig aus
+StyleCop.Loading	Loading StyleCop …	StyleCop wird geladen …
+StyleCop.Unavailable	StyleCop.Analyzers {0} could not be loaded (offline?)	StyleCop.Analyzers {0} konnte nicht geladen werden (offline?)
+StyleCop.AddPackageConfirm	Add StyleCop.Analyzers {1} as a package reference to {0} projects? The projects will then also be analysed during builds.	StyleCop.Analyzers {1} als Paketverweis zu {0} Projekten hinzufügen? Die Projekte werden dann auch beim Build analysiert.
+StyleCop.PackageAdded	StyleCop added to {0} projects	StyleCop zu {0} Projekten hinzugefügt

@@ -56,3 +56,11 @@ Format: je Phase ein Eintrag.
 - Abnahme (App-Test): Build-Fehler in einer Console-App springt per Klick zur Zeile; nach der Korrektur baut und läuft die App mit Ausgabe.
 - Behoben: UI-Tests scheiterten zufällig (siehe DECISIONS); das Hauptfenster schließt sich jetzt mit seinem Workbench, und Hintergrund-Diagnosen nach dem Schließen werden verworfen.
 
+## Phase 7 – StyleCop (2026-11-20)
+- StyleCop.Analyzers 1.3.180 (feste Version) wird aus dem NuGet-Cache per `AnalyzerFileReference` geladen; fehlt sie, lädt ein `dotnet restore` mit `PackageDownload` sie in den Cache. Aus = nicht geladen.
+- Live umschaltbar ohne Neustart (⌥⇧⌘S bzw. Build-Menü); Zustand pro Solution in `.vslike/settings.json`, sonst globaler Standard („StyleCop-Standard für neue Solutions umschalten“). Statusleiste zeigt „StyleCop“, wenn aktiv.
+- Diagnosen erscheinen mit Kategorie „StyleCop“ in Editor und Fehlerliste; `.editorconfig`-Schweregrade und `stylecop.json` (nächstgelegene Datei bis zum Solution-Ordner, als AdditionalFile nur im Snapshot) werden respektiert, die csproj bleibt unverändert.
+- Code-Fixes von StyleCop im ⌘.-Menü, dazu „Alle im Dokument beheben“ und „Alle im Projekt beheben“ (für alle Fixes mit Fix-All-Unterstützung).
+- Optional „StyleCop als Paketverweis übernehmen“ (mit Bestätigung, über `dotnet add package`).
+- Abnahme: Test-Solution zeigt mit StyleCop SA1200/SA1633, ohne keine StyleCop-Diagnosen; nach erneutem Öffnen ist der Zustand erhalten (App- und Roslyn-Tests).
+

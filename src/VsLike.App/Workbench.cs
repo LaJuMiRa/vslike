@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using VsLike.App.Analysis;
 using VsLike.App.Build;
 using VsLike.App.Editor;
 using VsLike.App.Explorer;
@@ -58,6 +59,7 @@ public sealed class Workbench : IDisposable
         Documents.Attach(Shell);
         var workspace = new RoslynWorkspace();
         Intelligence = new CodeIntelligence(workspace, new RoslynLanguageFeatures(workspace), Cli, Documents, Problems, Shell);
+        StyleCop = new StyleCopController(Intelligence.Workspace, Cli, services, Shell, dialogs, ProjectService);
         Build = new BuildController(new BuildService(Cli), Output, Problems, Shell, Documents.SaveAllAsync);
         Tests = new TestExplorerViewModel(new TestService(Cli), Output, Shell, Intelligence.Features, Documents, Documents.SaveAllAsync, () => Build.Configuration);
         Shell.Factory.Panels.Single(p => p.Id == ShellPanels.Tests.Id).Content = Tests;
@@ -124,6 +126,8 @@ public sealed class Workbench : IDisposable
 
     public BuildController Build { get; }
 
+    public StyleCopController StyleCop { get; }
+
     public TestExplorerViewModel Tests { get; }
 
     public CodeIntelligence Intelligence { get; }
@@ -145,6 +149,7 @@ public sealed class Workbench : IDisposable
             Tests.SetProjects([fullPath]);
         }
 
+        await StyleCop.ApplyForSolutionAsync(fullPath).ConfigureAwait(true);
         return await Intelligence.OpenSolutionAsync(fullPath).ConfigureAwait(true);
     }
 

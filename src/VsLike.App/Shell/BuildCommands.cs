@@ -30,6 +30,15 @@ public static class BuildCommands
         Add(workbench, "tests.runAll", "Command.Tests.RunAll", "Cmd+Alt+R", () => tests.RunAsync(), () => tests.HasTestProjects);
         Add(workbench, "tests.runFailed", "Command.Tests.RunFailed", null, tests.RunFailedAsync, () => tests.HasTestProjects);
 
+        var styleCop = workbench.StyleCop;
+        Add(workbench, "analysis.toggleStyleCop", "Command.StyleCop.Toggle", "Cmd+Alt+Shift+S", styleCop.ToggleAsync, () => !styleCop.IsBusy);
+        Add(workbench, "analysis.toggleStyleCopDefault", "Command.StyleCop.ToggleDefault", null, () =>
+        {
+            styleCop.ToggleDefault();
+            return Task.CompletedTask;
+        });
+        Add(workbench, "analysis.addStyleCopPackage", "Command.StyleCop.AddPackage", null, () => styleCop.AddPackageReferencesAsync([.. workbench.SolutionExplorer.Solution?.Projects.Select(p => p.FilePath) ?? []]), () => workbench.SolutionExplorer.HasSolution);
+
         var menus = workbench.Services.Menus;
         foreach (var id in new[] { "build.solution", "build.rebuild", "build.clean", "build.toggleConfiguration" })
         {
@@ -41,6 +50,11 @@ public static class BuildCommands
         foreach (var id in new[] { "tests.discover", "tests.runAll", "tests.runFailed" })
         {
             menus.Add("Menu.Build", id, group: 2);
+        }
+
+        foreach (var id in new[] { "analysis.toggleStyleCop", "analysis.toggleStyleCopDefault", "analysis.addStyleCopPackage" })
+        {
+            menus.Add("Menu.Build", id, group: 3);
         }
     }
 

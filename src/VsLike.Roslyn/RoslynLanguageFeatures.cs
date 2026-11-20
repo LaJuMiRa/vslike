@@ -43,7 +43,8 @@ public sealed class RoslynLanguageFeatures : ILanguageFeatures
 
         var span = new TextSpan(start, length);
         var diagnostics = await _workspace.GetRoslynDiagnosticsAsync(document, cancellationToken).ConfigureAwait(false);
-        return await CodeActions.GetAsync(document, span, diagnostics, cancellationToken).ConfigureAwait(false);
+        CodeActions.AdditionalFixProviders = _workspace.AdditionalFixProviders;
+        return await CodeActions.GetAsync(document, span, diagnostics, _workspace.GetRoslynDiagnosticsAsync, cancellationToken).ConfigureAwait(false);
     }
 
     public Task<WorkspaceEdit> GetCodeActionEditAsync(CodeActionInfo action, CancellationToken cancellationToken)

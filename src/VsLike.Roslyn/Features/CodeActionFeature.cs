@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.Text;
 using VsLike.Core.Code;
+using VsLike.Core.Localization;
 
 namespace VsLike.Roslyn.Features;
 
@@ -36,7 +37,8 @@ internal sealed class CodeActionFeature
         return changed is null ? WorkspaceEdit.Empty : await SolutionDiff.CreateAsync(handle.Solution, changed, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<IReadOnlyList<CodeActionInfo>> GetAsync(Document document, TextSpan span, ImmutableArray<Diagnostic> diagnostics, CancellationToken cancellationToken)
+    /// <param name="diagnosticsOf">Diagnostics of any document (for "fix all" in document/project).</param>
+    public async Task<IReadOnlyList<CodeActionInfo>> GetAsync(Document document, TextSpan span, ImmutableArray<Diagnostic> diagnostics, Func<Document, CancellationToken, Task<ImmutableArray<Diagnostic>>>? diagnosticsOf, CancellationToken cancellationToken)
     {
         var results = new List<CodeActionInfo>();
         var solution = document.Project.Solution;
@@ -48,6 +50,10 @@ internal sealed class CodeActionFeature
                 var registered = new List<CodeAction>();
                 await RunSafelyAsync(() => provider.RegisterCodeFixesAsync(new CodeFixContext(document, diagnostic, (action, _) => registered.Add(action), cancellationToken)), cancellationToken).ConfigureAwait(false);
                 results.AddRange(Flatten(registered, isFix: true, solution, diagnostic.Id));
+                if (diagnosticsOf is not null && registered.Count > 0)
+                {
+                    results.AddRange(await FixAllAsync(document, provider, registered[0], diagnostic, diagnostics, diagnosticsOf, cancellationToken).ConfigureAwait(false));
+                }
             }
         }
 
@@ -59,6 +65,58 @@ internal sealed class CodeActionFeature
         }
 
         return [.. results.DistinctBy(r => (r.Group, r.Title))];
+    }
+
+    private static async Task<IReadOnlyList<CodeActionInfo>> FixAllAsync(
+        Document document,
+        CodeFixProvider provider,
+        CodeAction action,
+        Diagnostic diagnostic,
+        ImmutableArray<Diagnostic> documentDiagnostics,
+        Func<Document, CancellationToken, Task<ImmutableArray<Diagnostic>>> diagnosticsOf,
+        CancellationToken cancellationToken)
+    {
+        var fixAll = provider.GetFixAllProvider();
+        if (fixAll is null)
+        {
+            return [];
+        }
+
+        var results = new List<CodeActionInfo>();
+        var scopes = fixAll.GetSupportedFixAllScopes().ToList();
+        var diagnosticProvider = new AllDiagnostics(diagnosticsOf);
+        var ids = new[] { diagnostic.Id };
+        if (scopes.Contains(FixAllScope.Document) && documentDiagnostics.Count(d => d.Id == diagnostic.Id) > 1)
+        {
+            var context = new FixAllContext(document, provider, FixAllScope.Document, action.EquivalenceKey, ids, diagnosticProvider, cancellationToken);
+            if (await TryGetFixAllAsync(fixAll, context, cancellationToken).ConfigureAwait(false) is { } fix)
+            {
+                results.Add(new CodeActionInfo(Loc.Format("CodeAction.FixAllDocument", action.Title), diagnostic.Id, true, new Handle(fix, document.Project.Solution)));
+            }
+        }
+
+        if (scopes.Contains(FixAllScope.Project))
+        {
+            var context = new FixAllContext(document.Project, provider, FixAllScope.Project, action.EquivalenceKey, ids, diagnosticProvider, cancellationToken);
+            if (await TryGetFixAllAsync(fixAll, context, cancellationToken).ConfigureAwait(false) is { } fix)
+            {
+                results.Add(new CodeActionInfo(Loc.Format("CodeAction.FixAllProject", action.Title), diagnostic.Id, true, new Handle(fix, document.Project.Solution)));
+            }
+        }
+
+        return results;
+    }
+
+    private static async Task<CodeAction?> TryGetFixAllAsync(FixAllProvider fixAll, FixAllContext context, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await fixAll.GetFixAsync(context).WaitAsync(ProviderTimeout, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is TimeoutException or InvalidOperationException or ArgumentException or NotSupportedException)
+        {
+            return null;
+        }
     }
 
     private static IEnumerable<CodeActionInfo> Flatten(IEnumerable<CodeAction> actions, bool isFix, Solution solution, string? group)
@@ -138,4 +196,25 @@ internal sealed class CodeActionFeature
     }
 
     private sealed record Handle(CodeAction Action, Solution Solution);
+
+    /// <summary>Supplies diagnostics for fix-all from the IDE's own analysis (compiler + active analyzers).</summary>
+    private sealed class AllDiagnostics(Func<Document, CancellationToken, Task<ImmutableArray<Diagnostic>>> diagnosticsOf) : FixAllContext.DiagnosticProvider
+    {
+        public override async Task<IEnumerable<Diagnostic>> GetDocumentDiagnosticsAsync(Document document, CancellationToken cancellationToken)
+            => await diagnosticsOf(document, cancellationToken).ConfigureAwait(false);
+
+        public override Task<IEnumerable<Diagnostic>> GetProjectDiagnosticsAsync(Project project, CancellationToken cancellationToken)
+            => Task.FromResult(Enumerable.Empty<Diagnostic>());
+
+        public override async Task<IEnumerable<Diagnostic>> GetAllDiagnosticsAsync(Project project, CancellationToken cancellationToken)
+        {
+            var all = new List<Diagnostic>();
+            foreach (var document in project.Documents)
+            {
+                all.AddRange(await diagnosticsOf(document, cancellationToken).ConfigureAwait(false));
+            }
+
+            return all;
+        }
+    }
 }
