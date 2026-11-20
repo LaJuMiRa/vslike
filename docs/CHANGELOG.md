@@ -95,3 +95,7 @@ Format: je Phase ein Eintrag.
 - Plattformunterschiede geprüft: Menü im Fenster (Test), Ctrl statt ⌘ (KeyChord), Dateidialoge über Avalonias StorageProvider, Einstellungen/Cache nach XDG, Schriften mit DejaVu-Rückfall, dotnet-Suche in `/usr/share/dotnet` und `~/.dotnet`; CI baut und testet auf ubuntu-24.04.
 - Behoben: Der Starter `vslike` hätte auf case-insensitiven Dateisystemen die App-Binärdatei `VsLike` überschrieben (daher `lib/`).
 
+## Abschluss (2026-11-20)
+- End-to-End-Test (`EndToEndTests`): neue Solution → Klasse im Diagramm → IntelliSense → StyleCop an/aus → Build → Debuggen.
+- `docs/RELEASE_CHECKLIST.md` mit Abnahmen je Phase und den offenen Schritten bis zum ersten Release.
+

@@ -13,7 +13,7 @@
 - [x] Phase 10 Packaging & Homebrew
 - [x] Phase 11 Linux
 
-Nächster Schritt: Abschluss (End-to-End-Test, `docs/RELEASE_CHECKLIST.md`).
+Alle Phasen abgeschlossen. Nächster Schritt: `docs/RELEASE_CHECKLIST.md` → „Vor dem ersten Release“.
 
 ## Wiedereinstieg
 - Prüfen: `tools/check.sh` (Build + alle Tests, Exit-Code ≠ 0 bei Fehlern). Commit nur in einem separaten Schritt danach.
