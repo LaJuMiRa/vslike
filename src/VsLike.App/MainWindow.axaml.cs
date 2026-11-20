@@ -14,7 +14,9 @@ public partial class MainWindow : Window
     private readonly AppServices? _services;
     private readonly ShellViewModel? _shell;
     private readonly Workbench? _workbench;
+    private readonly NativeMenu _nativeMenu = new();
     private bool _closeConfirmed;
+    private bool _menuRebuildPending;
 
     // Für den XAML-Previewer.
     public MainWindow()
@@ -37,11 +39,16 @@ public partial class MainWindow : Window
             WindowState = WindowState.Maximized;
         }
 
+        if (services.Platform.HasNativeMenuBar)
+        {
+            NativeMenu.SetMenu(this, _nativeMenu);
+        }
+
         RebuildMenus();
-        services.Commands.Changed += (_, _) => RebuildMenus();
-        services.Menus.Changed += (_, _) => RebuildMenus();
-        services.SettingsChanged += (_, _) => RebuildMenus();
-        Loc.CultureChanged += (_, _) => RebuildMenus();
+        services.Commands.Changed += (_, _) => ScheduleMenuRebuild();
+        services.Menus.Changed += (_, _) => ScheduleMenuRebuild();
+        services.SettingsChanged += (_, _) => ScheduleMenuRebuild();
+        Loc.CultureChanged += (_, _) => ScheduleMenuRebuild();
 
         shell.Palette.PropertyChanged += (_, e) =>
         {
@@ -107,6 +114,22 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>Coalesces many registry changes (e.g. at startup) into one rebuild.</summary>
+    private void ScheduleMenuRebuild()
+    {
+        if (_menuRebuildPending)
+        {
+            return;
+        }
+
+        _menuRebuildPending = true;
+        Dispatcher.UIThread.Post(() =>
+        {
+            _menuRebuildPending = false;
+            RebuildMenus();
+        });
+    }
+
     private void RebuildMenus()
     {
         if (_services is null)
@@ -116,11 +139,7 @@ public partial class MainWindow : Window
 
         if (_services.Platform.HasNativeMenuBar)
         {
-            NativeMenu.SetMenu(this, MenuBuilder.BuildNative(_services));
-            if (Application.Current is { } app)
-            {
-                NativeMenu.SetMenu(app, new NativeMenu());
-            }
+            MenuBuilder.FillNative(_nativeMenu, _services);
         }
         else
         {

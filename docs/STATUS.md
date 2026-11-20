@@ -3,7 +3,7 @@
 - [x] Phase 0 Gerüst
 - [x] Phase 1 Shell
 - [x] Phase 2 Editor
-- [ ] Phase 3 Roslyn-Workspace
+- [x] Phase 3 Roslyn-Workspace
 - [ ] Phase 4 IntelliSense
 - [ ] Phase 5 Solution/Projekte/NuGet
 - [ ] Phase 6 Build/Run/Test
@@ -13,4 +13,4 @@
 - [ ] Phase 10 Packaging & Homebrew
 - [ ] Phase 11 Linux
 
-Nächster Schritt: Phase 3 (Roslyn-Workspace).
+Nächster Schritt: Phase 4 (IntelliSense).

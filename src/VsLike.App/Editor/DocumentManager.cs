@@ -25,6 +25,10 @@ public sealed partial class DocumentManager : ObservableObject, IDocumentNavigat
         _dialogs = dialogs;
     }
 
+    public event EventHandler<EditorDocumentViewModel>? DocumentOpened;
+
+    public event EventHandler<EditorDocumentViewModel>? DocumentClosed;
+
     public IEnumerable<EditorDocumentViewModel> OpenDocuments
         => _shell?.Factory.DocumentDock?.VisibleDockables?.OfType<EditorDocumentViewModel>() ?? [];
 
@@ -50,6 +54,11 @@ public sealed partial class DocumentManager : ObservableObject, IDocumentNavigat
             if (ReferenceEquals(e.Dockable, Active))
             {
                 Active = OpenDocuments.FirstOrDefault();
+            }
+
+            if (e.Dockable is EditorDocumentViewModel closed)
+            {
+                DocumentClosed?.Invoke(this, closed);
             }
         };
     }
@@ -246,6 +255,7 @@ public sealed partial class DocumentManager : ObservableObject, IDocumentNavigat
     {
         var dock = Shell.Factory.DocumentDock ?? throw new InvalidOperationException("No document dock.");
         Shell.Factory.AddDockable(dock, document);
+        DocumentOpened?.Invoke(this, document);
     }
 
     private void Activate(EditorDocumentViewModel document)

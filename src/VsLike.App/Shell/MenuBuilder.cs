@@ -10,9 +10,13 @@ namespace VsLike.App.Shell;
 /// </summary>
 public static class MenuBuilder
 {
-    public static NativeMenu BuildNative(AppServices services)
+    /// <summary>
+    /// Replaces the items of an existing native menu. The menu object itself must stay the same:
+    /// Avalonia.Native crashes ("menu being updated does not match") when a window gets a new NativeMenu.
+    /// </summary>
+    public static void FillNative(NativeMenu menu, AppServices services)
     {
-        var menu = new NativeMenu();
+        menu.Items.Clear();
         foreach (var top in MenuRegistry.TopLevelMenus)
         {
             var entries = services.Menus.GetEntries(top);
@@ -29,8 +33,6 @@ public static class MenuBuilder
 
             menu.Add(new NativeMenuItem(Loc.Get(top)) { Menu = sub });
         }
-
-        return menu;
     }
 
     public static IReadOnlyList<Control> BuildInWindow(AppServices services)

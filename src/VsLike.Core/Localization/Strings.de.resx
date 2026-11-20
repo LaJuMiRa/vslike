@@ -89,4 +89,23 @@
   <data name="Status.FileConflict" xml:space="preserve"><value>„{0}“ wurde auf der Festplatte geändert, hat aber ungespeicherte Änderungen</value></data>
   <data name="Status.Saved" xml:space="preserve"><value>„{0}“ gespeichert</value></data>
   <data name="Explorer.NoFolder" xml:space="preserve"><value>Kein Ordner geöffnet</value></data>
+  <data name="Command.File.OpenSolution" xml:space="preserve"><value>Solution öffnen…</value></data>
+  <data name="Command.File.CloseSolution" xml:space="preserve"><value>Solution schließen</value></data>
+  <data name="Dialog.OpenSolution" xml:space="preserve"><value>Solution oder Projekt öffnen</value></data>
+  <data name="Status.Restoring" xml:space="preserve"><value>Pakete für {0} werden wiederhergestellt…</value></data>
+  <data name="Status.Loading" xml:space="preserve"><value>{0} wird geladen…</value></data>
+  <data name="Status.Loaded" xml:space="preserve"><value>{0} geladen: {1} Projekte in {2:0.0} s</value></data>
+  <data name="Status.LoadFailed" xml:space="preserve"><value>{0} konnte nicht geladen werden: {1}</value></data>
+  <data name="Status.Problems" xml:space="preserve"><value>{0} Fehler, {1} Warnungen</value></data>
+  <data name="Problems.Errors" xml:space="preserve"><value>{0} Fehler</value></data>
+  <data name="Problems.Warnings" xml:space="preserve"><value>{0} Warnungen</value></data>
+  <data name="Problems.Messages" xml:space="preserve"><value>{0} Meldungen</value></data>
+  <data name="Problems.Filter" xml:space="preserve"><value>Probleme filtern</value></data>
+  <data name="Problems.Column.Code" xml:space="preserve"><value>Code</value></data>
+  <data name="Problems.Column.Message" xml:space="preserve"><value>Meldung</value></data>
+  <data name="Problems.Column.File" xml:space="preserve"><value>Datei</value></data>
+  <data name="Problems.Column.Line" xml:space="preserve"><value>Zeile</value></data>
+  <data name="Problems.Column.Project" xml:space="preserve"><value>Projekt</value></data>
+  <data name="Problems.Column.Category" xml:space="preserve"><value>Kategorie</value></data>
+  <data name="Problems.Empty" xml:space="preserve"><value>Keine Probleme</value></data>
 </root>

@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:p="using:VsLike.App.Problems"
+             xmlns:l="using:VsLike.App.Localization"
+             x:Class="VsLike.App.Problems.ProblemsView"
+             x:DataType="p:ProblemsViewModel">
+  <UserControl.Styles>
+    <Style Selector="TextBlock.error"><Setter Property="Foreground" Value="{DynamicResource VsError}" /></Style>
+    <Style Selector="TextBlock.warning"><Setter Property="Foreground" Value="{DynamicResource VsWarning}" /></Style>
+    <Style Selector="TextBlock.info"><Setter Property="Foreground" Value="{DynamicResource VsInfo}" /></Style>
+    <Style Selector="ToggleButton.filter">
+      <Setter Property="Padding" Value="8,2" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+  </UserControl.Styles>
+  <DockPanel>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,Auto,*" Margin="8,6">
+      <ToggleButton Classes="filter" IsChecked="{Binding ShowErrors}" Content="{Binding ErrorsLabel}" Margin="0,0,6,0" />
+      <ToggleButton Grid.Column="1" Classes="filter" IsChecked="{Binding ShowWarnings}" Content="{Binding WarningsLabel}" Margin="0,0,6,0" />
+      <ToggleButton Grid.Column="2" Classes="filter" IsChecked="{Binding ShowMessages}" Content="{Binding MessagesLabel}" Margin="0,0,12,0" />
+      <TextBox Grid.Column="3" Text="{Binding Filter}" Watermark="{l:Loc Problems.Filter}" />
+    </Grid>
+    <Panel>
+      <TextBlock Classes="muted" Text="{l:Loc Problems.Empty}" IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      <ListBox x:Name="List" ItemsSource="{Binding Items}" Background="Transparent">
+        <ListBox.Styles>
+          <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="MinHeight" Value="0" />
+          </Style>
+        </ListBox.Styles>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="p:ProblemItem">
+            <Grid ColumnDefinitions="18,80,*,Auto">
+              <TextBlock Text="{Binding SeverityGlyph}" Classes.error="{Binding SeverityClass, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=error}"
+                         Classes.warning="{Binding SeverityClass, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=warning}"
+                         Classes.info="{Binding SeverityClass, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=info}"
+                         FontSize="11" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Classes="muted" Text="{Binding Diagnostic.Id}" FontFamily="{DynamicResource VsMonoFont}" FontSize="12" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="2" Text="{Binding Diagnostic.Message}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="3" Classes="muted" Text="{Binding Location}" FontSize="12" Margin="12,0,0,0" VerticalAlignment="Center" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Panel>
+  </DockPanel>
+</UserControl>

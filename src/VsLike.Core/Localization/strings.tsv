@@ -83,3 +83,22 @@ Status.FileReloaded	Reloaded "{0}" (changed on disk)	„{0}“ neu geladen (auf 
 Status.FileConflict	"{0}" changed on disk, but has unsaved changes	„{0}“ wurde auf der Festplatte geändert, hat aber ungespeicherte Änderungen
 Status.Saved	Saved "{0}"	„{0}“ gespeichert
 Explorer.NoFolder	No folder open	Kein Ordner geöffnet
+Command.File.OpenSolution	Open Solution…	Solution öffnen…
+Command.File.CloseSolution	Close Solution	Solution schließen
+Dialog.OpenSolution	Open Solution or Project	Solution oder Projekt öffnen
+Status.Restoring	Restoring packages for {0}…	Pakete für {0} werden wiederhergestellt…
+Status.Loading	Loading {0}…	{0} wird geladen…
+Status.Loaded	Loaded {0}: {1} projects in {2:0.0} s	{0} geladen: {1} Projekte in {2:0.0} s
+Status.LoadFailed	Could not load {0}: {1}	{0} konnte nicht geladen werden: {1}
+Status.Problems	{0} errors, {1} warnings	{0} Fehler, {1} Warnungen
+Problems.Errors	{0} Errors	{0} Fehler
+Problems.Warnings	{0} Warnings	{0} Warnungen
+Problems.Messages	{0} Messages	{0} Meldungen
+Problems.Filter	Filter problems	Probleme filtern
+Problems.Column.Code	Code	Code
+Problems.Column.Message	Message	Meldung
+Problems.Column.File	File	Datei
+Problems.Column.Line	Line	Zeile
+Problems.Column.Project	Project	Projekt
+Problems.Column.Category	Category	Kategorie
+Problems.Empty	No problems	Keine Probleme

@@ -19,4 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\VsLike.Roslyn\VsLike.Roslyn.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\TestAssets\**\*" LinkBase="TestAssets" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

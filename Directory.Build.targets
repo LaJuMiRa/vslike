@@ -4,4 +4,7 @@
     <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.StringTools" ExcludeAssets="runtime" PrivateAssets="all" />
   </ItemGroup>
+
+  <!-- Keine Telemetrie: Avalonia.BuildServices sendet sonst Build-Statistiken (Target AvaloniaStats). -->
+  <Target Name="AvaloniaStats" />
 </Project>

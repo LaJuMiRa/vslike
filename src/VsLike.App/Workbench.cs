@@ -1,18 +1,24 @@
 using Avalonia.Controls;
 using VsLike.App.Editor;
 using VsLike.App.Explorer;
+using VsLike.App.Intelligence;
+using VsLike.App.Problems;
 using VsLike.App.Search;
 using VsLike.App.Services;
 using VsLike.App.Shell;
+using VsLike.Core.Build;
+using VsLike.Core.Code;
 using VsLike.Core.Documents;
 using VsLike.Core.Localization;
+using VsLike.Projects.Cli;
+using VsLike.Roslyn;
 
 namespace VsLike.App;
 
 /// <summary>Kompositionswurzel des Hauptfensters: verbindet Shell, Dokumente, Explorer und Suche.</summary>
 public sealed class Workbench : IDisposable
 {
-    public Workbench(AppServices services, IDialogService dialogs, Func<TopLevel?> topLevel)
+    public Workbench(AppServices services, IDialogService dialogs, Func<TopLevel?> topLevel, ICodeWorkspace? workspace = null, IDotnetCli? cli = null)
     {
         Services = services;
         Dialogs = dialogs;
@@ -20,16 +26,22 @@ public sealed class Workbench : IDisposable
         Documents = new DocumentManager(dialogs);
         Explorer = new ExplorerViewModel(Documents);
         Search = new FindInFilesViewModel(Explorer.AllFiles, () => Explorer.RootPath, Documents, Documents);
+        Problems = new ProblemsViewModel(Documents);
+        Cli = cli ?? new DotnetCli();
         Shell = new ShellViewModel(
             services,
             [
                 (ShellPanels.Explorer, Explorer),
-                (ShellPanels.Problems, new EmptyPanelViewModel()),
+                (ShellPanels.Problems, Problems),
                 (ShellPanels.Output, new EmptyPanelViewModel()),
                 (ShellPanels.Search, Search),
                 (ShellPanels.Properties, new EmptyPanelViewModel()),
             ]);
         Documents.Attach(Shell);
+        Intelligence = new CodeIntelligence(workspace ?? new RoslynWorkspace(), Cli, Documents, Problems, Shell);
+        Problems.CountsChanged += (_, _) => Shell.ProblemsText = Problems.ErrorCount + Problems.WarningCount == 0
+            ? string.Empty
+            : Loc.Format("Status.Problems", Problems.ErrorCount, Problems.WarningCount);
         Explorer.FilesChanged += async (_, paths) => await Documents.OnFilesChangedAsync(paths).ConfigureAwait(true);
         Documents.PropertyChanged += (_, e) =>
         {
@@ -55,7 +67,25 @@ public sealed class Workbench : IDisposable
 
     public FindInFilesViewModel Search { get; }
 
-    public void Dispose() => Explorer.Dispose();
+    public ProblemsViewModel Problems { get; }
+
+    public IDotnetCli Cli { get; }
+
+    public CodeIntelligence Intelligence { get; }
+
+    /// <summary>Opens a .sln/.slnx/.csproj: shows its folder in the explorer and loads it into the workspace.</summary>
+    public async Task<bool> OpenSolutionAsync(string path)
+    {
+        Explorer.OpenFolder(Path.GetDirectoryName(Path.GetFullPath(path))!);
+        Services.UpdateSettings(s => s.WithRecentSolution(Path.GetFullPath(path)));
+        return await Intelligence.OpenSolutionAsync(path).ConfigureAwait(true);
+    }
+
+    public void Dispose()
+    {
+        Explorer.Dispose();
+        Intelligence.Dispose();
+    }
 
     private void TrackActiveDocument()
     {

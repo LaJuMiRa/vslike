@@ -29,18 +29,33 @@ public partial class App : Application
             workbench.Shell.QuitRequested += (_, _) => window.Close();
             desktop.MainWindow = window;
             desktop.Exit += (_, _) => workbench.Dispose();
-            window.Opened += async (_, _) => await OpenStartupPathsAsync(workbench, desktop.Args ?? []).ConfigureAwait(true);
+            window.Opened += async (_, _) =>
+            {
+                if (!await SdkCheck.EnsureSdkAsync(workbench).ConfigureAwait(true))
+                {
+                    return;
+                }
+
+                await OpenStartupPathsAsync(workbench, desktop.Args ?? []).ConfigureAwait(true);
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    private static bool IsSolutionOrProject(string path)
+        => Path.GetExtension(path).ToLowerInvariant() is ".sln" or ".slnx" or ".csproj";
 
     /// <summary>Opens folders and files passed on the command line (also used by file associations).</summary>
     private static async Task OpenStartupPathsAsync(Workbench workbench, IEnumerable<string> paths)
     {
         foreach (var path in paths)
         {
-            if (Directory.Exists(path))
+            if (IsSolutionOrProject(path) && File.Exists(path))
+            {
+                await workbench.OpenSolutionAsync(path).ConfigureAwait(true);
+            }
+            else if (Directory.Exists(path))
             {
                 workbench.Explorer.OpenFolder(path);
             }

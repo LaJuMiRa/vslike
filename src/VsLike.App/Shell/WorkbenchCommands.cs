@@ -27,12 +27,20 @@ public static class WorkbenchCommands
                 workbench.Shell.ShowPanel(ShellPanels.Explorer.Id);
             }
         });
+        Add(workbench, "file.openSolution", "Command.File.OpenSolution", "Category.File", "Cmd+Shift+O", async () =>
+        {
+            if (await workbench.Dialogs.PickFileAsync("Dialog.OpenSolution").ConfigureAwait(true) is { } path)
+            {
+                await workbench.OpenSolutionAsync(path).ConfigureAwait(true);
+            }
+        });
         Add(workbench, "file.save", "Command.File.Save", "Category.File", "Cmd+S", () => docs.SaveAsync(docs.Active!), HasActive);
         Add(workbench, "file.saveAs", "Command.File.SaveAs", "Category.File", "Cmd+Shift+S", () => docs.SaveAsAsync(docs.Active!), HasActive);
         Add(workbench, "file.saveAll", "Command.File.SaveAll", "Category.File", "Cmd+Alt+S", docs.SaveAllAsync);
         Add(workbench, "file.close", "Command.File.Close", "Category.File", "Cmd+W", () => docs.CloseAsync(docs.Active!), HasActive);
         menus.Add("Menu.File", "file.new");
         menus.Add("Menu.File", "file.open", group: 1);
+        menus.Add("Menu.File", "file.openSolution", group: 1);
         menus.Add("Menu.File", "file.openFolder", group: 1);
         menus.Add("Menu.File", "file.save", group: 2);
         menus.Add("Menu.File", "file.saveAs", group: 2);

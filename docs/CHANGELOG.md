@@ -26,3 +26,13 @@ Format: je Phase ein Eintrag.
 - Explorer mit Dateibaum (bin/obj/.git ausgeblendet), FileSystemWatcher mit Debounce; unveränderte Tabs laden externe Änderungen neu, geänderte melden einen Konflikt.
 - Statusleiste mit Zeile/Spalte und Sprache; Startargumente öffnen Ordner/Dateien.
 - Messung: 50.004-Zeilen-Datei lädt und rendert headless in 225 ms.
+
+## Phase 3 – Roslyn-Workspace (2026-11-20)
+- `ICodeWorkspace` in Core (Roslyn-frei: `DiagnosticInfo`, `ClassifiedSpan`, `QuickInfo`, `WorkspaceProject`); Implementierung `RoslynWorkspace` mit MSBuildLocator + MSBuildWorkspace für `.sln`, `.slnx`, `.csproj`.
+- Unveränderlicher Solution-Snapshot, Editor-Text per `WithDocumentText` (nie auf die Platte); lose `.cs`-Dateien ohne Projekt bekommen ein „Miscellaneous“-Projekt mit BCL-Referenzen.
+- Live-Diagnosen (250 ms Entprellung), Wellenlinien, die beim Tippen mitwandern, semantische Einfärbung des sichtbaren Bereichs, Hover mit Signatur, XML-Doku und Diagnosen.
+- Fehlerliste mit Filtern (Fehler/Warnungen/Meldungen, Text), Doppelklick springt zu Datei/Zeile/Spalte, Zähler in der Statusleiste.
+- „Solution öffnen“ (⇧⌘O) und Startargument: automatisches `dotnet restore`, wenn `obj/project.assets.json` fehlt oder älter als die csproj ist.
+- SDK-Prüfung beim Start (`dotnet --list-sdks`, mindestens 10.0) mit Installationshinweis; `dotnet`-Aufrufe ohne geerbte MSBuild-Umgebungsvariablen.
+- Messungen: Test-Solution mit 3 Projekten lädt in 1,0–1,4 s; Fehler erscheint 654 ms nach der Eingabe in der Fehlerliste (App-Test) bzw. < 1 s im Workspace-Test.
+- Behoben: Tabs zeigten nach dem ersten Rendern den Inhalt des vorherigen Tabs (eigener `ViewLocator`); Absturz beim Neuaufbau des nativen macOS-Menüs; Fluent-Akzentfarbe.

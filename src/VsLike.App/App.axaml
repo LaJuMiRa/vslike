@@ -1,10 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:shell="using:VsLike.App.Shell"
-             xmlns:l="using:VsLike.App.Localization"
-             xmlns:ed="using:VsLike.App.Editor"
-             xmlns:ex="using:VsLike.App.Explorer"
-             xmlns:se="using:VsLike.App.Search"
              x:Class="VsLike.App.App"
              Name="VsLike">
   <Application.Resources>
@@ -15,35 +11,17 @@
     </ResourceDictionary>
   </Application.Resources>
   <Application.Styles>
-    <FluentTheme />
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Light" Accent="#B4741A" RegionColor="#F5F5F2" />
+        <ColorPaletteResources x:Key="Dark" Accent="#E2A63B" RegionColor="#15171C" />
+      </FluentTheme.Palettes>
+    </FluentTheme>
     <DockFluentTheme />
     <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
     <StyleInclude Source="avares://VsLike/Themes/Styles.axaml" />
   </Application.Styles>
   <Application.DataTemplates>
-    <DataTemplate DataType="shell:PanelViewModel">
-      <ContentControl Content="{Binding Content}" />
-    </DataTemplate>
-    <DataTemplate DataType="ed:EditorDocumentViewModel">
-      <ed:EditorView />
-    </DataTemplate>
-    <DataTemplate DataType="ex:ExplorerViewModel">
-      <ex:ExplorerView />
-    </DataTemplate>
-    <DataTemplate DataType="se:FindInFilesViewModel">
-      <se:FindInFilesView />
-    </DataTemplate>
-    <DataTemplate DataType="shell:EmptyPanelViewModel">
-      <TextBlock Classes="muted" Text="{l:Loc Panel.Empty}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-    </DataTemplate>
-    <DataTemplate DataType="shell:WelcomeViewModel">
-      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
-        <TextBlock Classes="h1" Text="{l:Loc Welcome.Title}" HorizontalAlignment="Center" />
-        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-          <Border Classes="kbd"><TextBlock Text="{Binding PaletteChord}" FontFamily="{DynamicResource VsMonoFont}" /></Border>
-          <TextBlock Classes="muted" Text="{l:Loc Command.Palette}" VerticalAlignment="Center" />
-        </StackPanel>
-      </StackPanel>
-    </DataTemplate>
+    <shell:ViewLocator />
   </Application.DataTemplates>
 </Application>

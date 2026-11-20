@@ -14,9 +14,10 @@
                  InitializeFactory="True"
                  InitializeLayout="False" />
     <Border Grid.Row="2" Classes="statusbar">
-      <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Text="{Binding StatusText}" />
-        <TextBlock Grid.Column="1" Text="{Binding CaretText}" />
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <TextBlock Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="1" Text="{Binding ProblemsText}" Margin="0,0,16,0" />
+        <TextBlock Grid.Column="2" Text="{Binding CaretText}" />
       </Grid>
     </Border>
 

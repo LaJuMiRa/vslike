@@ -15,7 +15,6 @@
       <Color x:Key="VsWarningColor">#E9C46A</Color>
       <Color x:Key="VsInfoColor">#6CA6F0</Color>
       <Color x:Key="VsSelectionColor">#33E2A63B</Color>
-      <Color x:Key="SystemAccentColor">#E2A63B</Color>
     </ResourceDictionary>
     <ResourceDictionary x:Key="Light">
       <Color x:Key="VsBackgroundColor">#F5F5F2</Color>
@@ -30,7 +29,6 @@
       <Color x:Key="VsWarningColor">#A67A00</Color>
       <Color x:Key="VsInfoColor">#2F6FC4</Color>
       <Color x:Key="VsSelectionColor">#33B4741A</Color>
-      <Color x:Key="SystemAccentColor">#B4741A</Color>
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
   <SolidColorBrush x:Key="VsBackground" Color="{DynamicResource VsBackgroundColor}" />

@@ -23,6 +23,10 @@ public static class Loc
     public static void SetCulture(string language)
     {
         Culture = string.IsNullOrWhiteSpace(language) ? CultureInfo.InstalledUICulture : CultureInfo.GetCultureInfo(language);
+
+        // Auch Compiler-/Analyzer-Meldungen (Roslyn) und das dotnet-CLI folgen der UI-Sprache.
+        CultureInfo.DefaultThreadCurrentUICulture = Culture;
+        CultureInfo.CurrentUICulture = Culture;
         CultureChanged?.Invoke(null, EventArgs.Empty);
     }
 }

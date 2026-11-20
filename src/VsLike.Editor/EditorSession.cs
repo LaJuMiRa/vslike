@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -8,9 +9,11 @@ using AvaloniaEdit.Folding;
 using AvaloniaEdit.Indentation.CSharp;
 using AvaloniaEdit.Search;
 using AvaloniaEdit.TextMate;
+using VsLike.Core.Code;
 using VsLike.Editor.Editing;
 using VsLike.Editor.Folding;
 using VsLike.Editor.Highlighting;
+using VsLike.Editor.Intelligence;
 
 namespace VsLike.Editor;
 
@@ -53,6 +56,13 @@ public sealed class EditorSession : IDisposable
         }
 
         MultiCaret = new MultiCaretController(editor);
+        Diagnostics = new DiagnosticMarkers(editor.TextArea.TextView, editor.Document);
+        editor.TextArea.TextView.BackgroundRenderers.Add(Diagnostics);
+        Semantic = new SemanticColorizer();
+        editor.TextArea.TextView.LineTransformers.Add(Semantic);
+        editor.TextArea.TextView.PointerHover += OnPointerHover;
+        editor.TextArea.TextView.PointerHoverStopped += OnPointerHoverStopped;
+        editor.TextArea.TextView.ScrollOffsetChanged += OnViewportChanged;
         _searchPanel = SearchPanel.Install(editor);
         _foldingManager = FoldingManager.Install(editor.TextArea);
         _foldingTimer = new DispatcherTimer { Interval = FoldingDelay };
@@ -73,7 +83,32 @@ public sealed class EditorSession : IDisposable
     /// <summary>Raised when the caret moves; arguments are 1-based line and column.</summary>
     public event EventHandler<(int Line, int Column)>? CaretMoved;
 
+    /// <summary>Raised when the pointer rests over a text offset; listeners answer with <see cref="ShowQuickInfo"/>.</summary>
+    public event EventHandler<int>? HoverRequested;
+
+    /// <summary>Raised (debounced by the caller) when the visible text range changes.</summary>
+    public event EventHandler? ViewportChanged;
+
     public EditorLanguage Language { get; }
+
+    public DiagnosticMarkers Diagnostics { get; }
+
+    public SemanticColorizer Semantic { get; }
+
+    /// <summary>Gets the offsets of the first and last visible character (whole document if not yet laid out).</summary>
+    public (int Start, int End) VisibleRange
+    {
+        get
+        {
+            var view = _editor.TextArea.TextView;
+            if (!view.VisualLinesValid || view.VisualLines.Count == 0)
+            {
+                return (0, _editor.Document.TextLength);
+            }
+
+            return (view.VisualLines[0].FirstDocumentLine.Offset, view.VisualLines[^1].LastDocumentLine.EndOffset);
+        }
+    }
 
     public TextEditor Editor => _editor;
 
@@ -94,11 +129,45 @@ public sealed class EditorSession : IDisposable
         _editor.LineNumbersForeground = Brush(_textMate, "editorLineNumber.foreground", dark ? "#5E6675" : "#9AA0AA");
         _editor.TextArea.TextView.CurrentLineBackground = Brush(_textMate, "editor.lineHighlightBackground", dark ? "#20232B" : "#F4F4F0");
         _editor.TextArea.TextView.CurrentLineBorder = new Pen(Brushes.Transparent);
+        Semantic.SetTheme(kind);
+        _editor.TextArea.TextView.Redraw();
         _editor.TextArea.SelectionBrush = Brush(_textMate, "editor.selectionBackground", dark ? "#E2A63B40" : "#B4741A33");
         var caret = Brush(_textMate, "editorCursor.foreground", dark ? "#E2A63B" : "#9C5F0C");
         _editor.TextArea.Caret.CaretBrush = caret;
         MultiCaret.SetColors(caret, _editor.TextArea.SelectionBrush);
         _searchPanel.SetSearchResultsBrush(new SolidColorBrush(Color.Parse(dark ? "#553FB5A6" : "#401F8A7E")));
+    }
+
+    public void SetDiagnostics(IReadOnlyList<DiagnosticInfo> diagnostics)
+        => Diagnostics.Set(diagnostics, _editor.Document.TextLength);
+
+    /// <summary>Applies semantic spans computed for <paramref name="version"/>; stale results are ignored.</summary>
+    public bool ApplyClassifications(IReadOnlyList<ClassifiedSpan> spans, ITextSourceVersion? version)
+    {
+        if (!Semantic.SetSpans(spans, version, _editor.Document.Version))
+        {
+            return false;
+        }
+
+        _editor.TextArea.TextView.Redraw();
+        return true;
+    }
+
+    /// <summary>Shows hover content; diagnostics at the hovered offset are always included.</summary>
+    public void ShowQuickInfo(QuickInfo? info, int offset)
+    {
+        var font = _editor.FontFamily;
+        var content = QuickInfoPresenter.Create(info, Diagnostics.At(offset), font);
+        var view = _editor.TextArea.TextView;
+        if (content is null)
+        {
+            ToolTip.SetIsOpen(view, false);
+            return;
+        }
+
+        ToolTip.SetTip(view, content);
+        ToolTip.SetPlacement(view, PlacementMode.Pointer);
+        ToolTip.SetIsOpen(view, true);
     }
 
     public void OpenFind()
@@ -168,6 +237,12 @@ public sealed class EditorSession : IDisposable
         _foldingCancellation?.Cancel();
         _editor.Document.TextChanged -= OnTextChanged;
         _editor.TextArea.Caret.PositionChanged -= OnCaretPositionChanged;
+        _editor.TextArea.TextView.PointerHover -= OnPointerHover;
+        _editor.TextArea.TextView.PointerHoverStopped -= OnPointerHoverStopped;
+        _editor.TextArea.TextView.ScrollOffsetChanged -= OnViewportChanged;
+        _editor.TextArea.TextView.BackgroundRenderers.Remove(Diagnostics);
+        _editor.TextArea.TextView.LineTransformers.Remove(Semantic);
+        ToolTip.SetIsOpen(_editor.TextArea.TextView, false);
         _editor.TextArea.TextEntering -= OnTextEntering;
         _editor.TextArea.RemoveHandler(InputElement.KeyDownEvent, OnKeyDown);
         MultiCaret.Dispose();
@@ -185,6 +260,29 @@ public sealed class EditorSession : IDisposable
         => offset >= 0 && offset < document.TextLength ? document.GetCharAt(offset) : null;
 
     private void OnCaretPositionChanged(object? sender, EventArgs e) => CaretMoved?.Invoke(this, Caret);
+
+    private void OnViewportChanged(object? sender, EventArgs e) => ViewportChanged?.Invoke(this, EventArgs.Empty);
+
+    private void OnPointerHover(object? sender, PointerEventArgs e)
+    {
+        var view = _editor.TextArea.TextView;
+        if (view.GetPosition(e.GetPosition(view) + view.ScrollOffset) is not { } position)
+        {
+            return;
+        }
+
+        var offset = _editor.Document.GetOffset(position.Location);
+        if (HoverRequested is null)
+        {
+            ShowQuickInfo(null, offset);
+        }
+        else
+        {
+            HoverRequested.Invoke(this, offset);
+        }
+    }
+
+    private void OnPointerHoverStopped(object? sender, PointerEventArgs e) => ToolTip.SetIsOpen(_editor.TextArea.TextView, false);
 
     private void OnTextChanged(object? sender, EventArgs e)
     {
