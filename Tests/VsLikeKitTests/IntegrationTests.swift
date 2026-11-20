@@ -1,0 +1,127 @@
+import Foundation
+import Testing
+@testable import VsLikeKit
+
+/// Paths of the repository for tests that run against the real .NET SDK, engine and debugger.
+enum Repository {
+    static let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+
+    static var engineDLL: URL {
+        if let override = ProcessInfo.processInfo.environment["VSLIKE_ENGINE_DLL"] {
+            return URL(fileURLWithPath: override)
+        }
+        return root.appendingPathComponent("engine/artifacts.nosync/bin/VsLike.Engine/debug/VsLikeEngine.dll")
+    }
+
+    /// Copies a sample solution from engine/tests/TestAssets into a fresh temporary folder (symlinks resolved, as
+    /// the debugger reports real paths).
+    static func copySample(_ name: String) throws -> URL {
+        let target = RealPath.resolve(FileManager.default.temporaryDirectory).appendingPathComponent("vslike-swift-\(UUID().uuidString)")
+        try FileManager.default.copyItem(at: root.appendingPathComponent("engine/tests/TestAssets/\(name)"), to: target)
+        return target
+    }
+}
+
+@Suite("Engine, dotnet CLI and debugger end to end", .serialized)
+struct IntegrationTests {
+    let runner: CommandRunner
+
+    init() throws {
+        runner = try CommandRunner.dotnet(language: "en")
+    }
+
+    @Test(.timeLimit(.minutes(5)))
+    func engine_loadsSolutionAndServesIntelliSenseDiagnosticsAndDiagram() async throws {
+        let folder = try Repository.copySample("ThreeProjects")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let solution = folder.appendingPathComponent("Sample.slnx")
+        try await runner.runChecked(["restore", solution.path])
+        let engine = EngineClient(engineDLL: Repository.engineDLL, runner: runner)
+        try engine.start()
+
+        let info = try await engine.initialize(culture: "en")
+        let loaded = try await engine.load(solution.path)
+        #expect(!info.sdkVersion.isEmpty)
+        #expect(Set(loaded.projects.map(\.name)) == ["App", "Lib1", "Lib2"])
+
+        let car = folder.appendingPathComponent("Lib1/Car.cs").path
+        let original = try String(contentsOfFile: car, encoding: .utf8)
+        let edited = original.replacingOccurrences(of: "=> $\"{Name}: {_engine.Start()}\";", with: "=> _engine.;")
+        engine.updateDocument(car, text: edited)
+        let offset = (edited as NSString).range(of: "_engine.;").location + "_engine.".utf16.count
+        let completion = try #require(try await engine.completion(car, offset: offset))
+        #expect(completion.items.contains { $0.displayText == "Start" && $0.kind == .method })
+
+        engine.updateDocument(car, text: original.replacingOccurrences(of: "\"Car\";", with: "42;"))
+        let diagnostics = try await engine.diagnostics(car)
+        #expect(diagnostics.contains { $0.code == "CS0029" && $0.severity == .error })
+
+        let model = try await engine.diagramModel()
+        #expect(model.find("Lib1.Car")?.members.contains { $0.name == "Drive" } == true)
+        #expect(model.relations.contains { $0.from == "Lib1.Car" && $0.to == "Lib2.Engine" && $0.kind == .composition })
+        let member = try #require(try await engine.parseMember(kind: .property, text: "+ Speed: int", owner: "Car"))
+        let source = try await engine.addMember(source: original, type: "Lib1.Car", member: member)
+        #expect(source?.contains("public int Speed { get; set; }") == true)
+
+        await engine.stop()
+    }
+
+    @Test(.timeLimit(.minutes(5)))
+    func buildAndTests_reportResultsOfTheCalcSample() async throws {
+        let folder = try Repository.copySample("WithTests")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let solution = folder.appendingPathComponent("Calc.slnx").path
+        let project = folder.appendingPathComponent("Calc.Tests/Calc.Tests.csproj").path
+
+        let build = try await BuildService(runner: runner).build(target: solution, configuration: "Debug", kind: .build)
+        let tests = TestService(runner: runner)
+        let discovered = try await tests.discover(project: project, configuration: "Debug")
+        let run = try await tests.run(project: project, configuration: "Debug", filter: nil)
+
+        #expect(build.succeeded, "\(build.process.allText)")
+        #expect(discovered.tests.contains("Calc.Tests.CalculatorTests.Add_Works"))
+        #expect(run.results.count == 4)
+        #expect(run.results.first { $0.fullName.hasSuffix("Add_Wrong") }?.outcome == .failed)
+        #expect(try ProjectFile.load(project).isTestProject)
+    }
+
+    @Test(.timeLimit(.minutes(2)))
+    func debugger_stopsAtBreakpointAndShowsLocals() async throws {
+        let adapter = try #require(DebugSession.locateAdapter(), "netcoredbg missing: run ./build.sh once (it caches netcoredbg)")
+        let folder = try Repository.copySample("ThreeProjects")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let project = folder.appendingPathComponent("App/App.csproj").path
+        let build = try await BuildService(runner: runner).build(target: project, configuration: "Debug", kind: .build)
+        #expect(build.succeeded)
+        let program = try #require(try await BuildService(runner: runner).targetPath(project: project, configuration: "Debug"))
+        let file = folder.appendingPathComponent("App/Program.cs").path
+
+        let (session, states) = try await DebugSession.start(
+            adapter: adapter,
+            launch: LaunchConfiguration(program: program, workingDirectory: folder.appendingPathComponent("App").path),
+            breakpoints: [file: [SourceBreakpoint(line: 4)]],
+            dotnet: runner.executable
+        )
+        #expect(states[file]?.count == 1)
+        var stoppedThread: Int?
+        for await event in session.events {
+            if case let .stopped(_, threadID, _) = event {
+                stoppedThread = threadID
+                break
+            }
+            if case .terminated = event {
+                break
+            }
+        }
+        let thread = try #require(stoppedThread)
+        let frame = try #require(try await session.stackTrace(threadID: thread).first)
+        let scope = try #require(try await session.scopes(frameID: frame.id).first)
+        let locals = try await session.variables(reference: scope.variablesReference)
+        let name = try await session.evaluate("car.Name", frameID: frame.id, context: "watch")
+
+        #expect(frame.line == 4)
+        #expect(locals.contains { $0.name == "car" })
+        #expect(name.value == "\"Demo\"")
+        await session.stop()
+    }
+}
