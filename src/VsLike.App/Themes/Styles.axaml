@@ -1,0 +1,58 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource VsBackground}" />
+    <Setter Property="Foreground" Value="{DynamicResource VsText}" />
+  </Style>
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{DynamicResource VsTextMuted}" />
+  </Style>
+  <Style Selector="TextBlock.h1">
+    <Setter Property="FontSize" Value="26" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="Border.statusbar">
+    <Setter Property="Background" Value="{DynamicResource VsSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VsBorder}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="Padding" Value="12,3" />
+  </Style>
+  <Style Selector="Border.statusbar TextBlock">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{DynamicResource VsTextMuted}" />
+  </Style>
+  <Style Selector="Border.palette">
+    <Setter Property="Background" Value="{DynamicResource VsSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VsBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource VsRadius}" />
+    <Setter Property="BoxShadow" Value="0 12 32 0 #66000000" />
+  </Style>
+  <Style Selector="ListBox.palette">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="ListBox.palette ListBoxItem">
+    <Setter Property="Padding" Value="12,6" />
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+  <Style Selector="ListBox.palette ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource VsSelection}" />
+  </Style>
+  <Style Selector="TextBox.palette">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="TextBox.palette:focus /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="Border.kbd">
+    <Setter Property="Background" Value="{DynamicResource VsSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource VsBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Padding" Value="6,1" />
+  </Style>
+</Styles>

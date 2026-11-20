@@ -1,7 +1,53 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="using:VsLike.App.Shell"
+        xmlns:l="using:VsLike.App.Localization"
         x:Class="VsLike.App.MainWindow"
+        x:DataType="shell:ShellViewModel"
         Title="VsLike"
-        Width="1280" Height="800">
-  <TextBlock Text="VsLike" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        MinWidth="720" MinHeight="480">
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Menu x:Name="InWindowMenu" Grid.Row="0" IsVisible="False" />
+    <DockControl x:Name="DockHost" Grid.Row="1"
+                 Layout="{Binding Layout}"
+                 Factory="{Binding Factory}"
+                 InitializeFactory="True"
+                 InitializeLayout="False" />
+    <Border Grid.Row="2" Classes="statusbar">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="{Binding StatusText}" />
+        <TextBlock Grid.Column="1" x:Name="StatusRight" />
+      </Grid>
+    </Border>
+
+    <Panel x:Name="PaletteOverlay" Grid.Row="0" Grid.RowSpan="3"
+           IsVisible="{Binding Palette.IsOpen}" Background="#30000000">
+      <Border Classes="palette" Width="640" MaxHeight="440" VerticalAlignment="Top" Margin="16,72,16,0">
+        <DockPanel>
+          <TextBox x:Name="PaletteInput" DockPanel.Dock="Top" Classes="palette"
+                   Text="{Binding Palette.Query}" Watermark="{l:Loc Palette.Placeholder}" />
+          <Separator DockPanel.Dock="Top" Margin="0" />
+          <TextBlock DockPanel.Dock="Top" Classes="muted" Margin="16,12"
+                     IsVisible="{Binding Palette.HasNoResults}" Text="{l:Loc Palette.NoResults}" />
+          <ListBox x:Name="PaletteList" Classes="palette" Margin="6"
+                   ItemsSource="{Binding Palette.Items}"
+                   SelectedItem="{Binding Palette.SelectedItem}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="shell:PaletteItem">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Classes="muted" Text="{Binding Category, StringFormat='{}{0}:'}" />
+                    <TextBlock Text="{Binding Title}" />
+                  </StackPanel>
+                  <Border Grid.Column="1" Classes="kbd" IsVisible="{Binding Chord, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding Chord}" FontSize="11" FontFamily="{DynamicResource VsMonoFont}" />
+                  </Border>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Border>
+    </Panel>
+  </Grid>
 </Window>

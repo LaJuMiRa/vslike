@@ -6,4 +6,8 @@
     <InternalsVisibleTo Include="VsLike.Core.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Localization/strings.tsv" />
+    <None Include="Localization/strings.tsv" />
+  </ItemGroup>
 </Project>

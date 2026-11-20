@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App.Name" xml:space="preserve"><value>VsLike</value></data>
+  <data name="Category.General" xml:space="preserve"><value>Allgemein</value></data>
+  <data name="Category.File" xml:space="preserve"><value>Datei</value></data>
+  <data name="Category.Edit" xml:space="preserve"><value>Bearbeiten</value></data>
+  <data name="Category.View" xml:space="preserve"><value>Ansicht</value></data>
+  <data name="Category.Build" xml:space="preserve"><value>Build</value></data>
+  <data name="Category.Debug" xml:space="preserve"><value>Debuggen</value></data>
+  <data name="Category.Help" xml:space="preserve"><value>Hilfe</value></data>
+  <data name="Menu.File" xml:space="preserve"><value>Datei</value></data>
+  <data name="Menu.Edit" xml:space="preserve"><value>Bearbeiten</value></data>
+  <data name="Menu.View" xml:space="preserve"><value>Ansicht</value></data>
+  <data name="Menu.Build" xml:space="preserve"><value>Build</value></data>
+  <data name="Menu.Debug" xml:space="preserve"><value>Debuggen</value></data>
+  <data name="Menu.Window" xml:space="preserve"><value>Fenster</value></data>
+  <data name="Menu.Help" xml:space="preserve"><value>Hilfe</value></data>
+  <data name="Command.Palette" xml:space="preserve"><value>Befehlspalette anzeigen</value></data>
+  <data name="Command.Theme.Dark" xml:space="preserve"><value>Design: Dunkel</value></data>
+  <data name="Command.Theme.Light" xml:space="preserve"><value>Design: Hell</value></data>
+  <data name="Command.Theme.System" xml:space="preserve"><value>Design: System folgen</value></data>
+  <data name="Command.Language.German" xml:space="preserve"><value>Sprache: Deutsch</value></data>
+  <data name="Command.Language.English" xml:space="preserve"><value>Sprache: Englisch</value></data>
+  <data name="Command.Layout.Reset" xml:space="preserve"><value>Fensterlayout zurücksetzen</value></data>
+  <data name="Command.Panel.Toggle" xml:space="preserve"><value>Panel ein-/ausblenden: {0}</value></data>
+  <data name="Command.Quit" xml:space="preserve"><value>VsLike beenden</value></data>
+  <data name="Command.About" xml:space="preserve"><value>Über VsLike</value></data>
+  <data name="Panel.Explorer" xml:space="preserve"><value>Explorer</value></data>
+  <data name="Panel.Output" xml:space="preserve"><value>Ausgabe</value></data>
+  <data name="Panel.Errors" xml:space="preserve"><value>Probleme</value></data>
+  <data name="Panel.Properties" xml:space="preserve"><value>Eigenschaften</value></data>
+  <data name="Panel.Empty" xml:space="preserve"><value>Noch nichts hier.</value></data>
+  <data name="Palette.Placeholder" xml:space="preserve"><value>Befehl eingeben…</value></data>
+  <data name="Palette.NoResults" xml:space="preserve"><value>Keine passenden Befehle</value></data>
+  <data name="Status.Ready" xml:space="preserve"><value>Bereit</value></data>
+  <data name="Welcome.Title" xml:space="preserve"><value>Willkommen bei VsLike</value></data>
+  <data name="Welcome.Hint" xml:space="preserve"><value>Drücke {0}, um die Befehlspalette zu öffnen.</value></data>
+  <data name="Sdk.Missing.Title" xml:space="preserve"><value>.NET SDK nicht gefunden</value></data>
+  <data name="Sdk.Missing.Body" xml:space="preserve"><value>VsLike benötigt das .NET SDK 10 oder neuer. Installiere es mit „brew install --cask dotnet-sdk“ oder von https://dotnet.microsoft.com/download und starte VsLike neu.</value></data>
+</root>

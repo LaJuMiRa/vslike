@@ -1,0 +1,37 @@
+App.Name	VsLike	VsLike
+Category.General	General	Allgemein
+Category.File	File	Datei
+Category.Edit	Edit	Bearbeiten
+Category.View	View	Ansicht
+Category.Build	Build	Build
+Category.Debug	Debug	Debuggen
+Category.Help	Help	Hilfe
+Menu.File	File	Datei
+Menu.Edit	Edit	Bearbeiten
+Menu.View	View	Ansicht
+Menu.Build	Build	Build
+Menu.Debug	Debug	Debuggen
+Menu.Window	Window	Fenster
+Menu.Help	Help	Hilfe
+Command.Palette	Show Command Palette	Befehlspalette anzeigen
+Command.Theme.Dark	Theme: Dark	Design: Dunkel
+Command.Theme.Light	Theme: Light	Design: Hell
+Command.Theme.System	Theme: Follow System	Design: System folgen
+Command.Language.German	Language: German	Sprache: Deutsch
+Command.Language.English	Language: English	Sprache: Englisch
+Command.Layout.Reset	Reset Window Layout	Fensterlayout zurücksetzen
+Command.Panel.Toggle	Toggle Panel: {0}	Panel ein-/ausblenden: {0}
+Command.Quit	Quit VsLike	VsLike beenden
+Command.About	About VsLike	Über VsLike
+Panel.Explorer	Explorer	Explorer
+Panel.Output	Output	Ausgabe
+Panel.Errors	Problems	Probleme
+Panel.Properties	Properties	Eigenschaften
+Panel.Empty	Nothing here yet.	Noch nichts hier.
+Palette.Placeholder	Type a command…	Befehl eingeben…
+Palette.NoResults	No matching commands	Keine passenden Befehle
+Status.Ready	Ready	Bereit
+Welcome.Title	Welcome to VsLike	Willkommen bei VsLike
+Welcome.Hint	Press {0} to open the command palette.	Drücke {0}, um die Befehlspalette zu öffnen.
+Sdk.Missing.Title	.NET SDK not found	.NET SDK nicht gefunden
+Sdk.Missing.Body	VsLike needs the .NET SDK 10 or newer. Install it with "brew install --cask dotnet-sdk" or from https://dotnet.microsoft.com/download and restart VsLike.	VsLike benötigt das .NET SDK 10 oder neuer. Installiere es mit „brew install --cask dotnet-sdk“ oder von https://dotnet.microsoft.com/download und starte VsLike neu.

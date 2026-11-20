@@ -1,0 +1,81 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- VsLike-Designsprache: ruhige Schiefertöne, Bernstein als Akzent, Petrol als Zweitakzent. -->
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="VsBackgroundColor">#15171C</Color>
+      <Color x:Key="VsSurfaceColor">#1C1F25</Color>
+      <Color x:Key="VsSurfaceRaisedColor">#252932</Color>
+      <Color x:Key="VsBorderColor">#2C313B</Color>
+      <Color x:Key="VsTextColor">#E4E7EC</Color>
+      <Color x:Key="VsTextMutedColor">#8C94A3</Color>
+      <Color x:Key="VsAccentColor">#E2A63B</Color>
+      <Color x:Key="VsAccent2Color">#3FB5A6</Color>
+      <Color x:Key="VsErrorColor">#F07167</Color>
+      <Color x:Key="VsWarningColor">#E9C46A</Color>
+      <Color x:Key="VsInfoColor">#6CA6F0</Color>
+      <Color x:Key="VsSelectionColor">#33E2A63B</Color>
+      <Color x:Key="SystemAccentColor">#E2A63B</Color>
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="VsBackgroundColor">#F5F5F2</Color>
+      <Color x:Key="VsSurfaceColor">#FFFFFF</Color>
+      <Color x:Key="VsSurfaceRaisedColor">#ECECE7</Color>
+      <Color x:Key="VsBorderColor">#DEDED8</Color>
+      <Color x:Key="VsTextColor">#1E2228</Color>
+      <Color x:Key="VsTextMutedColor">#666D78</Color>
+      <Color x:Key="VsAccentColor">#B4741A</Color>
+      <Color x:Key="VsAccent2Color">#1F8A7E</Color>
+      <Color x:Key="VsErrorColor">#C4362B</Color>
+      <Color x:Key="VsWarningColor">#A67A00</Color>
+      <Color x:Key="VsInfoColor">#2F6FC4</Color>
+      <Color x:Key="VsSelectionColor">#33B4741A</Color>
+      <Color x:Key="SystemAccentColor">#B4741A</Color>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+  <SolidColorBrush x:Key="VsBackground" Color="{DynamicResource VsBackgroundColor}" />
+  <SolidColorBrush x:Key="VsSurface" Color="{DynamicResource VsSurfaceColor}" />
+  <SolidColorBrush x:Key="VsSurfaceRaised" Color="{DynamicResource VsSurfaceRaisedColor}" />
+  <SolidColorBrush x:Key="VsBorder" Color="{DynamicResource VsBorderColor}" />
+  <SolidColorBrush x:Key="VsText" Color="{DynamicResource VsTextColor}" />
+  <SolidColorBrush x:Key="VsTextMuted" Color="{DynamicResource VsTextMutedColor}" />
+  <SolidColorBrush x:Key="VsAccent" Color="{DynamicResource VsAccentColor}" />
+  <SolidColorBrush x:Key="VsAccent2" Color="{DynamicResource VsAccent2Color}" />
+  <SolidColorBrush x:Key="VsError" Color="{DynamicResource VsErrorColor}" />
+  <SolidColorBrush x:Key="VsWarning" Color="{DynamicResource VsWarningColor}" />
+  <SolidColorBrush x:Key="VsInfo" Color="{DynamicResource VsInfoColor}" />
+  <SolidColorBrush x:Key="VsSelection" Color="{DynamicResource VsSelectionColor}" />
+  <!-- Dock-Theme auf die VsLike-Tokens umlenken -->
+  <SolidColorBrush x:Key="DockThemeAccentBrush" Color="{DynamicResource VsAccentColor}" />
+  <SolidColorBrush x:Key="DockApplicationAccentBrushHigh" Color="{DynamicResource VsAccentColor}" />
+  <SolidColorBrush x:Key="DockApplicationAccentBrushMed" Color="{DynamicResource VsAccentColor}" />
+  <SolidColorBrush x:Key="DockApplicationAccentBrushLow" Color="{DynamicResource VsSelectionColor}" />
+  <SolidColorBrush x:Key="DockApplicationAccentBrushIndicator" Color="{DynamicResource VsAccentColor}" />
+  <SolidColorBrush x:Key="DockTabActiveIndicatorBrush" Color="{DynamicResource VsAccentColor}" />
+  <SolidColorBrush x:Key="DockTargetIndicatorBrush" Color="{DynamicResource VsAccentColor}" />
+  <SolidColorBrush x:Key="DockTabSelectedForegroundBrush" Color="{DynamicResource VsTextColor}" />
+  <SolidColorBrush x:Key="DockTabActiveForegroundBrush" Color="{DynamicResource VsTextColor}" />
+  <SolidColorBrush x:Key="DockTabForegroundBrush" Color="{DynamicResource VsTextMutedColor}" />
+  <SolidColorBrush x:Key="DockThemeBackgroundBrush" Color="{DynamicResource VsBackgroundColor}" />
+  <SolidColorBrush x:Key="DockSurfaceWorkbenchBrush" Color="{DynamicResource VsBackgroundColor}" />
+  <SolidColorBrush x:Key="DockSurfacePanelBrush" Color="{DynamicResource VsSurfaceColor}" />
+  <SolidColorBrush x:Key="DockSurfaceSidebarBrush" Color="{DynamicResource VsSurfaceColor}" />
+  <SolidColorBrush x:Key="DockSurfaceEditorBrush" Color="{DynamicResource VsSurfaceColor}" />
+  <SolidColorBrush x:Key="DockSurfaceHeaderBrush" Color="{DynamicResource VsSurfaceColor}" />
+  <SolidColorBrush x:Key="DockSurfaceHeaderActiveBrush" Color="{DynamicResource VsSurfaceRaisedColor}" />
+  <SolidColorBrush x:Key="DockTabActiveBackgroundBrush" Color="{DynamicResource VsSurfaceColor}" />
+  <SolidColorBrush x:Key="DockTabBackgroundBrush" Color="{DynamicResource VsBackgroundColor}" />
+  <SolidColorBrush x:Key="DockTabHoverBackgroundBrush" Color="{DynamicResource VsSurfaceRaisedColor}" />
+  <SolidColorBrush x:Key="DockDocumentTabStripBackgroundBrush" Color="{DynamicResource VsBackgroundColor}" />
+  <SolidColorBrush x:Key="DockThemeBorderLowBrush" Color="{DynamicResource VsBorderColor}" />
+  <SolidColorBrush x:Key="DockBorderSubtleBrush" Color="{DynamicResource VsBorderColor}" />
+  <SolidColorBrush x:Key="DockSeparatorBrush" Color="{DynamicResource VsBorderColor}" />
+  <SolidColorBrush x:Key="DockSplitterIdleBrush" Color="{DynamicResource VsBackgroundColor}" />
+  <SolidColorBrush x:Key="DockSplitterHoverBrush" Color="{DynamicResource VsAccentColor}" />
+  <SolidColorBrush x:Key="DockThemeForegroundBrush" Color="{DynamicResource VsTextColor}" />
+  <SolidColorBrush x:Key="DockToolChromeIconBrush" Color="{DynamicResource VsTextMutedColor}" />
+  <SolidColorBrush x:Key="DockChromeButtonForegroundBrush" Color="{DynamicResource VsTextMutedColor}" />
+  <x:Double x:Key="VsSpacing">12</x:Double>
+  <CornerRadius x:Key="VsRadius">8</CornerRadius>
+  <FontFamily x:Key="VsMonoFont">JetBrains Mono, Menlo, DejaVu Sans Mono, monospace</FontFamily>
+</ResourceDictionary>

@@ -1,7 +1,7 @@
 # Stand
 
 - [x] Phase 0 Gerüst
-- [ ] Phase 1 Shell
+- [x] Phase 1 Shell
 - [ ] Phase 2 Editor
 - [ ] Phase 3 Roslyn-Workspace
 - [ ] Phase 4 IntelliSense
@@ -13,4 +13,4 @@
 - [ ] Phase 10 Packaging & Homebrew
 - [ ] Phase 11 Linux
 
-Nächster Schritt: Phase 1 (Shell).
+Nächster Schritt: Phase 2 (Editor).
