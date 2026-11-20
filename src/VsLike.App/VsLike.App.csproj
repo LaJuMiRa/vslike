@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UsesMSBuildLocator>true</UsesMSBuildLocator>
+    <RootNamespace>VsLike.App</RootNamespace>
+    <AssemblyName>VsLike</AssemblyName>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="VsLike.App.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Dock.Avalonia" />
+    <PackageReference Include="Dock.Model.Mvvm" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VsLike.Core\VsLike.Core.csproj" />
+    <ProjectReference Include="..\VsLike.Editor\VsLike.Editor.csproj" />
+    <ProjectReference Include="..\VsLike.Roslyn\VsLike.Roslyn.csproj" />
+    <ProjectReference Include="..\VsLike.Projects\VsLike.Projects.csproj" />
+    <ProjectReference Include="..\VsLike.Diagram\VsLike.Diagram.csproj" />
+    <ProjectReference Include="..\VsLike.Debugging\VsLike.Debugging.csproj" />
+  </ItemGroup>
+</Project>

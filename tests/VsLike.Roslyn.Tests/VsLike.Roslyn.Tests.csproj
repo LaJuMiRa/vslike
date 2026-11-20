@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <UsesMSBuildLocator>true</UsesMSBuildLocator>
+    <RootNamespace>VsLike.Roslyn.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="Verify.Xunit" />
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VsLike.Roslyn\VsLike.Roslyn.csproj" />
+  </ItemGroup>
+</Project>
