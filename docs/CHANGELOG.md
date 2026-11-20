@@ -64,3 +64,13 @@ Format: je Phase ein Eintrag.
 - Optional „StyleCop als Paketverweis übernehmen“ (mit Bestätigung, über `dotnet add package`).
 - Abnahme: Test-Solution zeigt mit StyleCop SA1200/SA1633, ohne keine StyleCop-Diagnosen; nach erneutem Öffnen ist der Zustand erhalten (App- und Roslyn-Tests).
 
+## Phase 8 – Klassendiagramm (2026-11-20)
+- Modell (`VsLike.Diagram/Model`): class, interface, struct, enum, record, record struct, Namespaces, Zugriff, abstract/static/sealed/partial, Generics mit Constraints; Felder, Properties (auto/init/required), Methoden, Konstruktoren, Events, Enum-Werte.
+- Roslyn-Reader: partielle Typen über mehrere Dateien, Vererbung/Implementierung, Assoziation und Komposition aus Feld-/Property-Typen (Collections/Arrays → Multiplizität *), Fremdtypen als „extern“ (grau, schreibgeschützt).
+- Writer (Snapshot-Tests mit Verify, 21 Fälle): Typdatei mit file-scoped Namespace, Mitglied hinzufügen/ändern/entfernen, Basisliste, Modifizierer, Typ löschen. Roslyn findet den Knoten, ersetzt wird nur dessen Textbereich; Zeilenende (LF/CRLF) und Einrückung (Spaces/Tabs) werden übernommen, Kommentare und Rümpfe bleiben.
+- Diagramm-Tab mit eigener Zeichenfläche: Raster, Snap, Zoom (⌘/Ctrl + Scrollen), Pan, Einpassen, Auto-Layout (Basistypen oben), Ein-/Ausklappen; Werkzeugkasten (neue Typen platzieren, Erben/Implementieren ziehen ⇒ `: Basis, IFoo`), Eigenschaften-Bereich (Umbenennen, Zugriff/Modifizierer, Basistypen, Mitglieder in UML-Notation `+ Total(withTax: bool): decimal`).
+- Neue Klasse ⇒ `<Typname>.cs` im Ordner des Diagramms, Namespace aus RootNamespace + Ordner; Umbenennen über Roslyn inkl. Referenzen und Dateiname; Löschen mit Bestätigung (Anzahl Verwendungen).
+- Codeänderungen (Editor oder extern per FileSystemWatcher) aktualisieren offene Diagramme, Positionen bleiben; Layout nur in `<Name>.cdiagram.json`; „Klassendiagramm anzeigen“ für Projekte und Ordner im Solution Explorer.
+- Gemeinsames Undo/Redo (⌘Z/⇧⌘Z im Diagramm) über Code- und Layoutänderungen; Export als SVG und PNG.
+- Abnahme (App-Test): Klasse anlegen erzeugt Datei; Vererbung ziehen ergänzt `: Car`; Methode landet nur in `Car.cs`, übriger Text byte-gleich; externe Änderung erscheint im Diagramm; Rückgängig/Wiederholen stellen Code wieder her.
+

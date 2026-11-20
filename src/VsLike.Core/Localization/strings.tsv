@@ -233,3 +233,54 @@ StyleCop.Loading	Loading StyleCop …	StyleCop wird geladen …
 StyleCop.Unavailable	StyleCop.Analyzers {0} could not be loaded (offline?)	StyleCop.Analyzers {0} konnte nicht geladen werden (offline?)
 StyleCop.AddPackageConfirm	Add StyleCop.Analyzers {1} as a package reference to {0} projects? The projects will then also be analysed during builds.	StyleCop.Analyzers {1} als Paketverweis zu {0} Projekten hinzufügen? Die Projekte werden dann auch beim Build analysiert.
 StyleCop.PackageAdded	StyleCop added to {0} projects	StyleCop zu {0} Projekten hinzugefügt
+Command.Diagram.Show	Show Class Diagram	Klassendiagramm anzeigen
+Diagram.Title	Class diagram	Klassendiagramm
+Diagram.Tool.Select	Select	Auswählen
+Diagram.Tool.Connect	Inherit/Implement	Erben/Implementieren
+Diagram.New.Class	Class	Klasse
+Diagram.New.Interface	Interface	Interface
+Diagram.New.Struct	Struct	Struct
+Diagram.New.Enum	Enum	Enum
+Diagram.New.Record	Record	Record
+Diagram.New.RecordStruct	Record struct	Record struct
+Diagram.AddExisting	Add types…	Typen hinzufügen …
+Diagram.Arrange	Auto layout	Automatisch anordnen
+Diagram.Fit	Fit	Einpassen
+Diagram.Grid	Grid	Raster
+Diagram.ExportSvg	Export SVG	SVG exportieren
+Diagram.ExportPng	Export PNG	PNG exportieren
+Diagram.NoSelection	Select a type to edit it. Double-click opens the code.	Typ auswählen, um ihn zu bearbeiten. Doppelklick öffnet den Code.
+Diagram.External	External type (read-only)	Externer Typ (schreibgeschützt)
+Diagram.Name	Name	Name
+Diagram.Rename	Rename	Umbenennen
+Diagram.Modifiers	Access and modifiers	Zugriff und Modifizierer
+Diagram.Apply	Apply	Übernehmen
+Diagram.Bases	Base type and interfaces	Basistyp und Interfaces
+Diagram.Members	Members	Mitglieder
+Diagram.AddMember	Add member	Mitglied hinzufügen
+Diagram.Add	Add	Hinzufügen
+Diagram.EditMember	Edit member	Mitglied bearbeiten
+Diagram.OpenCode	Open in editor	Im Editor öffnen
+Diagram.Collapse	Collapse/expand	Ein-/Ausklappen
+Diagram.RemoveFromDiagram	Remove from diagram	Aus Diagramm entfernen
+Diagram.DeleteType	Delete type from code…	Typ aus dem Code löschen …
+Diagram.Prompt.TypeName	Name of the new type:	Name des neuen Typs:
+Diagram.Prompt.Filter	Add all types whose full name contains:	Alle Typen hinzufügen, deren vollständiger Name enthält:
+Diagram.Prompt.Member	Member in UML notation, e.g. + Total(withTax: bool): decimal	Mitglied in UML-Notation, z. B. + Total(withTax: bool): decimal
+Diagram.InvalidMember	Please enter the member as e.g. "+ Name: string" or "+ Run(count: int): bool".	Bitte das Mitglied z. B. als „+ Name: string“ oder „+ Run(count: int): bool“ eingeben.
+Diagram.FileExists	{0} already exists.	{0} existiert bereits.
+Diagram.CannotInherit	{0} cannot derive from {1}.	{0} kann nicht von {1} erben.
+Diagram.ConfirmDelete	Delete {0} from the code? It is referenced {1} times elsewhere; those places will no longer compile.	{0} aus dem Code löschen? Der Typ wird an {1} anderen Stellen verwendet, die danach nicht mehr kompilieren.
+Diagram.NoSolution	Open a solution first	Zuerst eine Solution öffnen
+Diagram.Undo.AddExisting	Add types	Typen hinzufügen
+Diagram.Undo.Move	Move	Verschieben
+Diagram.Undo.RemoveFromDiagram	Remove from diagram	Aus Diagramm entfernen
+Diagram.Undo.Arrange	Auto layout	Automatisch anordnen
+Diagram.Undo.CreateType	Create {0}	{0} anlegen
+Diagram.Undo.AddMember	Add {0}	{0} hinzufügen
+Diagram.Undo.RemoveMember	Remove {0}	{0} entfernen
+Diagram.Undo.UpdateMember	Change {0}	{0} ändern
+Diagram.Undo.Modifiers	Change modifiers	Modifizierer ändern
+Diagram.Undo.BaseList	Change base types	Basistypen ändern
+Diagram.Undo.DeleteType	Delete {0}	{0} löschen
+Diagram.Undo.Rename	Rename {0} to {1}	{0} in {1} umbenennen

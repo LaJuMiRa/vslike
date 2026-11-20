@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace VsLike.Diagram.Code;
 
 /// <summary>Findet Typ- und Mitgliedsdeklarationen in einem Syntaxbaum über den Diagramm-Schlüssel.</summary>
-internal static class SyntaxLocator
+public static class SyntaxLocator
 {
     public static SyntaxNode Parse(string source) => CSharpSyntaxTree.ParseText(source).GetRoot();
 

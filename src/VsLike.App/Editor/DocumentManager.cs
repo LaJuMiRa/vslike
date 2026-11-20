@@ -32,6 +32,9 @@ public sealed partial class DocumentManager : ObservableObject, IDocumentNavigat
     public IEnumerable<EditorDocumentViewModel> OpenDocuments
         => _shell?.Factory.DocumentDock?.VisibleDockables?.OfType<EditorDocumentViewModel>() ?? [];
 
+    /// <summary>Gets or sets a handler for files that open in a special tab (e.g. class diagrams); returns true if handled.</summary>
+    public Func<string, Task<bool>>? SpecialOpener { get; set; }
+
     private ShellViewModel Shell => _shell ?? throw new InvalidOperationException("DocumentManager is not attached.");
 
     public void Attach(ShellViewModel shell)
@@ -66,6 +69,11 @@ public sealed partial class DocumentManager : ObservableObject, IDocumentNavigat
     public async Task OpenAsync(string path, int? line = null, int? column = null)
     {
         var fullPath = Path.GetFullPath(path);
+        if (SpecialOpener is { } special && await special(fullPath).ConfigureAwait(true))
+        {
+            return;
+        }
+
         var document = OpenDocuments.FirstOrDefault(d => string.Equals(d.FilePath, fullPath, StringComparison.Ordinal));
         if (document is null)
         {

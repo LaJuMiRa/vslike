@@ -4,6 +4,8 @@ namespace VsLike.App.Tests;
 
 internal sealed class FakeDialogService : IDialogService
 {
+    public bool NextConfirm { get; set; } = true;
+
     public string? NextSavePath { get; set; }
 
     public SaveChangesChoice NextSaveChoice { get; set; } = SaveChangesChoice.Cancel;
@@ -24,7 +26,7 @@ internal sealed class FakeDialogService : IDialogService
         return Task.FromResult(NextSaveChoice);
     }
 
-    public Task<bool> ConfirmAsync(string title, string message) => Task.FromResult(true);
+    public Task<bool> ConfirmAsync(string title, string message) => Task.FromResult(NextConfirm);
 
     public Task ShowMessageAsync(string title, string message) => Task.CompletedTask;
 

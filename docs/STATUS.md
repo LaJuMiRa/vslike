@@ -8,15 +8,12 @@
 - [x] Phase 5 Solution/Projekte/NuGet
 - [x] Phase 6 Build/Run/Test
 - [x] Phase 7 StyleCop
-- [ ] Phase 8 Klassendiagramm
+- [x] Phase 8 Klassendiagramm
 - [ ] Phase 9 Debugger
 - [ ] Phase 10 Packaging & Homebrew
 - [ ] Phase 11 Linux
 
-Nächster Schritt: Phase 8 (Klassendiagramm) fortsetzen.
-- [x] 8.1a Modell (`VsLike.Diagram/Model`) und Writer (`Code/DiagramWriter`, `CodeText`) mit Verify-Snapshots (`tests/VsLike.Diagram.Tests/Snapshots`)
-- [x] 8.1b Roslyn-Reader (Typen, Mitglieder, Beziehungen, externe Typen) · `.cdiagram.json` (`Layout/DiagramDocument`), Auto-Layout, Box-Maße, SVG-Export
-- [ ] 8.2 Canvas-Control (Zoom/Pan/Raster/Snap) · 8.3 Dateianlage/Rename/Löschen in der App · 8.4 Werkzeugkasten + Eigenschaften · 8.5 `.cdiagram.json` · 8.6 gemeinsames Undo/Redo · 8.7 Export SVG/PNG
+Nächster Schritt: Phase 9 (Debugger, netcoredbg via DAP).
 
 ## Wiedereinstieg
 - Prüfen: `tools/check.sh` (Build + alle Tests, Exit-Code ≠ 0 bei Fehlern). Commit nur in einem separaten Schritt danach.

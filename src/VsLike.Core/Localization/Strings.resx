@@ -239,4 +239,55 @@
   <data name="StyleCop.Unavailable" xml:space="preserve"><value>StyleCop.Analyzers {0} could not be loaded (offline?)</value></data>
   <data name="StyleCop.AddPackageConfirm" xml:space="preserve"><value>Add StyleCop.Analyzers {1} as a package reference to {0} projects? The projects will then also be analysed during builds.</value></data>
   <data name="StyleCop.PackageAdded" xml:space="preserve"><value>StyleCop added to {0} projects</value></data>
+  <data name="Command.Diagram.Show" xml:space="preserve"><value>Show Class Diagram</value></data>
+  <data name="Diagram.Title" xml:space="preserve"><value>Class diagram</value></data>
+  <data name="Diagram.Tool.Select" xml:space="preserve"><value>Select</value></data>
+  <data name="Diagram.Tool.Connect" xml:space="preserve"><value>Inherit/Implement</value></data>
+  <data name="Diagram.New.Class" xml:space="preserve"><value>Class</value></data>
+  <data name="Diagram.New.Interface" xml:space="preserve"><value>Interface</value></data>
+  <data name="Diagram.New.Struct" xml:space="preserve"><value>Struct</value></data>
+  <data name="Diagram.New.Enum" xml:space="preserve"><value>Enum</value></data>
+  <data name="Diagram.New.Record" xml:space="preserve"><value>Record</value></data>
+  <data name="Diagram.New.RecordStruct" xml:space="preserve"><value>Record struct</value></data>
+  <data name="Diagram.AddExisting" xml:space="preserve"><value>Add types…</value></data>
+  <data name="Diagram.Arrange" xml:space="preserve"><value>Auto layout</value></data>
+  <data name="Diagram.Fit" xml:space="preserve"><value>Fit</value></data>
+  <data name="Diagram.Grid" xml:space="preserve"><value>Grid</value></data>
+  <data name="Diagram.ExportSvg" xml:space="preserve"><value>Export SVG</value></data>
+  <data name="Diagram.ExportPng" xml:space="preserve"><value>Export PNG</value></data>
+  <data name="Diagram.NoSelection" xml:space="preserve"><value>Select a type to edit it. Double-click opens the code.</value></data>
+  <data name="Diagram.External" xml:space="preserve"><value>External type (read-only)</value></data>
+  <data name="Diagram.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Diagram.Rename" xml:space="preserve"><value>Rename</value></data>
+  <data name="Diagram.Modifiers" xml:space="preserve"><value>Access and modifiers</value></data>
+  <data name="Diagram.Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="Diagram.Bases" xml:space="preserve"><value>Base type and interfaces</value></data>
+  <data name="Diagram.Members" xml:space="preserve"><value>Members</value></data>
+  <data name="Diagram.AddMember" xml:space="preserve"><value>Add member</value></data>
+  <data name="Diagram.Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Diagram.EditMember" xml:space="preserve"><value>Edit member</value></data>
+  <data name="Diagram.OpenCode" xml:space="preserve"><value>Open in editor</value></data>
+  <data name="Diagram.Collapse" xml:space="preserve"><value>Collapse/expand</value></data>
+  <data name="Diagram.RemoveFromDiagram" xml:space="preserve"><value>Remove from diagram</value></data>
+  <data name="Diagram.DeleteType" xml:space="preserve"><value>Delete type from code…</value></data>
+  <data name="Diagram.Prompt.TypeName" xml:space="preserve"><value>Name of the new type:</value></data>
+  <data name="Diagram.Prompt.Filter" xml:space="preserve"><value>Add all types whose full name contains:</value></data>
+  <data name="Diagram.Prompt.Member" xml:space="preserve"><value>Member in UML notation, e.g. + Total(withTax: bool): decimal</value></data>
+  <data name="Diagram.InvalidMember" xml:space="preserve"><value>Please enter the member as e.g. &quot;+ Name: string&quot; or &quot;+ Run(count: int): bool&quot;.</value></data>
+  <data name="Diagram.FileExists" xml:space="preserve"><value>{0} already exists.</value></data>
+  <data name="Diagram.CannotInherit" xml:space="preserve"><value>{0} cannot derive from {1}.</value></data>
+  <data name="Diagram.ConfirmDelete" xml:space="preserve"><value>Delete {0} from the code? It is referenced {1} times elsewhere; those places will no longer compile.</value></data>
+  <data name="Diagram.NoSolution" xml:space="preserve"><value>Open a solution first</value></data>
+  <data name="Diagram.Undo.AddExisting" xml:space="preserve"><value>Add types</value></data>
+  <data name="Diagram.Undo.Move" xml:space="preserve"><value>Move</value></data>
+  <data name="Diagram.Undo.RemoveFromDiagram" xml:space="preserve"><value>Remove from diagram</value></data>
+  <data name="Diagram.Undo.Arrange" xml:space="preserve"><value>Auto layout</value></data>
+  <data name="Diagram.Undo.CreateType" xml:space="preserve"><value>Create {0}</value></data>
+  <data name="Diagram.Undo.AddMember" xml:space="preserve"><value>Add {0}</value></data>
+  <data name="Diagram.Undo.RemoveMember" xml:space="preserve"><value>Remove {0}</value></data>
+  <data name="Diagram.Undo.UpdateMember" xml:space="preserve"><value>Change {0}</value></data>
+  <data name="Diagram.Undo.Modifiers" xml:space="preserve"><value>Change modifiers</value></data>
+  <data name="Diagram.Undo.BaseList" xml:space="preserve"><value>Change base types</value></data>
+  <data name="Diagram.Undo.DeleteType" xml:space="preserve"><value>Delete {0}</value></data>
+  <data name="Diagram.Undo.Rename" xml:space="preserve"><value>Rename {0} to {1}</value></data>
 </root>

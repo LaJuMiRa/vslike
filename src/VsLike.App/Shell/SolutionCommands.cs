@@ -64,6 +64,7 @@ public static class SolutionCommands
                 ("-", NoOp),
                 ("Command.Solution.AddClass", () => explorer.AddClassAsync(item)),
                 ("Command.Solution.AddFolder", () => explorer.AddFolderAsync(item)),
+                ("Command.Diagram.Show", () => workbench.Diagrams.ShowForFolderAsync(Path.GetDirectoryName(item.Path)!, Path.GetFileNameWithoutExtension(item.Path))),
                 ("-", NoOp),
                 ("Command.Solution.AddReference", () => EditReferencesAsync(workbench, item.Path)),
                 ("Command.Solution.ManagePackages", () => OpenNuGet(workbench, item.Path)),
@@ -75,6 +76,7 @@ public static class SolutionCommands
             [
                 ("Command.Solution.AddClass", () => explorer.AddClassAsync(item)),
                 ("Command.Solution.AddFolder", () => explorer.AddFolderAsync(item)),
+                ("Command.Diagram.Show", () => workbench.Diagrams.ShowForFolderAsync(item.Path, Path.GetFileName(item.Path))),
                 ("-", NoOp),
                 ("Command.Solution.Rename", () => explorer.RenameAsync(item)),
                 ("Command.Solution.Delete", () => explorer.DeleteAsync(item)),

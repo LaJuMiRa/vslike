@@ -5,4 +5,6 @@
  .Where()]`) als SA1500; mehrzeilig daher `.ToList()` verwenden.
 - Gestartete Programme bekommen keine Standardeingabe (`Console.ReadLine` liefert sofort `null`). Ein Eingabefeld im Ausgabefenster wäre der nächste Schritt; der Debugger (Phase 9) bringt eine Debug-Konsole.
 - Test-Explorer unterstützt VSTest-basierte Projekte; reine Microsoft.Testing.Platform-Projekte (z. B. TUnit ohne VSTest-Brücke) werden erkannt, aber evtl. nicht gefunden.
+- Klassendiagramm: Typparameter und Constraints lassen sich beim Anlegen setzen, an bestehenden Typen aber nur im Code ändern. Beziehungen werden als gerade Linien gezeichnet (keine Kantenführung um Boxen herum).
+- PNG-Export ist nur in der echten App geprüft (Headless-Tests haben keinen Skia-Renderer).
 

@@ -26,7 +26,7 @@ public static class FocusedEdit
             return true;
         }
 
-        return false;
+        return (focused as Avalonia.Visual)?.GetSelfAndVisualAncestors().OfType<IEditTarget>().FirstOrDefault() is { } target && target.TryEdit(action);
     }
 
     private static void Apply(TextEditor editor, EditAction action)

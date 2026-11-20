@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using VsLike.App.Analysis;
 using VsLike.App.Build;
+using VsLike.App.Diagram;
 using VsLike.App.Editor;
 using VsLike.App.Explorer;
 using VsLike.App.Intelligence;
@@ -63,6 +64,7 @@ public sealed class Workbench : IDisposable
         Build = new BuildController(new BuildService(Cli), Output, Problems, Shell, Documents.SaveAllAsync);
         Tests = new TestExplorerViewModel(new TestService(Cli), Output, Shell, Intelligence.Features, Documents, Documents.SaveAllAsync, () => Build.Configuration);
         Shell.Factory.Panels.Single(p => p.Id == ShellPanels.Tests.Id).Content = Tests;
+        Diagrams = new DiagramCoordinator(this);
         SolutionExplorer.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(SolutionExplorerViewModel.Solution) && SolutionExplorer.Solution is { } solution)
@@ -85,6 +87,7 @@ public sealed class Workbench : IDisposable
             }
         };
         Explorer.FilesChanged += (_, _) => SolutionExplorer.Refresh();
+        Explorer.FilesChanged += (_, paths) => SyncClosedFiles(paths);
         WorkbenchCommands.Register(this);
         SolutionCommands.Register(this);
         BuildCommands.Register(this);
@@ -128,6 +131,8 @@ public sealed class Workbench : IDisposable
 
     public StyleCopController StyleCop { get; }
 
+    public DiagramCoordinator Diagrams { get; }
+
     public TestExplorerViewModel Tests { get; }
 
     public CodeIntelligence Intelligence { get; }
@@ -160,6 +165,30 @@ public sealed class Workbench : IDisposable
         Tests.Cancel();
         Explorer.Dispose();
         Intelligence.Dispose();
+    }
+
+    /// <summary>External edits to C# files that are not open in an editor reach the workspace (analysis, diagrams).</summary>
+    private void SyncClosedFiles(IReadOnlyList<string> paths)
+    {
+        foreach (var path in paths.Where(p => p.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)))
+        {
+            if (Documents.OpenDocuments.Any(d => d.FilePath == path) || !Intelligence.Workspace.ContainsDocument(path))
+            {
+                continue;
+            }
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    Intelligence.Workspace.UpdateDocumentText(path, File.ReadAllText(path));
+                }
+            }
+            catch (IOException)
+            {
+                // The next change event retries.
+            }
+        }
     }
 
     private void TrackActiveDocument()

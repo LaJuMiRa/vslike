@@ -239,4 +239,55 @@
   <data name="StyleCop.Unavailable" xml:space="preserve"><value>StyleCop.Analyzers {0} konnte nicht geladen werden (offline?)</value></data>
   <data name="StyleCop.AddPackageConfirm" xml:space="preserve"><value>StyleCop.Analyzers {1} als Paketverweis zu {0} Projekten hinzufügen? Die Projekte werden dann auch beim Build analysiert.</value></data>
   <data name="StyleCop.PackageAdded" xml:space="preserve"><value>StyleCop zu {0} Projekten hinzugefügt</value></data>
+  <data name="Command.Diagram.Show" xml:space="preserve"><value>Klassendiagramm anzeigen</value></data>
+  <data name="Diagram.Title" xml:space="preserve"><value>Klassendiagramm</value></data>
+  <data name="Diagram.Tool.Select" xml:space="preserve"><value>Auswählen</value></data>
+  <data name="Diagram.Tool.Connect" xml:space="preserve"><value>Erben/Implementieren</value></data>
+  <data name="Diagram.New.Class" xml:space="preserve"><value>Klasse</value></data>
+  <data name="Diagram.New.Interface" xml:space="preserve"><value>Interface</value></data>
+  <data name="Diagram.New.Struct" xml:space="preserve"><value>Struct</value></data>
+  <data name="Diagram.New.Enum" xml:space="preserve"><value>Enum</value></data>
+  <data name="Diagram.New.Record" xml:space="preserve"><value>Record</value></data>
+  <data name="Diagram.New.RecordStruct" xml:space="preserve"><value>Record struct</value></data>
+  <data name="Diagram.AddExisting" xml:space="preserve"><value>Typen hinzufügen …</value></data>
+  <data name="Diagram.Arrange" xml:space="preserve"><value>Automatisch anordnen</value></data>
+  <data name="Diagram.Fit" xml:space="preserve"><value>Einpassen</value></data>
+  <data name="Diagram.Grid" xml:space="preserve"><value>Raster</value></data>
+  <data name="Diagram.ExportSvg" xml:space="preserve"><value>SVG exportieren</value></data>
+  <data name="Diagram.ExportPng" xml:space="preserve"><value>PNG exportieren</value></data>
+  <data name="Diagram.NoSelection" xml:space="preserve"><value>Typ auswählen, um ihn zu bearbeiten. Doppelklick öffnet den Code.</value></data>
+  <data name="Diagram.External" xml:space="preserve"><value>Externer Typ (schreibgeschützt)</value></data>
+  <data name="Diagram.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Diagram.Rename" xml:space="preserve"><value>Umbenennen</value></data>
+  <data name="Diagram.Modifiers" xml:space="preserve"><value>Zugriff und Modifizierer</value></data>
+  <data name="Diagram.Apply" xml:space="preserve"><value>Übernehmen</value></data>
+  <data name="Diagram.Bases" xml:space="preserve"><value>Basistyp und Interfaces</value></data>
+  <data name="Diagram.Members" xml:space="preserve"><value>Mitglieder</value></data>
+  <data name="Diagram.AddMember" xml:space="preserve"><value>Mitglied hinzufügen</value></data>
+  <data name="Diagram.Add" xml:space="preserve"><value>Hinzufügen</value></data>
+  <data name="Diagram.EditMember" xml:space="preserve"><value>Mitglied bearbeiten</value></data>
+  <data name="Diagram.OpenCode" xml:space="preserve"><value>Im Editor öffnen</value></data>
+  <data name="Diagram.Collapse" xml:space="preserve"><value>Ein-/Ausklappen</value></data>
+  <data name="Diagram.RemoveFromDiagram" xml:space="preserve"><value>Aus Diagramm entfernen</value></data>
+  <data name="Diagram.DeleteType" xml:space="preserve"><value>Typ aus dem Code löschen …</value></data>
+  <data name="Diagram.Prompt.TypeName" xml:space="preserve"><value>Name des neuen Typs:</value></data>
+  <data name="Diagram.Prompt.Filter" xml:space="preserve"><value>Alle Typen hinzufügen, deren vollständiger Name enthält:</value></data>
+  <data name="Diagram.Prompt.Member" xml:space="preserve"><value>Mitglied in UML-Notation, z. B. + Total(withTax: bool): decimal</value></data>
+  <data name="Diagram.InvalidMember" xml:space="preserve"><value>Bitte das Mitglied z. B. als „+ Name: string“ oder „+ Run(count: int): bool“ eingeben.</value></data>
+  <data name="Diagram.FileExists" xml:space="preserve"><value>{0} existiert bereits.</value></data>
+  <data name="Diagram.CannotInherit" xml:space="preserve"><value>{0} kann nicht von {1} erben.</value></data>
+  <data name="Diagram.ConfirmDelete" xml:space="preserve"><value>{0} aus dem Code löschen? Der Typ wird an {1} anderen Stellen verwendet, die danach nicht mehr kompilieren.</value></data>
+  <data name="Diagram.NoSolution" xml:space="preserve"><value>Zuerst eine Solution öffnen</value></data>
+  <data name="Diagram.Undo.AddExisting" xml:space="preserve"><value>Typen hinzufügen</value></data>
+  <data name="Diagram.Undo.Move" xml:space="preserve"><value>Verschieben</value></data>
+  <data name="Diagram.Undo.RemoveFromDiagram" xml:space="preserve"><value>Aus Diagramm entfernen</value></data>
+  <data name="Diagram.Undo.Arrange" xml:space="preserve"><value>Automatisch anordnen</value></data>
+  <data name="Diagram.Undo.CreateType" xml:space="preserve"><value>{0} anlegen</value></data>
+  <data name="Diagram.Undo.AddMember" xml:space="preserve"><value>{0} hinzufügen</value></data>
+  <data name="Diagram.Undo.RemoveMember" xml:space="preserve"><value>{0} entfernen</value></data>
+  <data name="Diagram.Undo.UpdateMember" xml:space="preserve"><value>{0} ändern</value></data>
+  <data name="Diagram.Undo.Modifiers" xml:space="preserve"><value>Modifizierer ändern</value></data>
+  <data name="Diagram.Undo.BaseList" xml:space="preserve"><value>Basistypen ändern</value></data>
+  <data name="Diagram.Undo.DeleteType" xml:space="preserve"><value>{0} löschen</value></data>
+  <data name="Diagram.Undo.Rename" xml:space="preserve"><value>{0} in {1} umbenennen</value></data>
 </root>

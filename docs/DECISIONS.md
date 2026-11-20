@@ -36,4 +36,9 @@
 | 2026-11-20 | StyleCop-Analyzer laufen über `CompilationWithAnalyzers` neben dem Compiler; Analyzer aus Projekt-PackageReferences werden in der IDE nicht zusätzlich ausgeführt | Vermeidet doppelte Meldungen bei Projekten, die StyleCop schon referenzieren; die IDE nutzt immer die eine geprüfte Version. |
 | 2026-11-20 | `stylecop.json` wird als AdditionalDocument nur in den unveränderlichen Solution-Snapshot gelegt | Vorgabe „csproj wird nicht verändert“; StyleCop liest seine Einstellungen nur aus AdditionalFiles. |
 | 2026-11-20 | „Alle im Dokument beheben“ erst ab zwei gleichen Diagnosen im Dokument; „Alle im Projekt“ immer, wenn der Provider es unterstützt | Ein Fix-All für ein einzelnes Vorkommen wäre nur eine Dublette des Einzel-Fixes. |
+| 2026-11-20 | Diagramm-Writer ersetzt nur den Textbereich des per Roslyn gefundenen Knotens (statt Syntaxbaum neu formatieren) | Formatierung, Kommentare und Rest der Datei bleiben garantiert unverändert; Ergebnis ist deterministisch und per Snapshot prüfbar. |
+| 2026-11-20 | Diagramm-Schlüssel ist der volle Typname (`Ns.Outer.Typ`\`Arity`); `.cdiagram.json` speichert nur Platzierungen und Ansicht | Code ist die einzige Quelle für Typen/Mitglieder; Umbenennen führt den Schlüssel im Layout mit. |
+| 2026-11-20 | Komposition = readonly-Feld bzw. get-only/init-Property eines Solution-Typs, sonst Assoziation | Aus dem Code ableitbar ohne Annotationen; dokumentierte Heuristik. |
+| 2026-11-20 | Mitglieder werden in UML-Notation eingegeben, wie sie in der Box stehen | Eine Notation für Anzeige und Eingabe; Parser (`MemberSpec`) ist getestet. |
+| 2026-11-20 | Entf-Taste entfernt einen Typ nur aus dem Diagramm; Löschen aus dem Code ist ein eigener Befehl mit Bestätigung | Verhindert versehentliches Löschen von Code. |
 
