@@ -14,4 +14,7 @@ public interface IDialogService
     Task<bool> ConfirmAsync(string title, string message);
 
     Task ShowMessageAsync(string title, string message);
+
+    /// <summary>Asks for a line of text; returns null when cancelled.</summary>
+    Task<string?> PromptAsync(string title, string message, string initialValue);
 }

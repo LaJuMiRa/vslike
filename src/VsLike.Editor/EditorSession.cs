@@ -14,6 +14,7 @@ using VsLike.Editor.Editing;
 using VsLike.Editor.Folding;
 using VsLike.Editor.Highlighting;
 using VsLike.Editor.Intelligence;
+using VsLike.Editor.Snippets;
 
 namespace VsLike.Editor;
 
@@ -32,6 +33,7 @@ public sealed class EditorSession : IDisposable
     private readonly SearchPanel _searchPanel;
     private readonly DispatcherTimer _foldingTimer;
     private CancellationTokenSource? _foldingCancellation;
+    private SnippetSession? _snippet;
 
     public EditorSession(TextEditor editor, string? filePath, EditorThemeKind theme)
     {
@@ -56,11 +58,14 @@ public sealed class EditorSession : IDisposable
         }
 
         MultiCaret = new MultiCaretController(editor);
+        Completion = new CompletionController(editor);
+        SignatureHelp = new SignatureHelpController(editor);
         Diagnostics = new DiagnosticMarkers(editor.TextArea.TextView, editor.Document);
         editor.TextArea.TextView.BackgroundRenderers.Add(Diagnostics);
         Semantic = new SemanticColorizer();
         editor.TextArea.TextView.LineTransformers.Add(Semantic);
         editor.TextArea.TextView.PointerHover += OnPointerHover;
+        editor.TextArea.AddHandler(InputElement.PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel);
         editor.TextArea.TextView.PointerHoverStopped += OnPointerHoverStopped;
         editor.TextArea.TextView.ScrollOffsetChanged += OnViewportChanged;
         _searchPanel = SearchPanel.Install(editor);
@@ -73,6 +78,7 @@ public sealed class EditorSession : IDisposable
         };
 
         editor.TextArea.TextEntering += OnTextEntering;
+        editor.TextArea.TextEntered += OnTextEntered;
         editor.TextArea.AddHandler(InputElement.KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
         editor.Document.TextChanged += OnTextChanged;
         editor.TextArea.Caret.PositionChanged += OnCaretPositionChanged;
@@ -83,6 +89,12 @@ public sealed class EditorSession : IDisposable
     /// <summary>Raised when the caret moves; arguments are 1-based line and column.</summary>
     public event EventHandler<(int Line, int Column)>? CaretMoved;
 
+    /// <summary>Raised on ⌘-click (Ctrl-click on Linux) with the clicked offset (Go to Definition).</summary>
+    public event EventHandler<int>? DefinitionRequested;
+
+    /// <summary>Raised after a single character was typed; arguments are the character and the caret offset after it.</summary>
+    public event EventHandler<(char Typed, int Offset)>? CharTyped;
+
     /// <summary>Raised when the pointer rests over a text offset; listeners answer with <see cref="ShowQuickInfo"/>.</summary>
     public event EventHandler<int>? HoverRequested;
 
@@ -92,6 +104,15 @@ public sealed class EditorSession : IDisposable
     public EditorLanguage Language { get; }
 
     public DiagnosticMarkers Diagnostics { get; }
+
+    public CompletionController Completion { get; }
+
+    public SignatureHelpController SignatureHelp { get; }
+
+    /// <summary>Gets or sets the resolver for the enclosing type name (used by snippets such as ctor).</summary>
+    public Func<int, Task<string?>>? TypeNameResolver { get; set; }
+
+    public bool IsSnippetActive => _snippet?.IsActive == true;
 
     public SemanticColorizer Semantic { get; }
 
@@ -218,6 +239,19 @@ public sealed class EditorSession : IDisposable
         _editor.Select(segmentStart, replacement.Length);
     }
 
+    /// <summary>Replaces <paramref name="length"/> characters at <paramref name="start"/> with an expanded snippet.</summary>
+    public async Task InsertSnippetAsync(SnippetDefinition snippet, int start, int length)
+    {
+        var document = _editor.Document;
+        var line = document.GetLineByOffset(start);
+        var lineText = document.GetText(line.Offset, line.Length);
+        var indentation = lineText[..(lineText.Length - lineText.TrimStart().Length)];
+        var typeName = TypeNameResolver is null ? null : await TypeNameResolver(start).ConfigureAwait(true);
+        var expanded = SnippetExpander.Expand(snippet.Body, indentation, typeName);
+        _snippet = SnippetSession.Insert(_editor, start, length, expanded);
+        _editor.TextArea.Focus();
+    }
+
     /// <summary>Moves the caret to a 1-based line/column and scrolls it into view.</summary>
     public void GoTo(int line, int column = 1)
     {
@@ -238,12 +272,16 @@ public sealed class EditorSession : IDisposable
         _editor.Document.TextChanged -= OnTextChanged;
         _editor.TextArea.Caret.PositionChanged -= OnCaretPositionChanged;
         _editor.TextArea.TextView.PointerHover -= OnPointerHover;
+        _editor.TextArea.RemoveHandler(InputElement.PointerPressedEvent, OnPointerPressed);
         _editor.TextArea.TextView.PointerHoverStopped -= OnPointerHoverStopped;
         _editor.TextArea.TextView.ScrollOffsetChanged -= OnViewportChanged;
         _editor.TextArea.TextView.BackgroundRenderers.Remove(Diagnostics);
         _editor.TextArea.TextView.LineTransformers.Remove(Semantic);
         ToolTip.SetIsOpen(_editor.TextArea.TextView, false);
         _editor.TextArea.TextEntering -= OnTextEntering;
+        _editor.TextArea.TextEntered -= OnTextEntered;
+        Completion.Close();
+        SignatureHelp.Close();
         _editor.TextArea.RemoveHandler(InputElement.KeyDownEvent, OnKeyDown);
         MultiCaret.Dispose();
         _searchPanel.Uninstall();
@@ -282,6 +320,22 @@ public sealed class EditorSession : IDisposable
         }
     }
 
+    private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        var primary = OperatingSystem.IsMacOS() ? KeyModifiers.Meta : KeyModifiers.Control;
+        if (DefinitionRequested is null || !e.KeyModifiers.HasFlag(primary))
+        {
+            return;
+        }
+
+        var view = _editor.TextArea.TextView;
+        if (view.GetPosition(e.GetPosition(view) + view.ScrollOffset) is { } position)
+        {
+            DefinitionRequested.Invoke(this, _editor.Document.GetOffset(position.Location));
+            e.Handled = true;
+        }
+    }
+
     private void OnPointerHoverStopped(object? sender, PointerEventArgs e) => ToolTip.SetIsOpen(_editor.TextArea.TextView, false);
 
     private void OnTextChanged(object? sender, EventArgs e)
@@ -316,6 +370,11 @@ public sealed class EditorSession : IDisposable
 
     private void OnTextEntering(object? sender, TextInputEventArgs e)
     {
+        if (e.Text is { Length: 1 } single)
+        {
+            Completion.OnCharacterTyping(single[0]);
+        }
+
         if (e.Handled || !AutoBracketsEnabled || e.Text is not { Length: 1 } typedText || !_editor.TextArea.Selection.IsEmpty)
         {
             return;
@@ -338,8 +397,62 @@ public sealed class EditorSession : IDisposable
         }
     }
 
+    private void OnTextEntered(object? sender, TextInputEventArgs e)
+    {
+        if (e.Text is { Length: 1 } single)
+        {
+            CharTyped?.Invoke(this, (single[0], _editor.CaretOffset));
+        }
+    }
+
+    private bool TryHandleSnippetKey(KeyEventArgs e)
+    {
+        if (Completion.IsOpen || e.KeyModifiers != KeyModifiers.None)
+        {
+            return false;
+        }
+
+        if (e.Key == Key.Escape || e.Key == Key.Enter)
+        {
+            _snippet?.End();
+            return false;
+        }
+
+        if (e.Key != Key.Tab)
+        {
+            return false;
+        }
+
+        if (_snippet is { IsActive: true } active)
+        {
+            active.Next();
+            return true;
+        }
+
+        if (Language != LanguageRegistry.CSharp || !_editor.TextArea.Selection.IsEmpty)
+        {
+            return false;
+        }
+
+        var caret = _editor.CaretOffset;
+        var (start, end) = MultiCaretController.WordAt(_editor.Document, caret);
+        if (end != caret || SnippetLibrary.Find(_editor.Document.GetText(start, end - start)) is not { } snippet)
+        {
+            return false;
+        }
+
+        _ = InsertSnippetAsync(snippet, start, end - start);
+        return true;
+    }
+
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
+        if (!e.Handled && TryHandleSnippetKey(e))
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (e.Handled || e.Key != Key.Back || !AutoBracketsEnabled || !_editor.TextArea.Selection.IsEmpty || MultiCaret.ExtraCaretCount > 0)
         {
             return;

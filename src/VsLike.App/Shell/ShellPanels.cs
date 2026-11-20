@@ -7,6 +7,7 @@ public static class ShellPanels
     public static readonly PanelDescriptor Problems = new("problems", "Panel.Errors", LayoutAreas.Bottom, "Cmd+Shift+M");
     public static readonly PanelDescriptor Output = new("output", "Panel.Output", LayoutAreas.Bottom, "Cmd+Shift+U");
     public static readonly PanelDescriptor Search = new("search", "Panel.Search", LayoutAreas.Bottom);
+    public static readonly PanelDescriptor References = new("references", "Panel.References", LayoutAreas.Bottom);
     public static readonly PanelDescriptor Properties = new("properties", "Panel.Properties", LayoutAreas.Right);
 
     /// <summary>Panels with placeholder content (used by layout tests).</summary>
@@ -16,6 +17,7 @@ public static class ShellPanels
         (Problems, new EmptyPanelViewModel()),
         (Output, new EmptyPanelViewModel()),
         (Search, new EmptyPanelViewModel()),
+        (References, new EmptyPanelViewModel()),
         (Properties, new EmptyPanelViewModel()),
     ];
 }

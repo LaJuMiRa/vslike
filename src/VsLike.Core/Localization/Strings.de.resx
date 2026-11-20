@@ -108,4 +108,22 @@
   <data name="Problems.Column.Project" xml:space="preserve"><value>Projekt</value></data>
   <data name="Problems.Column.Category" xml:space="preserve"><value>Kategorie</value></data>
   <data name="Problems.Empty" xml:space="preserve"><value>Keine Probleme</value></data>
+  <data name="Command.Edit.TriggerCompletion" xml:space="preserve"><value>Vorschläge anzeigen</value></data>
+  <data name="Command.Edit.SignatureHelp" xml:space="preserve"><value>Parameterinfo</value></data>
+  <data name="Command.Edit.QuickFix" xml:space="preserve"><value>Schnellkorrektur und Refactorings…</value></data>
+  <data name="Command.Edit.Format" xml:space="preserve"><value>Dokument formatieren</value></data>
+  <data name="Command.Nav.GoToDefinition" xml:space="preserve"><value>Gehe zu Definition</value></data>
+  <data name="Command.Nav.FindReferences" xml:space="preserve"><value>Alle Verweise suchen</value></data>
+  <data name="Command.Edit.Rename" xml:space="preserve"><value>Symbol umbenennen…</value></data>
+  <data name="Category.Navigate" xml:space="preserve"><value>Navigieren</value></data>
+  <data name="Panel.References" xml:space="preserve"><value>Verweise</value></data>
+  <data name="References.Summary" xml:space="preserve"><value>{0} Verweise auf {1}</value></data>
+  <data name="Rename.Title" xml:space="preserve"><value>{0} umbenennen</value></data>
+  <data name="Rename.Message" xml:space="preserve"><value>Neuer Name ({0} Verweise):</value></data>
+  <data name="Rename.Invalid" xml:space="preserve"><value>„{0}“ ist kein gültiger Bezeichner.</value></data>
+  <data name="Rename.Done" xml:space="preserve"><value>{0} in {2} Dateien zu {1} umbenannt</value></data>
+  <data name="Rename.NotPossible" xml:space="preserve"><value>Umbenennen nicht möglich: {0}</value></data>
+  <data name="Status.NoDefinition" xml:space="preserve"><value>Keine Definition im Quellcode gefunden</value></data>
+  <data name="Status.NoCodeActions" xml:space="preserve"><value>Hier gibt es keine Schnellkorrekturen oder Refactorings</value></data>
+  <data name="Status.Formatted" xml:space="preserve"><value>„{0}“ formatiert</value></data>
 </root>

@@ -15,6 +15,7 @@ namespace VsLike.App.Intelligence;
 public sealed class CodeIntelligence : IDisposable
 {
     private readonly ICodeWorkspace _workspace;
+    private readonly ILanguageFeatures _features;
     private readonly IDotnetCli _cli;
     private readonly DocumentManager _documents;
     private readonly ProblemsViewModel _problems;
@@ -22,9 +23,11 @@ public sealed class CodeIntelligence : IDisposable
     private readonly Dictionary<EditorDocumentViewModel, DocumentBinding> _bindings = [];
     private CancellationTokenSource? _loadCancellation;
 
-    public CodeIntelligence(ICodeWorkspace workspace, IDotnetCli cli, DocumentManager documents, ProblemsViewModel problems, ShellViewModel shell)
+    public CodeIntelligence(ICodeWorkspace workspace, ILanguageFeatures features, IDotnetCli cli, DocumentManager documents, ProblemsViewModel problems, ShellViewModel shell)
     {
         _workspace = workspace;
+        _features = features;
+        Applier = new WorkspaceEditApplier(documents, workspace);
         _cli = cli;
         _documents = documents;
         _problems = problems;
@@ -40,7 +43,14 @@ public sealed class CodeIntelligence : IDisposable
 
     public event EventHandler<WorkspaceLoadResult>? SolutionLoaded;
 
+    /// <summary>Raised when the user ⌘-clicks a symbol in a C# editor (document, offset).</summary>
+    public event EventHandler<(EditorDocumentViewModel Document, int Offset)>? DefinitionRequested;
+
     public ICodeWorkspace Workspace => _workspace;
+
+    public ILanguageFeatures Features => _features;
+
+    public WorkspaceEditApplier Applier { get; }
 
     public bool IsLoading { get; private set; }
 
@@ -117,6 +127,18 @@ public sealed class CodeIntelligence : IDisposable
         });
     }
 
+    /// <summary>Returns the binding of an open C# document, pushing its latest text to the workspace.</summary>
+    internal DocumentBinding? BindingFor(EditorDocumentViewModel? document)
+    {
+        if (document is null || !_bindings.TryGetValue(document, out var binding))
+        {
+            return null;
+        }
+
+        binding.Sync();
+        return binding;
+    }
+
     private static string LastError(ProcessResult result)
         => result.Output.LastOrDefault(l => l.Text.Contains("error", StringComparison.OrdinalIgnoreCase))?.Text ?? $"exit code {result.ExitCode}";
 
@@ -126,7 +148,9 @@ public sealed class CodeIntelligence : IDisposable
     {
         if (IsCSharp(document) && !_bindings.ContainsKey(document))
         {
-            _bindings[document] = new DocumentBinding(_workspace, document);
+            var binding = new DocumentBinding(_workspace, _features, Applier, document);
+            binding.DefinitionRequested += (_, offset) => DefinitionRequested?.Invoke(this, (document, offset));
+            _bindings[document] = binding;
         }
     }
 

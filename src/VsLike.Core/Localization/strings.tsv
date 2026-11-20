@@ -102,3 +102,21 @@ Problems.Column.Line	Line	Zeile
 Problems.Column.Project	Project	Projekt
 Problems.Column.Category	Category	Kategorie
 Problems.Empty	No problems	Keine Probleme
+Command.Edit.TriggerCompletion	Trigger Suggestions	Vorschläge anzeigen
+Command.Edit.SignatureHelp	Parameter Info	Parameterinfo
+Command.Edit.QuickFix	Quick Fix and Refactorings…	Schnellkorrektur und Refactorings…
+Command.Edit.Format	Format Document	Dokument formatieren
+Command.Nav.GoToDefinition	Go to Definition	Gehe zu Definition
+Command.Nav.FindReferences	Find All References	Alle Verweise suchen
+Command.Edit.Rename	Rename Symbol…	Symbol umbenennen…
+Category.Navigate	Navigate	Navigieren
+Panel.References	References	Verweise
+References.Summary	{0} references to {1}	{0} Verweise auf {1}
+Rename.Title	Rename {0}	{0} umbenennen
+Rename.Message	New name ({0} references):	Neuer Name ({0} Verweise):
+Rename.Invalid	"{0}" is not a valid identifier.	„{0}“ ist kein gültiger Bezeichner.
+Rename.Done	Renamed {0} to {1} in {2} files	{0} in {2} Dateien zu {1} umbenannt
+Rename.NotPossible	Cannot rename: {0}	Umbenennen nicht möglich: {0}
+Status.NoDefinition	No definition in source code found	Keine Definition im Quellcode gefunden
+Status.NoCodeActions	No quick fixes or refactorings here	Hier gibt es keine Schnellkorrekturen oder Refactorings
+Status.Formatted	Formatted "{0}"	„{0}“ formatiert

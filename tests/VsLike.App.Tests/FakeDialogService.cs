@@ -10,6 +10,8 @@ internal sealed class FakeDialogService : IDialogService
 
     public int SaveChangesPrompts { get; private set; }
 
+    public string? NextPrompt { get; set; }
+
     public Task<string?> PickFileAsync(string titleKey) => Task.FromResult<string?>(null);
 
     public Task<string?> PickFolderAsync(string titleKey) => Task.FromResult<string?>(null);
@@ -25,4 +27,6 @@ internal sealed class FakeDialogService : IDialogService
     public Task<bool> ConfirmAsync(string title, string message) => Task.FromResult(true);
 
     public Task ShowMessageAsync(string title, string message) => Task.CompletedTask;
+
+    public Task<string?> PromptAsync(string title, string message, string initialValue) => Task.FromResult(NextPrompt);
 }

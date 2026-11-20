@@ -87,6 +87,55 @@ public sealed class RoslynWorkspace : ICodeWorkspace
         return result;
     }
 
+    /// <summary>Adds a new file on disk to the project whose folder contains it (deepest match).</summary>
+    public bool AddDocument(string filePath, string text)
+    {
+        lock (_gate)
+        {
+            if (_solution is not { } solution || ContainsDocument(filePath))
+            {
+                return false;
+            }
+
+            var project = solution.Projects
+                .Where(p => p.FilePath is not null && filePath.StartsWith(Path.GetDirectoryName(p.FilePath)! + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+                .OrderByDescending(p => p.FilePath!.Length)
+                .FirstOrDefault();
+            if (project is null)
+            {
+                return false;
+            }
+
+            var folders = Path.GetRelativePath(Path.GetDirectoryName(project.FilePath!)!, Path.GetDirectoryName(filePath)!)
+                .Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)
+                .Where(f => f != ".");
+            _solution = solution.AddDocument(DocumentId.CreateNewId(project.Id), Path.GetFileName(filePath), SourceText.From(text), folders, filePath);
+            _projects = [.. _solution.Projects.Select(ToWorkspaceProject)];
+            return true;
+        }
+    }
+
+    public bool RemoveDocument(string filePath)
+    {
+        lock (_gate)
+        {
+            if (_solution is not { } solution)
+            {
+                return false;
+            }
+
+            var ids = solution.GetDocumentIdsWithFilePath(filePath);
+            if (ids.IsEmpty)
+            {
+                return false;
+            }
+
+            _solution = solution.RemoveDocuments(ids);
+            _projects = [.. _solution.Projects.Select(ToWorkspaceProject)];
+            return true;
+        }
+    }
+
     public bool ContainsDocument(string filePath)
         => _solution?.GetDocumentIdsWithFilePath(filePath).IsEmpty == false;
 
@@ -123,25 +172,29 @@ public sealed class RoslynWorkspace : ICodeWorkspace
             return [];
         }
 
+        var diagnostics = await GetRoslynDiagnosticsAsync(document, cancellationToken).ConfigureAwait(false);
+        return [.. diagnostics.Where(d => d.Severity != DiagnosticSeverity.Hidden).Select(d => RoslynMapping.ToInfo(d, document.Project.Name))];
+    }
+
+    /// <summary>Compiler and analyzer diagnostics of one document as Roslyn objects (needed for code fixes).</summary>
+    public async Task<ImmutableArray<Diagnostic>> GetRoslynDiagnosticsAsync(Document document, CancellationToken cancellationToken)
+    {
         var model = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
         if (model is null)
         {
             return [];
         }
 
-        var diagnostics = model.GetDiagnostics(cancellationToken: cancellationToken).ToList();
+        var diagnostics = model.GetDiagnostics(cancellationToken: cancellationToken).ToBuilder();
         var analyzers = _analyzers;
-        if (!analyzers.IsEmpty && model.Compilation is { } compilation)
+        if (!analyzers.IsEmpty)
         {
-            var withAnalyzers = compilation.WithAnalyzers(analyzers, document.Project.AnalyzerOptions);
-            var tree = model.SyntaxTree;
-            var syntax = await withAnalyzers.GetAnalyzerSyntaxDiagnosticsAsync(tree, cancellationToken).ConfigureAwait(false);
-            var semantic = await withAnalyzers.GetAnalyzerSemanticDiagnosticsAsync(model, null, cancellationToken).ConfigureAwait(false);
-            diagnostics.AddRange(syntax);
-            diagnostics.AddRange(semantic);
+            var withAnalyzers = model.Compilation.WithAnalyzers(analyzers, document.Project.AnalyzerOptions);
+            diagnostics.AddRange(await withAnalyzers.GetAnalyzerSyntaxDiagnosticsAsync(model.SyntaxTree, cancellationToken).ConfigureAwait(false));
+            diagnostics.AddRange(await withAnalyzers.GetAnalyzerSemanticDiagnosticsAsync(model, null, cancellationToken).ConfigureAwait(false));
         }
 
-        return [.. diagnostics.Where(d => d.Severity != DiagnosticSeverity.Hidden && d.Location.IsInSource).Select(d => RoslynMapping.ToInfo(d, document.Project.Name))];
+        return [.. diagnostics.Where(d => d.Location.IsInSource && d.Location.SourceTree == model.SyntaxTree)];
     }
 
     public async Task RefreshAllDiagnosticsAsync(CancellationToken cancellationToken)

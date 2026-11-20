@@ -23,6 +23,11 @@ public interface ICodeWorkspace : IDisposable
     /// <summary>Tells the workspace about unsaved editor text. Diagnostics are recomputed debounced.</summary>
     void UpdateDocumentText(string filePath, string text);
 
+    /// <summary>Adds a new file to the project whose folder contains it. Returns false if no project matches.</summary>
+    bool AddDocument(string filePath, string text);
+
+    bool RemoveDocument(string filePath);
+
     /// <summary>Returns true if the file belongs to a loaded project (otherwise it is handled as a loose file).</summary>
     bool ContainsDocument(string filePath);
 

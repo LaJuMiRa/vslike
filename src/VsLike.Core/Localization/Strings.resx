@@ -108,4 +108,22 @@
   <data name="Problems.Column.Project" xml:space="preserve"><value>Project</value></data>
   <data name="Problems.Column.Category" xml:space="preserve"><value>Category</value></data>
   <data name="Problems.Empty" xml:space="preserve"><value>No problems</value></data>
+  <data name="Command.Edit.TriggerCompletion" xml:space="preserve"><value>Trigger Suggestions</value></data>
+  <data name="Command.Edit.SignatureHelp" xml:space="preserve"><value>Parameter Info</value></data>
+  <data name="Command.Edit.QuickFix" xml:space="preserve"><value>Quick Fix and Refactorings…</value></data>
+  <data name="Command.Edit.Format" xml:space="preserve"><value>Format Document</value></data>
+  <data name="Command.Nav.GoToDefinition" xml:space="preserve"><value>Go to Definition</value></data>
+  <data name="Command.Nav.FindReferences" xml:space="preserve"><value>Find All References</value></data>
+  <data name="Command.Edit.Rename" xml:space="preserve"><value>Rename Symbol…</value></data>
+  <data name="Category.Navigate" xml:space="preserve"><value>Navigate</value></data>
+  <data name="Panel.References" xml:space="preserve"><value>References</value></data>
+  <data name="References.Summary" xml:space="preserve"><value>{0} references to {1}</value></data>
+  <data name="Rename.Title" xml:space="preserve"><value>Rename {0}</value></data>
+  <data name="Rename.Message" xml:space="preserve"><value>New name ({0} references):</value></data>
+  <data name="Rename.Invalid" xml:space="preserve"><value>&quot;{0}&quot; is not a valid identifier.</value></data>
+  <data name="Rename.Done" xml:space="preserve"><value>Renamed {0} to {1} in {2} files</value></data>
+  <data name="Rename.NotPossible" xml:space="preserve"><value>Cannot rename: {0}</value></data>
+  <data name="Status.NoDefinition" xml:space="preserve"><value>No definition in source code found</value></data>
+  <data name="Status.NoCodeActions" xml:space="preserve"><value>No quick fixes or refactorings here</value></data>
+  <data name="Status.Formatted" xml:space="preserve"><value>Formatted &quot;{0}&quot;</value></data>
 </root>

@@ -36,6 +36,24 @@ public sealed class MultiCaretController : IBackgroundRenderer, IDisposable
 
     public IReadOnlyList<(int Start, int End)> ExtraRanges => [.. _extra.Select(r => (r.Start.Offset, r.End.Offset))];
 
+    public static (int Start, int End) WordAt(TextDocument document, int offset)
+    {
+        var text = document.Text;
+        var start = offset;
+        while (start > 0 && IsWordChar(text[start - 1]))
+        {
+            start--;
+        }
+
+        var end = offset;
+        while (end < text.Length && IsWordChar(text[end]))
+        {
+            end++;
+        }
+
+        return (start, end);
+    }
+
     public void SetColors(IBrush caret, IBrush selection)
     {
         _caretBrush = caret;
@@ -107,24 +125,6 @@ public sealed class MultiCaretController : IBackgroundRenderer, IDisposable
         _editor.TextArea.TextEntering -= OnTextEntering;
         _editor.TextArea.RemoveHandler(InputElement.KeyDownEvent, OnKeyDown);
         _editor.TextArea.RemoveHandler(InputElement.PointerPressedEvent, OnPointerPressed);
-    }
-
-    internal static (int Start, int End) WordAt(TextDocument document, int offset)
-    {
-        var text = document.Text;
-        var start = offset;
-        while (start > 0 && IsWordChar(text[start - 1]))
-        {
-            start--;
-        }
-
-        var end = offset;
-        while (end < text.Length && IsWordChar(text[end]))
-        {
-            end++;
-        }
-
-        return (start, end);
     }
 
     /// <summary>Applies an edit to the primary selection and all extra ranges in one undo group.</summary>

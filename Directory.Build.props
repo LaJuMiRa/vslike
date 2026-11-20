@@ -11,6 +11,9 @@
     <Copyright>Copyright (c) 2026 VsLike contributors</Copyright>
     <Version>0.1.0</Version>
     <SatelliteResourceLanguages>en;de</SatelliteResourceLanguages>
+    <!-- Build-Ausgaben außerhalb der iCloud-Synchronisierung (.nosync), siehe docs/DECISIONS.md. -->
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts.nosync</ArtifactsPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />

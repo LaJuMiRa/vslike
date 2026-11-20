@@ -3,6 +3,7 @@ using VsLike.App.Editor;
 using VsLike.App.Explorer;
 using VsLike.App.Intelligence;
 using VsLike.App.Problems;
+using VsLike.App.References;
 using VsLike.App.Search;
 using VsLike.App.Services;
 using VsLike.App.Shell;
@@ -18,7 +19,7 @@ namespace VsLike.App;
 /// <summary>Kompositionswurzel des Hauptfensters: verbindet Shell, Dokumente, Explorer und Suche.</summary>
 public sealed class Workbench : IDisposable
 {
-    public Workbench(AppServices services, IDialogService dialogs, Func<TopLevel?> topLevel, ICodeWorkspace? workspace = null, IDotnetCli? cli = null)
+    public Workbench(AppServices services, IDialogService dialogs, Func<TopLevel?> topLevel, IDotnetCli? cli = null)
     {
         Services = services;
         Dialogs = dialogs;
@@ -27,6 +28,7 @@ public sealed class Workbench : IDisposable
         Explorer = new ExplorerViewModel(Documents);
         Search = new FindInFilesViewModel(Explorer.AllFiles, () => Explorer.RootPath, Documents, Documents);
         Problems = new ProblemsViewModel(Documents);
+        References = new ReferencesViewModel(Documents);
         Cli = cli ?? new DotnetCli();
         Shell = new ShellViewModel(
             services,
@@ -35,10 +37,13 @@ public sealed class Workbench : IDisposable
                 (ShellPanels.Problems, Problems),
                 (ShellPanels.Output, new EmptyPanelViewModel()),
                 (ShellPanels.Search, Search),
+                (ShellPanels.References, References),
                 (ShellPanels.Properties, new EmptyPanelViewModel()),
             ]);
         Documents.Attach(Shell);
-        Intelligence = new CodeIntelligence(workspace ?? new RoslynWorkspace(), Cli, Documents, Problems, Shell);
+        var workspace = new RoslynWorkspace();
+        Intelligence = new CodeIntelligence(workspace, new RoslynLanguageFeatures(workspace), Cli, Documents, Problems, Shell);
+        Language = new LanguageActions(Intelligence, Documents, References, Shell, dialogs, () => Explorer.RootPath);
         Problems.CountsChanged += (_, _) => Shell.ProblemsText = Problems.ErrorCount + Problems.WarningCount == 0
             ? string.Empty
             : Loc.Format("Status.Problems", Problems.ErrorCount, Problems.WarningCount);
@@ -51,6 +56,7 @@ public sealed class Workbench : IDisposable
             }
         };
         WorkbenchCommands.Register(this);
+        LanguageCommands.Register(this);
     }
 
     public AppServices Services { get; }
@@ -68,6 +74,10 @@ public sealed class Workbench : IDisposable
     public FindInFilesViewModel Search { get; }
 
     public ProblemsViewModel Problems { get; }
+
+    public ReferencesViewModel References { get; }
+
+    public LanguageActions Language { get; }
 
     public IDotnetCli Cli { get; }
 

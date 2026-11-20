@@ -73,6 +73,9 @@ public sealed class DialogService : IDialogService
         return await ChoiceDialog.ShowAsync(window, title, message, (Loc.Get("Dialog.No"), false, false), (Loc.Get("Dialog.Yes"), true, true)).ConfigureAwait(true);
     }
 
+    public async Task<string?> PromptAsync(string title, string message, string initialValue)
+        => _owner() is { } window ? await PromptDialog.ShowAsync(window, title, message, initialValue).ConfigureAwait(true) : null;
+
     public async Task ShowMessageAsync(string title, string message)
     {
         if (_owner() is { } window)
