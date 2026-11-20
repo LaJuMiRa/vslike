@@ -10,10 +10,10 @@
 - [x] Phase 7 StyleCop
 - [x] Phase 8 Klassendiagramm
 - [x] Phase 9 Debugger
-- [ ] Phase 10 Packaging & Homebrew
+- [x] Phase 10 Packaging & Homebrew
 - [ ] Phase 11 Linux
 
-Nächster Schritt: Phase 10 (Packaging & Homebrew).
+Nächster Schritt: Phase 11 (Linux).
 
 ## Wiedereinstieg
 - Prüfen: `tools/check.sh` (Build + alle Tests, Exit-Code ≠ 0 bei Fehlern). Commit nur in einem separaten Schritt danach.

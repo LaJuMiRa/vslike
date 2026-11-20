@@ -1,0 +1,37 @@
+cask "vslike" do
+  arch arm: "arm64", intel: "x64"
+
+  version "@VERSION@"
+  sha256 arm:   "@SHA256_ARM64@",
+         intel: "@SHA256_X64@"
+
+  url "https://github.com/LaJuMiRa/vslike/releases/download/v#{version}/VsLike-#{version}-osx-#{arch}.zip"
+  name "VsLike"
+  desc "C# IDE with Roslyn IntelliSense, class diagrams, StyleCop and a debugger"
+  homepage "https://github.com/LaJuMiRa/vslike"
+
+  depends_on macos: ">= :ventura"
+
+  app "VsLike.app"
+
+  uninstall quit: "io.github.lajumira.vslike"
+
+  zap trash: [
+    "~/Library/Application Support/VsLike",
+    "~/Library/Caches/VsLike",
+    "~/Library/Preferences/io.github.lajumira.vslike.plist",
+    "~/Library/Saved Application State/io.github.lajumira.vslike.savedState",
+  ]
+
+  caveats <<~EOS
+    VsLike needs an installed .NET SDK (10.0 or newer) to load, build and debug projects:
+      https://dotnet.microsoft.com/download
+    The IDE checks this at startup and shows instructions if it is missing.
+
+    VsLike is not notarized by Apple, so macOS blocks the first start.
+    Either allow it in
+      System Settings > Privacy & Security > "Open Anyway"
+    or remove the quarantine flag once:
+      xattr -dr com.apple.quarantine "#{appdir}/VsLike.app"
+  EOS
+end

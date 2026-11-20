@@ -1,0 +1,128 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  macos:
+    name: Package ${{ matrix.rid }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: macos-15
+            rid: osx-arm64
+          - os: macos-15-intel
+            rid: osx-x64
+    runs-on: ${{ matrix.os }}
+    env:
+      MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Optional signing certificate
+        if: ${{ env.MACOS_CERT_P12 != '' }}
+        env:
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+        run: |
+          echo "$MACOS_CERT_P12" | base64 --decode > cert.p12
+          security create-keychain -p ci build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p ci build.keychain
+          security import cert.p12 -k build.keychain -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k ci build.keychain
+          rm cert.p12
+      - name: Build app bundle
+        env:
+          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+          MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+          MACOS_NOTARY_TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
+          MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
+        run: packaging/macos/build-app.sh "${{ matrix.rid }}" "$VERSION" "$PWD/dist"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.rid }}
+          path: |
+            dist/*.zip
+            dist/*.dmg
+            dist/*.sha256
+
+  release:
+    name: GitHub release
+    needs: macos
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      sha_arm64: ${{ steps.sums.outputs.arm64 }}
+      sha_x64: ${{ steps.sums.outputs.x64 }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+      - id: sums
+        run: |
+          v="${{ steps.version.outputs.version }}"
+          echo "arm64=$(sha256sum "dist/VsLike-$v-osx-arm64.zip" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "x64=$(sha256sum "dist/VsLike-$v-osx-x64.zip" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.zip dist/*.dmg dist/*.sha256 --repo "$GITHUB_REPOSITORY" --title "VsLike ${{ steps.version.outputs.version }}" --generate-notes
+
+  tap:
+    name: Update Homebrew cask (pull request)
+    needs: release
+    runs-on: ubuntu-24.04
+    env:
+      TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+    steps:
+      - name: Skip without tap token
+        if: ${{ env.TAP_GITHUB_TOKEN == '' }}
+        run: echo "TAP_GITHUB_TOKEN is not set; the cask is not updated."
+      - uses: actions/checkout@v4
+        if: ${{ env.TAP_GITHUB_TOKEN != '' }}
+        with:
+          path: vslike
+      - uses: actions/checkout@v4
+        if: ${{ env.TAP_GITHUB_TOKEN != '' }}
+        with:
+          repository: LaJuMiRa/homebrew-tap
+          token: ${{ secrets.TAP_GITHUB_TOKEN }}
+          path: tap
+      - name: Write Casks/vslike.rb only
+        if: ${{ env.TAP_GITHUB_TOKEN != '' }}
+        run: |
+          vslike/packaging/homebrew/render-cask.sh "${{ needs.release.outputs.version }}" "${{ needs.release.outputs.sha_arm64 }}" "${{ needs.release.outputs.sha_x64 }}" tap/Casks/vslike.rb
+          cd tap
+          git status --porcelain
+          # Nur diese eine Datei darf sich ändern; vorhandene Casks bleiben unberührt.
+          test "$(git status --porcelain | grep -v ' Casks/vslike.rb$' | wc -l)" -eq 0
+      - name: Open pull request
+        if: ${{ env.TAP_GITHUB_TOKEN != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          cd tap
+          branch="vslike-${{ needs.release.outputs.version }}"
+          git config user.name "vslike-release"
+          git config user.email "vslike-release@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add Casks/vslike.rb
+          git commit -m "vslike ${{ needs.release.outputs.version }}"
+          git push --force origin "$branch"
+          gh pr create --repo LaJuMiRa/homebrew-tap --head "$branch" --title "vslike ${{ needs.release.outputs.version }}" --body "Automatic update of Casks/vslike.rb from the VsLike release workflow." || echo "PR already exists"

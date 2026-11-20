@@ -81,3 +81,11 @@ Format: je Phase ein Eintrag.
 - Fortsetzen (F5), Prozedurschritt (F10), Einzelschritt (F11), Rücksprung (⇧F11), Anhalten, Beenden (⇧F5); Debug-Leiste in der Werkzeugleiste.
 - Abnahme: Integrationstest gegen echten netcoredbg (bedingter Haltepunkt `i == 3`, Variablen, Step In/Out, Auswertung, Ausgabe) und App-Test (Haltepunkt in `Car.Drive` trifft, Variablen/Überwachen/Hover, Schritt, Programmende).
 
+## Phase 10 – Packaging & Homebrew (2026-11-20)
+- `packaging/macos/build-app.sh <rid> <version>`: self-contained Publish (osx-arm64/osx-x64), `VsLike.app` mit `Info.plist` (Bundle-ID `io.github.lajumira.vslike`, Dateizuordnungen `.cs/.sln/.slnx/.csproj`), eigenem Icon (per CoreGraphics gezeichnet), gebündeltem netcoredbg (SHA-256 geprüft), `.zip`, `.dmg` und Prüfsumme.
+- Signierung: ohne Secrets ad-hoc (Apple Silicon startet das Bundle), mit Secrets Developer-ID-Signatur mit Hardened Runtime und Entitlements sowie Notarisierung/Stapling.
+- Dateien aus dem Finder bzw. per Dateizuordnung öffnen die Solution oder Datei in der laufenden IDE.
+- Release-Workflow (`.github/workflows/release.yml`) bei Tag `v*`: Bundles für beide Architekturen, GitHub-Release, danach Pull Request im Tap `LaJuMiRa/homebrew-tap`, der nur `Casks/vslike.rb` ändert (Token `TAP_GITHUB_TOKEN`; ohne Token wird der Schritt übersprungen).
+- Cask-Vorlage `packaging/homebrew/vslike.rb.template` (arm/intel, `zap`, Hinweise zu .NET SDK und Gatekeeper); README mit Installation und Gatekeeper-Hinweis.
+- Geprüft: arm64-Bundle lokal gebaut, Signatur des ausgelieferten Zips gültig, entpackte App startet und lädt eine Solution über das installierte SDK.
+

@@ -10,4 +10,7 @@
 - netcoredbg 3.2 wertet Member-Ketten auf Property-Ergebnissen nicht aus (`Name.Length` → Fehler, `Name` geht). Betrifft Überwachen/Hover/Konsole; Variablenbaum zeigt die Werte trotzdem.
 - Debugger: die Debug-Konsole zeigt Programmausgabe, nimmt aber keine Standardeingabe entgegen. Haltepunkte werden nicht über Neustarts hinweg gespeichert.
 - Intel-Macs bekommen netcoredbg 3.1.3 (älter als 3.2.0); nicht auf echter x64-Hardware getestet.
+- Homebrew: `Casks/vslike.rb` liegt noch nicht im Tap. Er entsteht beim ersten Release-Tag per Pull Request (Secret `TAP_GITHUB_TOKEN` im vslike-Repo nötig). `brew install --cask LaJuMiRa/tap/vslike` ist deshalb noch nicht Ende-zu-Ende geprüft; lokal geprüft sind Bundle, Signatur und Start.
+- Das osx-x64-Bundle wird nur in CI (macos-15-intel) gebaut, nicht lokal getestet.
+- Notarisierung braucht eine Apple-Developer-ID (Secrets `MACOS_CERT_P12`, `MACOS_CERT_PASSWORD`, `MACOS_SIGN_IDENTITY`, `MACOS_NOTARY_*`); ohne sie bleibt der Gatekeeper-Hinweis nötig.
 

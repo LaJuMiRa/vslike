@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 using VsLike.App.Dialogs;
 using VsLike.App.Services;
 using VsLike.Core.Localization;
@@ -29,6 +30,20 @@ public partial class App : Application
             workbench.Shell.QuitRequested += (_, _) => window.Close();
             desktop.MainWindow = window;
             desktop.Exit += (_, _) => workbench.Dispose();
+
+            // macOS: Dateien, die per Finder/Dateizuordnung geöffnet werden, kommen als Aktivierung statt als Argument.
+            if (TryGetFeature(typeof(IActivatableLifetime)) is IActivatableLifetime activatable)
+            {
+                activatable.Activated += async (_, e) =>
+                {
+                    if (e is FileActivatedEventArgs files)
+                    {
+                        var paths = files.Files.Select(f => f.TryGetLocalPath()).OfType<string>().ToList();
+                        await OpenStartupPathsAsync(workbench, paths).ConfigureAwait(true);
+                    }
+                };
+            }
+
             window.Opened += async (_, _) =>
             {
                 if (!await SdkCheck.EnsureSdkAsync(workbench).ConfigureAwait(true))

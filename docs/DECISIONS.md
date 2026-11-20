@@ -44,4 +44,7 @@
 | 2026-11-20 | netcoredbg wird bei Bedarf von GitHub geladen (gepinnte Version, SHA-256 aus den Release-Daten im Code) und im Benutzer-Cache abgelegt; im App-Paket (Phase 10) liegt er bereits bei | Lizenz MIT erlaubt Weitergabe; Prüfsumme verhindert manipulierte Downloads; kein vsdbg. |
 | 2026-11-20 | Breakpoint-Pfade werden vor dem Senden mit `RealPath` aufgelöst | netcoredbg vergleicht mit dem Pfad aus der PDB; unter macOS ist `/var` ein Symlink auf `/private/var`, sonst bindet der Breakpoint nie (im Test nachgewiesen). |
 | 2026-11-20 | Event-Handler einer Debug-Sitzung werden vor `configurationDone` angehängt (`attach`-Callback) | Sonst kann ein früher Halt (Breakpoint in den ersten Zeilen) verloren gehen. |
+| 2026-11-20 | Cask ohne `depends_on` für das .NET SDK, stattdessen Hinweis in `caveats` und SDK-Prüfung beim Start | Das SDK wird meist per Microsoft-Installer oder `dotnet-install` eingerichtet; ein erzwungenes `depends_on cask: "dotnet-sdk"` würde es doppelt installieren. |
+| 2026-11-20 | Bundle-ID `io.github.lajumira.vslike` | Bezug auf das GitHub-Konto statt auf Personennamen. |
+| 2026-11-20 | Zip per `ditto` mit erweiterten Attributen; vor dem Signieren `xattr -cr` | Signaturen der DLLs in `Contents/MacOS` liegen in erweiterten Attributen (ohne sie ist das Zip unsigniert, geprüft); Finder-/iCloud-Attribute lassen `codesign` dagegen scheitern. |
 
