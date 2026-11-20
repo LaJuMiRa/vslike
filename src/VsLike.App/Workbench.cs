@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using VsLike.App.Analysis;
 using VsLike.App.Build;
+using VsLike.App.Debugging;
 using VsLike.App.Diagram;
 using VsLike.App.Editor;
 using VsLike.App.Explorer;
@@ -56,6 +57,8 @@ public sealed class Workbench : IDisposable
                 (ShellPanels.References, References),
                 (ShellPanels.Properties, new EmptyPanelViewModel()),
                 (ShellPanels.Tests, new EmptyPanelViewModel()),
+                (ShellPanels.Debug, new EmptyPanelViewModel()),
+                (ShellPanels.DebugConsole, new EmptyPanelViewModel()),
             ]);
         Documents.Attach(Shell);
         var workspace = new RoslynWorkspace();
@@ -65,6 +68,10 @@ public sealed class Workbench : IDisposable
         Tests = new TestExplorerViewModel(new TestService(Cli), Output, Shell, Intelligence.Features, Documents, Documents.SaveAllAsync, () => Build.Configuration);
         Shell.Factory.Panels.Single(p => p.Id == ShellPanels.Tests.Id).Content = Tests;
         Diagrams = new DiagramCoordinator(this);
+        Debugger = new DebugController(this);
+        Shell.Factory.Panels.Single(p => p.Id == ShellPanels.Debug.Id).Content = new DebugPanelViewModel(Debugger);
+        Shell.Factory.Panels.Single(p => p.Id == ShellPanels.DebugConsole.Id).Content = new DebugConsoleViewModel(Debugger);
+        Intelligence.DebugHover = Debugger.HoverAsync;
         SolutionExplorer.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(SolutionExplorerViewModel.Solution) && SolutionExplorer.Solution is { } solution)
@@ -91,6 +98,7 @@ public sealed class Workbench : IDisposable
         WorkbenchCommands.Register(this);
         SolutionCommands.Register(this);
         BuildCommands.Register(this);
+        DebugCommands.Register(this);
         LanguageCommands.Register(this);
     }
 
@@ -133,6 +141,8 @@ public sealed class Workbench : IDisposable
 
     public DiagramCoordinator Diagrams { get; }
 
+    public DebugController Debugger { get; }
+
     public TestExplorerViewModel Tests { get; }
 
     public CodeIntelligence Intelligence { get; }
@@ -161,6 +171,7 @@ public sealed class Workbench : IDisposable
     public void Dispose()
     {
         Disposing?.Invoke(this, EventArgs.Empty);
+        Debugger.Dispose();
         Build.Stop();
         Tests.Cancel();
         Explorer.Dispose();

@@ -11,6 +11,8 @@ public static class ShellPanels
     public static readonly PanelDescriptor References = new("references", "Panel.References", LayoutAreas.Bottom);
     public static readonly PanelDescriptor Properties = new("properties", "Panel.Properties", LayoutAreas.Right);
     public static readonly PanelDescriptor Tests = new("tests", "Panel.Tests", LayoutAreas.Left, "Cmd+Alt+T");
+    public static readonly PanelDescriptor Debug = new("debug", "Panel.Debug", LayoutAreas.Right, "Cmd+Shift+D");
+    public static readonly PanelDescriptor DebugConsole = new("debugconsole", "Panel.DebugConsole", LayoutAreas.Bottom);
 
     /// <summary>Panels with placeholder content (used by layout tests).</summary>
     public static IReadOnlyList<(PanelDescriptor Descriptor, object Content)> CreateDefault() =>
@@ -23,5 +25,7 @@ public static class ShellPanels
         (References, new EmptyPanelViewModel()),
         (Properties, new EmptyPanelViewModel()),
         (Tests, new EmptyPanelViewModel()),
+        (Debug, new EmptyPanelViewModel()),
+        (DebugConsole, new EmptyPanelViewModel()),
     ];
 }

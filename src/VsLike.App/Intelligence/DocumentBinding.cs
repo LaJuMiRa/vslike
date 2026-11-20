@@ -63,6 +63,9 @@ internal sealed class DocumentBinding : IDisposable
 
     public EditorDocumentViewModel Document => _document;
 
+    /// <summary>Gets or sets the debugger hover (value of the expression under the mouse while stopped).</summary>
+    public Func<int, Task<QuickInfo?>>? DebugHover { get; set; }
+
     public void ForceSync()
     {
         _pushedVersion = null;
@@ -332,6 +335,16 @@ internal sealed class DocumentBinding : IDisposable
         var cancellation = _hoverCancellation = new CancellationTokenSource();
         try
         {
+            if (DebugHover is not null && await DebugHover(offset).ConfigureAwait(true) is { } value)
+            {
+                if (!cancellation.IsCancellationRequested && ReferenceEquals(session, _session))
+                {
+                    session.ShowQuickInfo(value, offset);
+                }
+
+                return;
+            }
+
             var info = await Task.Run(() => _workspace.GetQuickInfoAsync(path, offset, cancellation.Token), cancellation.Token).ConfigureAwait(true);
             if (!cancellation.IsCancellationRequested && ReferenceEquals(session, _session))
             {

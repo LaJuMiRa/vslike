@@ -60,6 +60,22 @@ public partial class MainWindow : Window
         };
         PaletteInput.AddHandler(KeyDownEvent, OnPaletteKeyDown, RoutingStrategies.Tunnel);
         Toolbar.DataContext = workbench.Build;
+        var debug = workbench.Debugger;
+        DebugButton.Click += async (_, _) => await debug.StartOrContinueAsync().ConfigureAwait(true);
+        StepOverButton.Click += async (_, _) => await debug.StepOverAsync().ConfigureAwait(true);
+        StepIntoButton.Click += async (_, _) => await debug.StepIntoAsync().ConfigureAwait(true);
+        StepOutButton.Click += async (_, _) => await debug.StepOutAsync().ConfigureAwait(true);
+        DebugStopButton.Click += async (_, _) => await debug.StopAsync().ConfigureAwait(true);
+        void UpdateDebugBar()
+        {
+            DebugButton.IsEnabled = debug.CanStart;
+            DebugButton.Content = Loc.Get(debug.IsDebugging ? "Debug.Continue" : "Command.Debug.Start");
+            StepOverButton.IsEnabled = StepIntoButton.IsEnabled = StepOutButton.IsEnabled = debug.CanStep;
+            DebugStopButton.IsEnabled = debug.IsDebugging;
+        }
+
+        debug.PropertyChanged += (_, _) => UpdateDebugBar();
+        UpdateDebugBar();
         workbench.Disposing += (_, _) =>
         {
             // Das Fenster lebt nicht länger als sein Workbench; sonst schreiben Hintergrund-Ergebnisse in ein verwaistes Fenster.

@@ -284,3 +284,30 @@ Diagram.Undo.Modifiers	Change modifiers	Modifizierer ändern
 Diagram.Undo.BaseList	Change base types	Basistypen ändern
 Diagram.Undo.DeleteType	Delete {0}	{0} löschen
 Diagram.Undo.Rename	Rename {0} to {1}	{0} in {1} umbenennen
+Panel.Debug	Debug	Debuggen
+Panel.DebugConsole	Debug Console	Debug-Konsole
+Command.Debug.Start	Start Debugging	Debuggen starten
+Command.Debug.Stop	Stop Debugging	Debuggen beenden
+Command.Debug.Pause	Pause	Anhalten
+Command.Debug.StepOver	Step Over	Prozedurschritt
+Command.Debug.StepInto	Step Into	Einzelschritt
+Command.Debug.StepOut	Step Out	Rücksprung
+Command.Debug.ToggleBreakpoint	Toggle Breakpoint	Haltepunkt umschalten
+Debug.Continue	Continue	Fortsetzen
+Debug.StepOverShort	Over	Über
+Debug.StepIntoShort	Into	Hinein
+Debug.StepOutShort	Out	Heraus
+Debug.Locals	Variables	Variablen
+Debug.Watch	Watch	Überwachen
+Debug.CallStack	Call Stack	Aufrufliste
+Debug.Threads	Threads	Threads
+Debug.AddWatch	Add expression (Enter)	Ausdruck hinzufügen (Enter)
+Debug.Evaluate	Evaluate expression (Enter)	Ausdruck auswerten (Enter)
+Debug.Condition	Breakpoint condition	Haltepunkt-Bedingung
+Debug.ConditionPrompt	Stop only when this C# expression is true (empty = always):	Nur anhalten, wenn dieser C#-Ausdruck wahr ist (leer = immer):
+Debug.Preparing	Starting debugger …	Debugger wird gestartet …
+Debug.Running	Debugging {0}	{0} wird debuggt
+Debug.Stopped	Stopped: {0}	Angehalten: {0}
+Debug.Exited	Program exited with code {0}	Programm beendet mit Code {0}
+Debug.Failed	Debugging could not start: {0}	Debuggen konnte nicht starten: {0}
+Debug.NoTarget	Build output of {0} not found	Build-Ausgabe von {0} nicht gefunden

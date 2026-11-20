@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
+using VsLike.App.Debugging;
 using VsLike.App.Editor;
 using VsLike.App.Explorer;
 using VsLike.App.Localization;
@@ -33,6 +34,8 @@ public sealed class ViewLocator : IDataTemplate
         [typeof(NuGetManagerViewModel)] = _ => new NuGetManagerView(),
         [typeof(OutputViewModel)] = _ => new OutputView(),
         [typeof(TestExplorerViewModel)] = _ => new TestExplorerView(),
+        [typeof(DebugPanelViewModel)] = _ => new DebugPanelView(),
+        [typeof(DebugConsoleViewModel)] = _ => new DebugConsoleView(),
         [typeof(WelcomeViewModel)] = _ => new WelcomeView(),
         [typeof(PanelViewModel)] = data => new ContentControl { Content = ((PanelViewModel)data).Content },
         [typeof(EmptyPanelViewModel)] = _ => new TextBlock

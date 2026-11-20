@@ -30,6 +30,13 @@
           <TextBlock Text="■" FontSize="11" />
         </Button>
         <Button x:Name="BuildButton" IsEnabled="{Binding CanBuild}" Content="{l:Loc Command.Build.Solution}" />
+        <StackPanel x:Name="DebugBar" Orientation="Horizontal" Spacing="4" Margin="8,0,0,0">
+          <Button x:Name="DebugButton" ToolTip.Tip="F5" Content="{l:Loc Command.Debug.Start}" />
+          <Button x:Name="StepOverButton" ToolTip.Tip="F10" Content="{l:Loc Debug.StepOverShort}" />
+          <Button x:Name="StepIntoButton" ToolTip.Tip="F11" Content="{l:Loc Debug.StepIntoShort}" />
+          <Button x:Name="StepOutButton" ToolTip.Tip="⇧F11" Content="{l:Loc Debug.StepOutShort}" />
+          <Button x:Name="DebugStopButton" ToolTip.Tip="⇧F5" Content="{l:Loc Command.Debug.Stop}" />
+        </StackPanel>
       </StackPanel>
     </Border>
     <DockControl x:Name="DockHost" Grid.Row="2"

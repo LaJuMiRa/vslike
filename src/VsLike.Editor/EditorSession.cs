@@ -32,6 +32,7 @@ public sealed class EditorSession : IDisposable
     private readonly XmlFoldingStrategy _xmlFolding = new();
     private readonly SearchPanel _searchPanel;
     private readonly DispatcherTimer _foldingTimer;
+    private readonly Debugging.ExecutionLineRenderer _executionLine = new();
     private CancellationTokenSource? _foldingCancellation;
     private SnippetSession? _snippet;
 
@@ -62,6 +63,9 @@ public sealed class EditorSession : IDisposable
         SignatureHelp = new SignatureHelpController(editor);
         Diagnostics = new DiagnosticMarkers(editor.TextArea.TextView, editor.Document);
         editor.TextArea.TextView.BackgroundRenderers.Add(Diagnostics);
+        BreakpointMargin = new Debugging.BreakpointMargin();
+        editor.TextArea.LeftMargins.Insert(0, BreakpointMargin);
+        editor.TextArea.TextView.BackgroundRenderers.Add(_executionLine);
         Semantic = new SemanticColorizer();
         editor.TextArea.TextView.LineTransformers.Add(Semantic);
         editor.TextArea.TextView.PointerHover += OnPointerHover;
@@ -104,6 +108,8 @@ public sealed class EditorSession : IDisposable
     public EditorLanguage Language { get; }
 
     public DiagnosticMarkers Diagnostics { get; }
+
+    public Debugging.BreakpointMargin BreakpointMargin { get; }
 
     public CompletionController Completion { get; }
 
@@ -157,6 +163,18 @@ public sealed class EditorSession : IDisposable
         _editor.TextArea.Caret.CaretBrush = caret;
         MultiCaret.SetColors(caret, _editor.TextArea.SelectionBrush);
         _searchPanel.SetSearchResultsBrush(new SolidColorBrush(Color.Parse(dark ? "#553FB5A6" : "#401F8A7E")));
+    }
+
+    /// <summary>Shows or clears the line where the debugger is stopped and scrolls it into view.</summary>
+    public void SetExecutionLine(int? line)
+    {
+        _executionLine.Line = line;
+        BreakpointMargin.SetExecutionLine(line);
+        _editor.TextArea.TextView.InvalidateLayer(AvaloniaEdit.Rendering.KnownLayer.Background);
+        if (line is { } number && number >= 1 && number <= _editor.Document.LineCount)
+        {
+            _editor.ScrollTo(number, 1);
+        }
     }
 
     public void SetDiagnostics(IReadOnlyList<DiagnosticInfo> diagnostics)
@@ -276,6 +294,8 @@ public sealed class EditorSession : IDisposable
         _editor.TextArea.TextView.PointerHoverStopped -= OnPointerHoverStopped;
         _editor.TextArea.TextView.ScrollOffsetChanged -= OnViewportChanged;
         _editor.TextArea.TextView.BackgroundRenderers.Remove(Diagnostics);
+        _editor.TextArea.TextView.BackgroundRenderers.Remove(_executionLine);
+        _editor.TextArea.LeftMargins.Remove(BreakpointMargin);
         _editor.TextArea.TextView.LineTransformers.Remove(Semantic);
         ToolTip.SetIsOpen(_editor.TextArea.TextView, false);
         _editor.TextArea.TextEntering -= OnTextEntering;

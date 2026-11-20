@@ -55,6 +55,9 @@ public sealed class CodeIntelligence : IDisposable
 
     public bool IsLoading { get; private set; }
 
+    /// <summary>Gets or sets the debugger's hover evaluation; it wins over quick info while the debugger is stopped.</summary>
+    public Func<EditorDocumentViewModel, int, Task<QuickInfo?>>? DebugHover { get; set; }
+
     /// <summary>Restores (if needed) and loads a .sln/.slnx/.csproj, then analyses the whole solution in the background.</summary>
     public async Task<bool> OpenSolutionAsync(string path)
     {
@@ -152,7 +155,7 @@ public sealed class CodeIntelligence : IDisposable
     {
         if (IsCSharp(document) && !_bindings.ContainsKey(document))
         {
-            var binding = new DocumentBinding(_workspace, _features, Applier, document);
+            var binding = new DocumentBinding(_workspace, _features, Applier, document) { DebugHover = offset => DebugHover?.Invoke(document, offset) ?? Task.FromResult<QuickInfo?>(null) };
             binding.DefinitionRequested += (_, offset) => DefinitionRequested?.Invoke(this, (document, offset));
             _bindings[document] = binding;
         }

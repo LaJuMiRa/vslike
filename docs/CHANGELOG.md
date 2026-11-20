@@ -74,3 +74,10 @@ Format: je Phase ein Eintrag.
 - Gemeinsames Undo/Redo (⌘Z/⇧⌘Z im Diagramm) über Code- und Layoutänderungen; Export als SVG und PNG.
 - Abnahme (App-Test): Klasse anlegen erzeugt Datei; Vererbung ziehen ergänzt `: Car`; Methode landet nur in `Car.cs`, übriger Text byte-gleich; externe Änderung erscheint im Diagramm; Rückgängig/Wiederholen stellen Code wieder her.
 
+## Phase 9 – Debugger (2026-11-20)
+- DAP-Client (`VsLike.Debugging`) und Sitzung mit netcoredbg (`--interpreter=vscode`); netcoredbg wird gefunden (Umgebung, App-Paket, Cache) oder in der gepinnten Version geladen und per SHA-256 geprüft. Kein vsdbg.
+- Haltepunkte per Klick in die Leiste links (F9), bedingte Haltepunkte per Rechtsklick (Raute), wandern beim Bearbeiten mit; Start (F5) baut das Startprojekt und nutzt das Startprofil (Argumente, Umgebung, Arbeitsordner).
+- Halt: Ausführungszeile mit Pfeil und Hinterlegung, Aufrufliste (Auswahl wechselt Variablen und springt zum Code), Threads, Variablenbaum mit nachgeladenen Kindern, Überwachen, Debug-Konsole mit Programmausgabe und Auswertung, Hover-Werte im Editor.
+- Fortsetzen (F5), Prozedurschritt (F10), Einzelschritt (F11), Rücksprung (⇧F11), Anhalten, Beenden (⇧F5); Debug-Leiste in der Werkzeugleiste.
+- Abnahme: Integrationstest gegen echten netcoredbg (bedingter Haltepunkt `i == 3`, Variablen, Step In/Out, Auswertung, Ausgabe) und App-Test (Haltepunkt in `Car.Drive` trifft, Variablen/Überwachen/Hover, Schritt, Programmende).
+

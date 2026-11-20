@@ -290,4 +290,31 @@
   <data name="Diagram.Undo.BaseList" xml:space="preserve"><value>Change base types</value></data>
   <data name="Diagram.Undo.DeleteType" xml:space="preserve"><value>Delete {0}</value></data>
   <data name="Diagram.Undo.Rename" xml:space="preserve"><value>Rename {0} to {1}</value></data>
+  <data name="Panel.Debug" xml:space="preserve"><value>Debug</value></data>
+  <data name="Panel.DebugConsole" xml:space="preserve"><value>Debug Console</value></data>
+  <data name="Command.Debug.Start" xml:space="preserve"><value>Start Debugging</value></data>
+  <data name="Command.Debug.Stop" xml:space="preserve"><value>Stop Debugging</value></data>
+  <data name="Command.Debug.Pause" xml:space="preserve"><value>Pause</value></data>
+  <data name="Command.Debug.StepOver" xml:space="preserve"><value>Step Over</value></data>
+  <data name="Command.Debug.StepInto" xml:space="preserve"><value>Step Into</value></data>
+  <data name="Command.Debug.StepOut" xml:space="preserve"><value>Step Out</value></data>
+  <data name="Command.Debug.ToggleBreakpoint" xml:space="preserve"><value>Toggle Breakpoint</value></data>
+  <data name="Debug.Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="Debug.StepOverShort" xml:space="preserve"><value>Over</value></data>
+  <data name="Debug.StepIntoShort" xml:space="preserve"><value>Into</value></data>
+  <data name="Debug.StepOutShort" xml:space="preserve"><value>Out</value></data>
+  <data name="Debug.Locals" xml:space="preserve"><value>Variables</value></data>
+  <data name="Debug.Watch" xml:space="preserve"><value>Watch</value></data>
+  <data name="Debug.CallStack" xml:space="preserve"><value>Call Stack</value></data>
+  <data name="Debug.Threads" xml:space="preserve"><value>Threads</value></data>
+  <data name="Debug.AddWatch" xml:space="preserve"><value>Add expression (Enter)</value></data>
+  <data name="Debug.Evaluate" xml:space="preserve"><value>Evaluate expression (Enter)</value></data>
+  <data name="Debug.Condition" xml:space="preserve"><value>Breakpoint condition</value></data>
+  <data name="Debug.ConditionPrompt" xml:space="preserve"><value>Stop only when this C# expression is true (empty = always):</value></data>
+  <data name="Debug.Preparing" xml:space="preserve"><value>Starting debugger …</value></data>
+  <data name="Debug.Running" xml:space="preserve"><value>Debugging {0}</value></data>
+  <data name="Debug.Stopped" xml:space="preserve"><value>Stopped: {0}</value></data>
+  <data name="Debug.Exited" xml:space="preserve"><value>Program exited with code {0}</value></data>
+  <data name="Debug.Failed" xml:space="preserve"><value>Debugging could not start: {0}</value></data>
+  <data name="Debug.NoTarget" xml:space="preserve"><value>Build output of {0} not found</value></data>
 </root>
