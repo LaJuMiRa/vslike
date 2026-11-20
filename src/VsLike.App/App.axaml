@@ -2,6 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:shell="using:VsLike.App.Shell"
              xmlns:l="using:VsLike.App.Localization"
+             xmlns:ed="using:VsLike.App.Editor"
+             xmlns:ex="using:VsLike.App.Explorer"
+             xmlns:se="using:VsLike.App.Search"
              x:Class="VsLike.App.App"
              Name="VsLike">
   <Application.Resources>
@@ -14,11 +17,21 @@
   <Application.Styles>
     <FluentTheme />
     <DockFluentTheme />
+    <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
     <StyleInclude Source="avares://VsLike/Themes/Styles.axaml" />
   </Application.Styles>
   <Application.DataTemplates>
     <DataTemplate DataType="shell:PanelViewModel">
       <ContentControl Content="{Binding Content}" />
+    </DataTemplate>
+    <DataTemplate DataType="ed:EditorDocumentViewModel">
+      <ed:EditorView />
+    </DataTemplate>
+    <DataTemplate DataType="ex:ExplorerViewModel">
+      <ex:ExplorerView />
+    </DataTemplate>
+    <DataTemplate DataType="se:FindInFilesViewModel">
+      <se:FindInFilesView />
     </DataTemplate>
     <DataTemplate DataType="shell:EmptyPanelViewModel">
       <TextBlock Classes="muted" Text="{l:Loc Panel.Empty}" HorizontalAlignment="Center" VerticalAlignment="Center" />

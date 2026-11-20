@@ -11,6 +11,8 @@
     <PackageReference Include="Verify.Xunit" />
     <PackageReference Include="coverlet.collector" PrivateAssets="all" />
     <PackageReference Include="Avalonia.Headless.XUnit" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Skia" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />

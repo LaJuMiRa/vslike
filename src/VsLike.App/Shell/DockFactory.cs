@@ -18,11 +18,18 @@ public sealed class DockFactory : Factory
     {
         _panels = panels.ToDictionary(p => p.Id, StringComparer.Ordinal);
         HideToolsOnClose = false;
+        HideDocumentsOnClose = false;
     }
 
     public IReadOnlyCollection<PanelViewModel> Panels => [.. _panels.Values];
 
     public IDocumentDock? DocumentDock { get; private set; }
+
+    /// <summary>Gets or sets a veto for closing a tab (e.g. unsaved changes). Returning false keeps it open.</summary>
+    public Func<IDockable, bool>? CanClose { get; set; }
+
+    public override bool OnDockableClosing(IDockable? dockable)
+        => (dockable is null || CanClose?.Invoke(dockable) != false) && base.OnDockableClosing(dockable);
 
     public IRootDock Build(LayoutState state, IReadOnlyList<IDockable> documents, IDockable? activeDocument)
     {

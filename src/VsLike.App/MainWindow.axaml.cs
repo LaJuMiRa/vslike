@@ -13,6 +13,8 @@ public partial class MainWindow : Window
 {
     private readonly AppServices? _services;
     private readonly ShellViewModel? _shell;
+    private readonly Workbench? _workbench;
+    private bool _closeConfirmed;
 
     // Für den XAML-Previewer.
     public MainWindow()
@@ -20,10 +22,11 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    public MainWindow(AppServices services, ShellViewModel shell)
+    public MainWindow(Workbench workbench)
     {
-        _services = services;
-        _shell = shell;
+        _workbench = workbench;
+        var services = _services = workbench.Services;
+        var shell = _shell = workbench.Shell;
         DataContext = shell;
         InitializeComponent();
 
@@ -56,11 +59,22 @@ public partial class MainWindow : Window
                 shell.Palette.Close();
             }
         };
-        StatusRight.Text = Environment.Version.ToString();
     }
 
-    protected override void OnClosing(WindowClosingEventArgs e)
+    protected override async void OnClosing(WindowClosingEventArgs e)
     {
+        if (!_closeConfirmed && _workbench is not null && _workbench.Documents.OpenDocuments.Any(d => d.IsDirty))
+        {
+            e.Cancel = true;
+            if (await _workbench.Documents.ConfirmCloseAllAsync().ConfigureAwait(true))
+            {
+                _closeConfirmed = true;
+                Close();
+            }
+
+            return;
+        }
+
         _shell?.SaveLayout(Width, Height, WindowState == WindowState.Maximized);
         base.OnClosing(e);
     }

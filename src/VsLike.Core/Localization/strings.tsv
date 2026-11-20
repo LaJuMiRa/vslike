@@ -35,3 +35,51 @@ Welcome.Title	Welcome to VsLike	Willkommen bei VsLike
 Welcome.Hint	Press {0} to open the command palette.	Drücke {0}, um die Befehlspalette zu öffnen.
 Sdk.Missing.Title	.NET SDK not found	.NET SDK nicht gefunden
 Sdk.Missing.Body	VsLike needs the .NET SDK 10 or newer. Install it with "brew install --cask dotnet-sdk" or from https://dotnet.microsoft.com/download and restart VsLike.	VsLike benötigt das .NET SDK 10 oder neuer. Installiere es mit „brew install --cask dotnet-sdk“ oder von https://dotnet.microsoft.com/download und starte VsLike neu.
+Command.File.New	New File	Neue Datei
+Command.File.Open	Open File…	Datei öffnen…
+Command.File.OpenFolder	Open Folder…	Ordner öffnen…
+Command.File.Save	Save	Speichern
+Command.File.SaveAs	Save As…	Speichern unter…
+Command.File.SaveAll	Save All	Alle speichern
+Command.File.Close	Close Editor	Editor schließen
+Command.Edit.Undo	Undo	Rückgängig
+Command.Edit.Redo	Redo	Wiederholen
+Command.Edit.Cut	Cut	Ausschneiden
+Command.Edit.Copy	Copy	Kopieren
+Command.Edit.Paste	Paste	Einfügen
+Command.Edit.SelectAll	Select All	Alles auswählen
+Command.Edit.Find	Find	Suchen
+Command.Edit.Replace	Replace	Ersetzen
+Command.Edit.FindInFiles	Find in Files	In Dateien suchen
+Command.Edit.ToggleComment	Toggle Line Comment	Zeilenkommentar umschalten
+Command.Edit.AddNextOccurrence	Add Next Occurrence	Nächstes Vorkommen hinzufügen
+Dialog.Save	Save	Speichern
+Dialog.DontSave	Don't Save	Nicht speichern
+Dialog.Cancel	Cancel	Abbrechen
+Dialog.Ok	OK	OK
+Dialog.Yes	Yes	Ja
+Dialog.No	No	Nein
+Dialog.SaveChanges.Title	Unsaved Changes	Ungespeicherte Änderungen
+Dialog.SaveChanges.Body	Do you want to save the changes to "{0}"?	Möchtest du die Änderungen an „{0}“ speichern?
+Dialog.OpenFile	Open File	Datei öffnen
+Dialog.OpenFolder	Open Folder	Ordner öffnen
+Dialog.SaveAs	Save As	Speichern unter
+Dialog.Error.Title	Error	Fehler
+Document.Untitled	Untitled-{0}	Unbenannt-{0}
+Panel.Search	Search	Suche
+Search.Placeholder	Search in files	In Dateien suchen
+Search.ReplacePlaceholder	Replace with	Ersetzen durch
+Search.MatchCase	Match case	Groß-/Kleinschreibung
+Search.WholeWord	Whole word	Ganzes Wort
+Search.Regex	Regular expression	Regulärer Ausdruck
+Search.Run	Search	Suchen
+Search.ReplaceAll	Replace All	Alle ersetzen
+Search.Summary	{0} results in {1} files	{0} Treffer in {1} Dateien
+Search.Replaced	Replaced {0} occurrences in {1} files	{0} Vorkommen in {1} Dateien ersetzt
+Search.InvalidRegex	Invalid regular expression: {0}	Ungültiger regulärer Ausdruck: {0}
+Search.NoFolder	Open a folder or solution first.	Öffne zuerst einen Ordner oder eine Solution.
+Status.LineCol	Ln {0}, Col {1}	Z {0}, Sp {1}
+Status.FileReloaded	Reloaded "{0}" (changed on disk)	„{0}“ neu geladen (auf der Festplatte geändert)
+Status.FileConflict	"{0}" changed on disk, but has unsaved changes	„{0}“ wurde auf der Festplatte geändert, hat aber ungespeicherte Änderungen
+Status.Saved	Saved "{0}"	„{0}“ gespeichert
+Explorer.NoFolder	No folder open	Kein Ordner geöffnet

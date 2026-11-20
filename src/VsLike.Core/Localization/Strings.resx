@@ -41,4 +41,52 @@
   <data name="Welcome.Hint" xml:space="preserve"><value>Press {0} to open the command palette.</value></data>
   <data name="Sdk.Missing.Title" xml:space="preserve"><value>.NET SDK not found</value></data>
   <data name="Sdk.Missing.Body" xml:space="preserve"><value>VsLike needs the .NET SDK 10 or newer. Install it with &quot;brew install --cask dotnet-sdk&quot; or from https://dotnet.microsoft.com/download and restart VsLike.</value></data>
+  <data name="Command.File.New" xml:space="preserve"><value>New File</value></data>
+  <data name="Command.File.Open" xml:space="preserve"><value>Open File…</value></data>
+  <data name="Command.File.OpenFolder" xml:space="preserve"><value>Open Folder…</value></data>
+  <data name="Command.File.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Command.File.SaveAs" xml:space="preserve"><value>Save As…</value></data>
+  <data name="Command.File.SaveAll" xml:space="preserve"><value>Save All</value></data>
+  <data name="Command.File.Close" xml:space="preserve"><value>Close Editor</value></data>
+  <data name="Command.Edit.Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="Command.Edit.Redo" xml:space="preserve"><value>Redo</value></data>
+  <data name="Command.Edit.Cut" xml:space="preserve"><value>Cut</value></data>
+  <data name="Command.Edit.Copy" xml:space="preserve"><value>Copy</value></data>
+  <data name="Command.Edit.Paste" xml:space="preserve"><value>Paste</value></data>
+  <data name="Command.Edit.SelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="Command.Edit.Find" xml:space="preserve"><value>Find</value></data>
+  <data name="Command.Edit.Replace" xml:space="preserve"><value>Replace</value></data>
+  <data name="Command.Edit.FindInFiles" xml:space="preserve"><value>Find in Files</value></data>
+  <data name="Command.Edit.ToggleComment" xml:space="preserve"><value>Toggle Line Comment</value></data>
+  <data name="Command.Edit.AddNextOccurrence" xml:space="preserve"><value>Add Next Occurrence</value></data>
+  <data name="Dialog.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Dialog.DontSave" xml:space="preserve"><value>Don&#x27;t Save</value></data>
+  <data name="Dialog.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Dialog.Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Dialog.Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Dialog.No" xml:space="preserve"><value>No</value></data>
+  <data name="Dialog.SaveChanges.Title" xml:space="preserve"><value>Unsaved Changes</value></data>
+  <data name="Dialog.SaveChanges.Body" xml:space="preserve"><value>Do you want to save the changes to &quot;{0}&quot;?</value></data>
+  <data name="Dialog.OpenFile" xml:space="preserve"><value>Open File</value></data>
+  <data name="Dialog.OpenFolder" xml:space="preserve"><value>Open Folder</value></data>
+  <data name="Dialog.SaveAs" xml:space="preserve"><value>Save As</value></data>
+  <data name="Dialog.Error.Title" xml:space="preserve"><value>Error</value></data>
+  <data name="Document.Untitled" xml:space="preserve"><value>Untitled-{0}</value></data>
+  <data name="Panel.Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Search.Placeholder" xml:space="preserve"><value>Search in files</value></data>
+  <data name="Search.ReplacePlaceholder" xml:space="preserve"><value>Replace with</value></data>
+  <data name="Search.MatchCase" xml:space="preserve"><value>Match case</value></data>
+  <data name="Search.WholeWord" xml:space="preserve"><value>Whole word</value></data>
+  <data name="Search.Regex" xml:space="preserve"><value>Regular expression</value></data>
+  <data name="Search.Run" xml:space="preserve"><value>Search</value></data>
+  <data name="Search.ReplaceAll" xml:space="preserve"><value>Replace All</value></data>
+  <data name="Search.Summary" xml:space="preserve"><value>{0} results in {1} files</value></data>
+  <data name="Search.Replaced" xml:space="preserve"><value>Replaced {0} occurrences in {1} files</value></data>
+  <data name="Search.InvalidRegex" xml:space="preserve"><value>Invalid regular expression: {0}</value></data>
+  <data name="Search.NoFolder" xml:space="preserve"><value>Open a folder or solution first.</value></data>
+  <data name="Status.LineCol" xml:space="preserve"><value>Ln {0}, Col {1}</value></data>
+  <data name="Status.FileReloaded" xml:space="preserve"><value>Reloaded &quot;{0}&quot; (changed on disk)</value></data>
+  <data name="Status.FileConflict" xml:space="preserve"><value>&quot;{0}&quot; changed on disk, but has unsaved changes</value></data>
+  <data name="Status.Saved" xml:space="preserve"><value>Saved &quot;{0}&quot;</value></data>
+  <data name="Explorer.NoFolder" xml:space="preserve"><value>No folder open</value></data>
 </root>

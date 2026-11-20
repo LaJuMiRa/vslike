@@ -25,6 +25,9 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private string _statusText = Loc.Get("Status.Ready");
 
+    [ObservableProperty]
+    private string _caretText = string.Empty;
+
     public ShellViewModel(AppServices services, IEnumerable<(PanelDescriptor Descriptor, object Content)> panels)
     {
         _services = services;
@@ -60,6 +63,20 @@ public sealed partial class ShellViewModel : ObservableObject
             .ToList();
         _layoutState = current with { Panels = placements };
         Rebuild(Factory.DocumentDock?.ActiveDockable);
+    }
+
+    /// <summary>Makes a panel visible and selects its tab.</summary>
+    public void ShowPanel(string panelId)
+    {
+        if (!IsPanelVisible(panelId))
+        {
+            TogglePanel(panelId);
+        }
+
+        if (Factory.Panels.FirstOrDefault(p => p.Id == panelId) is { } panel)
+        {
+            Factory.SetActiveDockable(panel);
+        }
     }
 
     public void ResetLayout()

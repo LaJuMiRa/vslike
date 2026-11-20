@@ -64,7 +64,7 @@ public class DockFactoryTests
         var placements = factory.Normalize(input);
 
         Assert.DoesNotContain(placements, p => p.PanelId == "removed-panel");
-        Assert.Equal(4, placements.Count);
+        Assert.Equal(5, placements.Count);
     }
 
     private static string Area(LayoutState state, string panelId) => state.Panels.Single(p => p.PanelId == panelId).Area;

@@ -16,7 +16,7 @@
     <Border Grid.Row="2" Classes="statusbar">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Text="{Binding StatusText}" />
-        <TextBlock Grid.Column="1" x:Name="StatusRight" />
+        <TextBlock Grid.Column="1" Text="{Binding CaretText}" />
       </Grid>
     </Border>
 

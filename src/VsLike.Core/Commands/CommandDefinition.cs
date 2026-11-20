@@ -17,6 +17,12 @@ public sealed record CommandDefinition
 
     public Func<bool>? CanExecute { get; init; }
 
+    /// <summary>
+    /// Gets a value indicating whether the chord is bound on the window. False for commands that focused controls
+    /// already handle themselves (clipboard, undo); the chord is then only shown in menus.
+    /// </summary>
+    public bool BindGlobally { get; init; } = true;
+
     /// <summary>Gets a value indicating whether the command is listed in the command palette.</summary>
     public bool ShowInPalette { get; init; } = true;
 }

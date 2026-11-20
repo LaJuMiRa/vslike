@@ -55,10 +55,9 @@ public sealed class MainWindowTests : IDisposable
 
     private (MainWindow Window, ShellViewModel Shell) Show()
     {
-        var services = new AppServices(_platform);
-        var shell = new ShellViewModel(services, ShellPanels.CreateDefault());
-        var window = new MainWindow(services, shell);
+        var workbench = new Workbench(new AppServices(_platform), new FakeDialogService(), () => null);
+        var window = new MainWindow(workbench);
         window.Show();
-        return (window, shell);
+        return (window, workbench.Shell);
     }
 }

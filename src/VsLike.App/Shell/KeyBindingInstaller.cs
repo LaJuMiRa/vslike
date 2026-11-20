@@ -16,7 +16,7 @@ public static class KeyBindingInstaller
         window.KeyBindings.Clear();
         foreach (var command in services.Commands.Commands)
         {
-            if (services.Platform.HasNativeMenuBar && services.Menus.Contains(command.Id))
+            if (!command.BindGlobally || (services.Platform.HasNativeMenuBar && services.Menus.Contains(command.Id)))
             {
                 continue;
             }

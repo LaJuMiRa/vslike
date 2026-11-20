@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:VsLike.App.Search"
+             xmlns:l="using:VsLike.App.Localization"
+             x:Class="VsLike.App.Search.FindInFilesView"
+             x:DataType="s:FindInFilesViewModel">
+  <DockPanel Margin="8">
+    <StackPanel DockPanel.Dock="Top" Spacing="6">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox x:Name="QueryBox" Text="{Binding Query}" Watermark="{l:Loc Search.Placeholder}" />
+        <Button Grid.Column="1" Margin="6,0,0,0" Content="{l:Loc Search.Run}" Command="{Binding SearchCommand}" />
+      </Grid>
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox Text="{Binding Replacement}" Watermark="{l:Loc Search.ReplacePlaceholder}" />
+        <Button Grid.Column="1" Margin="6,0,0,0" Content="{l:Loc Search.ReplaceAll}" Command="{Binding ReplaceAllCommand}" />
+      </Grid>
+      <WrapPanel>
+        <CheckBox Content="{l:Loc Search.MatchCase}" IsChecked="{Binding MatchCase}" Margin="0,0,12,0" />
+        <CheckBox Content="{l:Loc Search.WholeWord}" IsChecked="{Binding WholeWord}" Margin="0,0,12,0" />
+        <CheckBox Content="{l:Loc Search.Regex}" IsChecked="{Binding UseRegex}" />
+      </WrapPanel>
+      <TextBlock Classes="muted" Text="{Binding Summary}" />
+    </StackPanel>
+    <TreeView x:Name="ResultTree" ItemsSource="{Binding Results}" Background="Transparent" Margin="0,6,0,0">
+      <TreeView.DataTemplates>
+        <TreeDataTemplate DataType="s:SearchResultFile" ItemsSource="{Binding Matches}">
+          <TextBlock Text="{Binding DisplayPath}" FontWeight="SemiBold" />
+        </TreeDataTemplate>
+        <DataTemplate DataType="s:SearchResultLine">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Classes="muted" Text="{Binding Location}" FontFamily="{DynamicResource VsMonoFont}" FontSize="12" />
+            <TextBlock Text="{Binding Preview}" FontFamily="{DynamicResource VsMonoFont}" FontSize="12" />
+          </StackPanel>
+        </DataTemplate>
+      </TreeView.DataTemplates>
+      <TreeView.Styles>
+        <Style Selector="TreeViewItem">
+          <Setter Property="IsExpanded" Value="True" />
+        </Style>
+      </TreeView.Styles>
+    </TreeView>
+  </DockPanel>
+</UserControl>
