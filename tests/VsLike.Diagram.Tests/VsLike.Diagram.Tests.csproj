@@ -13,6 +13,11 @@
     <PackageReference Include="Avalonia.Headless.XUnit" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Verify-Snapshots sind erwarteter Quelltext, kein Teil des Testprojekts. -->
+    <Compile Remove="Snapshots\**" />
+    <None Include="Snapshots\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
