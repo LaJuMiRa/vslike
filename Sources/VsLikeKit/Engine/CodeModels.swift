@@ -89,6 +89,12 @@ public struct CompletionList: Codable, Sendable {
     public let items: [CompletionItem]
     public let spanStart: Int
     public let spanLength: Int
+
+    public init(items: [CompletionItem], spanStart: Int, spanLength: Int) {
+        self.items = items
+        self.spanStart = spanStart
+        self.spanLength = spanLength
+    }
 }
 
 public struct TextEdit: Codable, Sendable, Hashable {
@@ -205,6 +211,12 @@ public struct ClassifiedSpan: Codable, Sendable, Hashable {
     public let start: Int
     public let length: Int
     public let classification: String
+
+    public init(start: Int, length: Int, classification: String) {
+        self.start = start
+        self.length = length
+        self.classification = classification
+    }
 }
 
 public struct WorkspaceProject: Codable, Sendable, Hashable, Identifiable {

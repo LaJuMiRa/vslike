@@ -1,6 +1,12 @@
 import Foundation
 
 public struct ProjectTemplate: Sendable, Hashable, Identifiable {
+    public init(name: String, shortName: String, tags: String) {
+        self.name = name
+        self.shortName = shortName
+        self.tags = tags
+    }
+
     public let name: String
     public let shortName: String
     public let tags: String

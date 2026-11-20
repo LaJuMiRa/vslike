@@ -180,11 +180,11 @@ public enum CSharpLexer {
         return tokens
     }
 
-    static func isDigit(_ c: UInt16) -> Bool { c >= 48 && c <= 57 }
+    public static func isDigit(_ c: UInt16) -> Bool { c >= 48 && c <= 57 }
 
-    static func isIdentifierStart(_ c: UInt16) -> Bool {
+    public static func isIdentifierStart(_ c: UInt16) -> Bool {
         (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 95 || c > 127
     }
 
-    static func isIdentifierPart(_ c: UInt16) -> Bool { isIdentifierStart(c) || isDigit(c) }
+    public static func isIdentifierPart(_ c: UInt16) -> Bool { isIdentifierStart(c) || isDigit(c) }
 }

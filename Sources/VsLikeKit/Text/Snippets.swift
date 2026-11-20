@@ -45,6 +45,12 @@ public struct ExpandedSnippet: Sendable, Hashable {
         public let index: Int
         public let start: Int
         public let length: Int
+
+        public init(index: Int, start: Int, length: Int) {
+            self.index = index
+            self.start = start
+            self.length = length
+        }
     }
 
     public let text: String

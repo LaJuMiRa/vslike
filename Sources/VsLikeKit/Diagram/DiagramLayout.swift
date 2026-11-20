@@ -145,6 +145,12 @@ public struct DiagramBox: Sendable {
     public let frame: CGRect
     public let collapsed: Bool
 
+    public init(type: DiagramType, frame: CGRect, collapsed: Bool) {
+        self.type = type
+        self.frame = frame
+        self.collapsed = collapsed
+    }
+
     public var center: CGPoint { CGPoint(x: frame.midX, y: frame.midY) }
 
     /// Point where the line from the center towards `point` leaves the box.

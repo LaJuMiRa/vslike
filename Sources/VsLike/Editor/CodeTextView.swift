@@ -1,0 +1,1117 @@
+import AppKit
+import SwiftUI
+import VsLikeKit
+
+/// The code editor: an NSTextView (TextKit 1 for predictable, fast layout of long files) with C# editing behaviour,
+/// IntelliSense popups, quick actions (⌘⇧.), snippets, breakpoints and diagnostics.
+@MainActor
+final class CodeTextView: NSTextView {
+    private(set) var document: CodeDocument?
+    private unowned var workspace: Workspace!
+    private(set) var highlighter: SyntaxHighlighter?
+    private let completion = CompletionPopup()
+    private let signaturePopup = InfoPopup()
+    private let hoverPopup = InfoPopup()
+    private var completionList: CompletionList?
+    private var completionStart = 0
+    private var completionTask: Task<Void, Never>?
+    private var signatureTask: Task<Void, Never>?
+    private var hoverTask: Task<Void, Never>?
+    private var detailTask: Task<Void, Never>?
+    private var snippet: SnippetSession?
+    private var bracketHighlight: NSRange?
+    private var lineStarts: [Int] = [0]
+    private(set) var diagnosticSeverityByLine: [Int: DiagnosticSeverity] = [:]
+    private var diagnostics: [Diagnostic] = []
+    private var trackingArea: NSTrackingArea?
+
+    static func make(document: CodeDocument, workspace: Workspace) -> (NSScrollView, CodeTextView) {
+        let layoutManager = NSLayoutManager()
+        layoutManager.allowsNonContiguousLayout = true
+        document.storage.addLayoutManager(layoutManager)
+        let container = NSTextContainer(size: NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+        container.widthTracksTextView = false
+        layoutManager.addTextContainer(container)
+
+        let textView = CodeTextView(frame: NSRect(x: 0, y: 0, width: 800, height: 600), textContainer: container)
+        textView.document = document
+        textView.workspace = workspace
+        textView.configure()
+
+        let scroll = NSScrollView()
+        scroll.documentView = textView
+        scroll.hasVerticalScroller = true
+        scroll.hasHorizontalScroller = true
+        scroll.autohidesScrollers = true
+        scroll.drawsBackground = true
+        scroll.backgroundColor = Palette.editorBackground
+        scroll.verticalScroller = MarkerScroller()
+        scroll.scrollerStyle = .overlay
+        textView.minSize = NSSize(width: 0, height: 0)
+        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = true
+        textView.autoresizingMask = [.width]
+
+        let gutter = LineGutter(textView: textView)
+        scroll.verticalRulerView = gutter
+        scroll.hasVerticalRuler = true
+        scroll.rulersVisible = true
+        gutter.onToggleBreakpoint = { [weak textView] line in textView?.toggleBreakpoint(line: line) }
+        gutter.onEditCondition = { [weak textView] line in textView?.editBreakpointCondition(line: line) }
+
+        document.storage.delegate = textView
+        textView.highlighter = SyntaxHighlighter(textView: textView, document: document, workspace: workspace)
+        textView.rebuildLineStarts()
+        textView.highlighter?.recolor()
+        textView.highlighter?.scheduleSemantic()
+        NotificationCenter.default.addObserver(textView, selector: #selector(scrolled), name: NSView.boundsDidChangeNotification, object: scroll.contentView)
+        scroll.contentView.postsBoundsChangedNotifications = true
+        return (scroll, textView)
+    }
+
+    private func configure() {
+        font = workspace.preferences.editorFont
+        isRichText = false
+        importsGraphics = false
+        allowsUndo = true
+        usesFindBar = true
+        isIncrementalSearchingEnabled = true
+        isAutomaticQuoteSubstitutionEnabled = false
+        isAutomaticDashSubstitutionEnabled = false
+        isAutomaticTextReplacementEnabled = false
+        isAutomaticSpellingCorrectionEnabled = false
+        isContinuousSpellCheckingEnabled = false
+        isGrammarCheckingEnabled = false
+        smartInsertDeleteEnabled = false
+        isAutomaticLinkDetectionEnabled = false
+        isAutomaticDataDetectionEnabled = false
+        isAutomaticTextCompletionEnabled = false
+        drawsBackground = true
+        backgroundColor = Palette.editorBackground
+        insertionPointColor = Palette.accent
+        selectedTextAttributes = [.backgroundColor: Palette.selection]
+        textColor = SyntaxColors.text
+        typingAttributes = [.font: workspace.preferences.editorFont, .foregroundColor: SyntaxColors.text, .paragraphStyle: Self.paragraphStyle(for: workspace.preferences.editorFont)]
+        defaultParagraphStyle = Self.paragraphStyle(for: workspace.preferences.editorFont)
+        textContainerInset = NSSize(width: 6, height: 8)
+        document?.storage.setAttributes(typingAttributes, range: NSRange(location: 0, length: document?.storage.length ?? 0))
+        delegate = self
+        completion.onCommit = { [weak self] item in self?.commitCompletion(item) }
+        completion.onSelectionChange = { [weak self] item in self?.loadCompletionDetail(item) }
+    }
+
+    static func paragraphStyle(for font: NSFont) -> NSParagraphStyle {
+        let style = NSMutableParagraphStyle()
+        let tabWidth = ("    " as NSString).size(withAttributes: [.font: font]).width
+        style.defaultTabInterval = tabWidth
+        style.tabStops = []
+        style.lineHeightMultiple = 1.18
+        return style
+    }
+
+    func applyFont() {
+        let font = workspace.preferences.editorFont
+        guard font != self.font else { return }
+        self.font = font
+        typingAttributes[.font] = font
+        typingAttributes[.paragraphStyle] = Self.paragraphStyle(for: font)
+        document?.storage.addAttributes([.font: font, .paragraphStyle: Self.paragraphStyle(for: font)], range: NSRange(location: 0, length: document?.storage.length ?? 0))
+        (enclosingScrollView?.verticalRulerView as? LineGutter)?.needsDisplay = true
+    }
+
+    override var undoManager: UndoManager? { document?.undoManager }
+
+    // MARK: Lines
+
+    var lineCount: Int { lineStarts.count }
+
+    private func rebuildLineStarts() {
+        let units = (string as NSString)
+        var starts = [0]
+        starts.reserveCapacity(units.length / 30)
+        let length = units.length
+        var index = 0
+        let buffer = UnsafeMutablePointer<unichar>.allocate(capacity: max(1, length))
+        defer { buffer.deallocate() }
+        units.getCharacters(buffer, range: NSRange(location: 0, length: length))
+        while index < length {
+            if buffer[index] == 10 {
+                starts.append(index + 1)
+            }
+            index += 1
+        }
+        lineStarts = starts
+        (enclosingScrollView?.verticalRulerView as? LineGutter)?.updateThickness(lineCount: starts.count)
+    }
+
+    /// 1-based line of a UTF-16 offset.
+    func lineNumber(at offset: Int) -> Int {
+        var low = 0
+        var high = lineStarts.count - 1
+        while low < high {
+            let mid = (low + high + 1) / 2
+            if lineStarts[mid] <= offset { low = mid } else { high = mid - 1 }
+        }
+        return low + 1
+    }
+
+    func offset(ofLine line: Int) -> Int {
+        lineStarts[max(0, min(lineStarts.count - 1, line - 1))]
+    }
+
+    var caretLine: Int { lineNumber(at: selectedRange().location) }
+
+    // MARK: Text changes
+
+    override func didChangeText() {
+        super.didChangeText()
+        document?.textDidChange()
+    }
+
+    private var lastEdit: (range: NSRange, delta: Int)?
+    private var refreshScheduled = false
+
+    /// Called for every character change of the storage (typing, undo, code fixes, reloads).
+    fileprivate func storageEdited(range: NSRange, delta: Int) {
+        textStorageEdited(range: range, delta: delta)
+        if let previous = lastEdit {
+            lastEdit = (NSUnionRange(previous.range, range), previous.delta + delta)
+        } else {
+            lastEdit = (range, delta)
+        }
+        guard !refreshScheduled else { return }
+        refreshScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            MainActor.assumeIsolated {
+                self?.refreshScheduled = false
+                self?.documentEdited()
+            }
+        }
+    }
+
+    func textStorageEdited(range: NSRange, delta: Int) {
+        let oldLineCount = lineStarts.count
+        let editLine = lineNumber(at: range.location)
+        rebuildLineStarts()
+        let lineDelta = lineStarts.count - oldLineCount
+        if lineDelta != 0, let document, !document.breakpoints.isEmpty {
+            var moved: [Int: SourceBreakpoint] = [:]
+            for (line, breakpoint) in document.breakpoints {
+                if line > editLine || (line == editLine && range.location == offset(ofLine: line) && lineDelta > 0) {
+                    let target = line + lineDelta
+                    if target > editLine || lineDelta > 0 {
+                        moved[max(1, target)] = SourceBreakpoint(line: max(1, target), condition: breakpoint.condition)
+                    }
+                } else {
+                    moved[line] = breakpoint
+                }
+            }
+            document.breakpoints = moved
+            workspace.debugger.breakpointsChanged(in: document)
+        }
+    }
+
+    private func documentEdited() {
+        let edit = lastEdit ?? (NSRange(location: NSNotFound, length: 0), 0)
+        lastEdit = nil
+        highlighter?.textChanged(editedRange: edit.range, delta: edit.delta)
+        updateBracketMatch()
+        needsDisplay = true
+        enclosingScrollView?.verticalRulerView?.needsDisplay = true
+    }
+
+    @objc private func scrolled() {
+        highlighter?.scheduleSemantic()
+        if completion.isVisible || signaturePopup.isVisible {
+            positionPopups()
+        }
+        hoverPopup.dismiss()
+    }
+
+    // MARK: Diagnostics
+
+    func setDiagnostics(_ list: [Diagnostic]) {
+        guard let layoutManager, let document else { return }
+        diagnostics = list
+        let full = NSRange(location: 0, length: document.storage.length)
+        layoutManager.removeTemporaryAttribute(.underlineStyle, forCharacterRange: full)
+        layoutManager.removeTemporaryAttribute(.underlineColor, forCharacterRange: full)
+        var byLine: [Int: DiagnosticSeverity] = [:]
+        var marks: [MarkerScroller.Mark] = []
+        let total = max(1, lineCount)
+        for diagnostic in list where diagnostic.severity != .hidden {
+            var start = diagnostic.start
+            var length = diagnostic.length
+            if diagnostic.category == "Build" || (start == 0 && length == 0 && diagnostic.startLine > 1) {
+                start = document.offset(line: diagnostic.startLine, column: diagnostic.startColumn)
+                length = 0
+            }
+            if length == 0 {
+                // Underline the word at the position so that zero-length diagnostics are visible.
+                let word = wordRange(at: start)
+                start = word.location
+                length = max(1, word.length)
+            }
+            let range = NSRange(location: min(start, full.length), length: max(0, min(length, full.length - min(start, full.length))))
+            if range.length > 0 {
+                let color = diagnostic.isStyleCop ? Palette.styleCop : Palette.color(for: diagnostic.severity)
+                let style: NSUnderlineStyle = diagnostic.severity == .error ? [.thick, .patternDot] : [.single, .patternDot]
+                layoutManager.addTemporaryAttribute(.underlineStyle, value: style.rawValue, forCharacterRange: range)
+                layoutManager.addTemporaryAttribute(.underlineColor, value: color, forCharacterRange: range)
+            }
+            let line = diagnostic.startLine
+            byLine[line] = max(byLine[line] ?? .hidden, diagnostic.severity)
+            if diagnostic.severity >= .warning {
+                marks.append(.init(fraction: CGFloat(line - 1) / CGFloat(total), color: diagnostic.isStyleCop ? Palette.styleCop : Palette.color(for: diagnostic.severity)))
+            }
+        }
+        for line in document.breakpoints.keys {
+            marks.append(.init(fraction: CGFloat(line - 1) / CGFloat(total), color: Palette.breakpoint))
+        }
+        diagnosticSeverityByLine = byLine
+        (enclosingScrollView?.verticalScroller as? MarkerScroller)?.marks = workspace.preferences.showMinimapOfDiagnostics ? marks : []
+        enclosingScrollView?.verticalRulerView?.needsDisplay = true
+    }
+
+    private func wordRange(at offset: Int) -> NSRange {
+        let string = self.string as NSString
+        guard offset < string.length else { return NSRange(location: max(0, string.length - 1), length: string.length > 0 ? 1 : 0) }
+        var start = offset
+        var end = offset
+        let isWord: (unichar) -> Bool = { CSharpLexer.isIdentifierPart($0) }
+        while start > 0 && isWord(string.character(at: start - 1)) { start -= 1 }
+        while end < string.length && isWord(string.character(at: end)) { end += 1 }
+        return NSRange(location: start, length: end - start)
+    }
+
+    // MARK: Drawing
+
+    override func drawBackground(in rect: NSRect) {
+        super.drawBackground(in: rect)
+        guard let layoutManager, let document else { return }
+        if let line = document.executionLine {
+            fillLine(line, color: Palette.executionLine, layoutManager: layoutManager)
+        }
+        if selectedRange().length == 0, window?.firstResponder === self {
+            fillLine(caretLine, color: Palette.currentLine, layoutManager: layoutManager)
+        }
+    }
+
+    private func fillLine(_ line: Int, color: NSColor, layoutManager: NSLayoutManager) {
+        let offset = offset(ofLine: line)
+        var rect: NSRect
+        if offset >= (string as NSString).length && layoutManager.extraLineFragmentRect.height > 0 {
+            rect = layoutManager.extraLineFragmentRect
+        } else {
+            let glyph = layoutManager.glyphIndexForCharacter(at: min(offset, max(0, (string as NSString).length - 1)))
+            rect = layoutManager.lineFragmentRect(forGlyphAt: glyph, effectiveRange: nil)
+        }
+        rect.origin.x = 0
+        rect.size.width = bounds.width
+        rect.origin.y += textContainerInset.height
+        color.setFill()
+        rect.fill()
+    }
+
+    override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
+        let oldLine = caretLine
+        super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
+        if caretLine != oldLine || true {
+            needsDisplay = true
+            enclosingScrollView?.verticalRulerView?.needsDisplay = true
+        }
+        if !stillSelecting {
+            updateBracketMatch()
+            snippet?.selectionChanged(selectedRange())
+            if completion.isVisible && (selectedRange().location < completionStart || selectedRange().length > 0) {
+                dismissCompletion()
+            }
+        }
+    }
+
+    private func updateBracketMatch() {
+        guard let layoutManager, let highlighter else { return }
+        if let old = bracketHighlight, NSMaxRange(old) <= (string as NSString).length {
+            layoutManager.removeTemporaryAttribute(.backgroundColor, forCharacterRange: old)
+        }
+        bracketHighlight = nil
+        let caret = selectedRange().location
+        let units = highlighter.units
+        for candidate in [caret - 1, caret] where candidate >= 0 && candidate < units.count {
+            if let match = TextEditing.matchingBracket(at: candidate, in: units, tokens: highlighter.tokens) {
+                for offset in [candidate, match] {
+                    layoutManager.addTemporaryAttribute(.backgroundColor, value: Palette.bracketMatch, forCharacterRange: NSRange(location: offset, length: 1))
+                }
+                bracketHighlight = NSRange(location: min(candidate, match), length: abs(match - candidate) + 1)
+                return
+            }
+        }
+    }
+
+    // MARK: Keyboard
+
+    override func keyDown(with event: NSEvent) {
+        hoverPopup.dismiss()
+        if completion.isVisible {
+            switch event.keyCode {
+            case 125: completion.move(1); return
+            case 126: completion.move(-1); return
+            case 121: completion.move(9); return
+            case 116: completion.move(-9); return
+            case 36, 76, 48:
+                if let item = completion.selected {
+                    commitCompletion(item)
+                    return
+                }
+            case 53:
+                dismissCompletion()
+                return
+            default:
+                break
+            }
+        }
+        if event.keyCode == 53 {
+            if signaturePopup.isVisible { signaturePopup.dismiss(); return }
+            if snippet != nil { snippet = nil; return }
+        }
+        super.keyDown(with: event)
+    }
+
+    override func insertTab(_ sender: Any?) {
+        if let snippet, snippet.next(in: self) {
+            return
+        }
+        snippet = nil
+        if expandSnippetBeforeCaret() {
+            return
+        }
+        if selectedRange().length > 0 && (string as NSString).substring(with: selectedRange()).contains("\n") {
+            shiftSelectedLines(by: 1)
+            return
+        }
+        insertText(TextEditing.indentUnit, replacementRange: selectedRange())
+    }
+
+    override func insertBacktab(_ sender: Any?) {
+        if let snippet, snippet.previous(in: self) {
+            return
+        }
+        shiftSelectedLines(by: -1)
+    }
+
+    override func insertNewline(_ sender: Any?) {
+        snippet = nil
+        let string = self.string as NSString
+        let result = TextEditing.newline(at: selectedRange().location, in: string)
+        let insertAt = selectedRange()
+        insertText(result.text, replacementRange: insertAt)
+        setSelectedRange(NSRange(location: insertAt.location + result.caret, length: 0))
+        scrollRangeToVisible(selectedRange())
+    }
+
+    override func deleteBackward(_ sender: Any?) {
+        let range = selectedRange()
+        let string = self.string as NSString
+        if range.length == 0, range.location > 0 {
+            // Delete a whole indent unit when the caret sits in leading whitespace.
+            let lineStart = string.lineRange(for: NSRange(location: range.location, length: 0)).location
+            let before = string.substring(with: NSRange(location: lineStart, length: range.location - lineStart))
+            if !before.isEmpty, before.allSatisfy({ $0 == " " }) {
+                let remove = (before.count - 1) % TextEditing.indentUnit.count + 1
+                insertText("", replacementRange: NSRange(location: range.location - remove, length: remove))
+                return
+            }
+            // Remove an auto-inserted closing pair together with the opening one.
+            if range.location < string.length, let closing = TextEditing.closingPair(for: Character(UnicodeScalar(string.character(at: range.location - 1)) ?? " ")),
+               String(Character(UnicodeScalar(string.character(at: range.location)) ?? " ")) == String(closing) {
+                insertText("", replacementRange: NSRange(location: range.location - 1, length: 2))
+                updateCompletionFilter()
+                return
+            }
+        }
+        super.deleteBackward(sender)
+        updateCompletionFilter()
+        if signaturePopup.isVisible { refreshSignatureHelp() }
+    }
+
+    override func insertText(_ insertString: Any, replacementRange: NSRange) {
+        guard let text = insertString as? String, text.count == 1, let character = text.first else {
+            super.insertText(insertString, replacementRange: replacementRange)
+            return
+        }
+        let range = replacementRange.location == NSNotFound ? selectedRange() : replacementRange
+        let string = self.string as NSString
+        let next: Character? = range.location < string.length ? Character(UnicodeScalar(string.character(at: range.location)) ?? " ") : nil
+
+        // Type over an auto-inserted closing character.
+        if range.length == 0, [")", "]", "}", "\"", "'"].contains(character), next == character {
+            setSelectedRange(NSRange(location: range.location + 1, length: 0))
+            afterTyping(character)
+            return
+        }
+        if workspace.preferences.autoCloseBrackets, let closing = TextEditing.closingPair(for: character), shouldAutoClose(character, next: next, at: range.location) {
+            if range.length > 0 {
+                let selected = string.substring(with: range)
+                super.insertText(String(character) + selected + String(closing), replacementRange: range)
+                setSelectedRange(NSRange(location: range.location + 1, length: (selected as NSString).length))
+            } else {
+                super.insertText(String(character) + String(closing), replacementRange: range)
+                setSelectedRange(NSRange(location: range.location + 1, length: 0))
+            }
+            afterTyping(character)
+            return
+        }
+        // Outdent a closing brace typed on an otherwise empty line.
+        if character == "}" {
+            let lineStart = string.lineRange(for: NSRange(location: range.location, length: 0)).location
+            let before = string.substring(with: NSRange(location: lineStart, length: range.location - lineStart))
+            if before.count >= TextEditing.indentUnit.count, before.allSatisfy({ $0 == " " }) {
+                super.insertText("}", replacementRange: NSRange(location: range.location - TextEditing.indentUnit.count, length: TextEditing.indentUnit.count + range.length))
+                afterTyping(character)
+                return
+            }
+        }
+        super.insertText(insertString, replacementRange: replacementRange)
+        afterTyping(character)
+    }
+
+    private func shouldAutoClose(_ character: Character, next: Character?, at location: Int) -> Bool {
+        if let next, next.isLetter || next.isNumber || next == "_" {
+            return false
+        }
+        if character == "\"" || character == "'" {
+            let tokens = highlighter?.tokens ?? []
+            if tokens.contains(where: { ($0.kind == .string || $0.kind == .character || $0.kind == .comment) && location > $0.start && location < $0.start + $0.length }) {
+                return false
+            }
+            if location > 0, let previous = UnicodeScalar((string as NSString).character(at: location - 1)), CharacterSet.alphanumerics.contains(previous) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private func afterTyping(_ character: Character) {
+        guard document?.isCSharp == true else { return }
+        if completion.isVisible {
+            if character.isLetter || character.isNumber || character == "_" {
+                updateCompletionFilter()
+                return
+            }
+            if let item = completion.selected, ".;(),[<> =".contains(character), !(completionList?.items.isEmpty ?? true), typedPrefix.count > 0 {
+                // Commit characters: keep the typed character after the committed item.
+                commitCompletion(item, thenType: character)
+                return
+            }
+            dismissCompletion()
+        }
+        switch character {
+        case "(", ",":
+            refreshSignatureHelp()
+        case ")":
+            signaturePopup.dismiss()
+        default:
+            break
+        }
+        if character == "." || character == "<" || character == " " || character.isLetter || character == "_" || character == "#" || character == "[" {
+            maybeTriggerCompletion(typed: character)
+        }
+    }
+
+    private func shiftSelectedLines(by direction: Int) {
+        let string = self.string as NSString
+        let lines = string.lineRange(for: selectedRange())
+        let text = string.substring(with: lines)
+        var parts = text.components(separatedBy: "\n")
+        let trailing = parts.last == ""
+        if trailing { parts.removeLast() }
+        let shifted = parts.map { line -> String in
+            if direction > 0 { return line.isEmpty ? line : TextEditing.indentUnit + line }
+            let spaces = line.prefix { $0 == " " }.count
+            return String(line.dropFirst(min(spaces, TextEditing.indentUnit.count)))
+        }
+        let replacement = shifted.joined(separator: "\n") + (trailing ? "\n" : "")
+        insertText(replacement, replacementRange: lines)
+        setSelectedRange(NSRange(location: lines.location, length: (replacement as NSString).length - (trailing ? 1 : 0)))
+    }
+
+    func toggleComment() {
+        let result = TextEditing.toggleLineComment(in: string as NSString, range: selectedRange())
+        insertText(result.text, replacementRange: result.range)
+        setSelectedRange(NSRange(location: result.range.location, length: max(0, (result.text as NSString).length - 1)))
+    }
+
+    // MARK: Snippets
+
+    /// Expands the word before the caret when it is a snippet shortcut. Returns true when it did.
+    private func expandSnippetBeforeCaret() -> Bool {
+        guard document?.isCSharp == true, selectedRange().length == 0 else { return false }
+        let word = wordRange(at: max(0, selectedRange().location - 1))
+        guard NSMaxRange(word) == selectedRange().location, word.length > 0 else { return false }
+        let shortcut = (string as NSString).substring(with: word)
+        guard let definition = Snippet.find(shortcut) else { return false }
+        expand(definition, replacing: word)
+        return true
+    }
+
+    private func expand(_ definition: Snippet, replacing range: NSRange) {
+        Task {
+            var typeName: String?
+            if definition.body.contains("$TYPE"), let engine = workspace.engine, let document {
+                workspace.syncNow(document)
+                typeName = try? await engine.enclosingType(document.path, offset: range.location)
+            }
+            let indent = TextEditing.indentation(ofLineAt: range.location, in: string as NSString)
+            let expanded = SnippetExpander.expand(definition.body, indentation: indent, typeName: typeName)
+            insertText(expanded.text, replacementRange: range)
+            let session = SnippetSession(snippet: expanded, base: range.location)
+            snippet = session.stops.isEmpty ? nil : session
+            if let first = session.firstSelection {
+                setSelectedRange(first)
+            } else {
+                setSelectedRange(NSRange(location: range.location + expanded.finalCaret, length: 0))
+            }
+        }
+    }
+
+    // MARK: Completion
+
+    private var typedPrefix: String {
+        let caret = selectedRange().location
+        guard caret >= completionStart else { return "" }
+        return (string as NSString).substring(with: NSRange(location: completionStart, length: caret - completionStart))
+    }
+
+    func triggerCompletion() {
+        requestCompletion()
+    }
+
+    private func maybeTriggerCompletion(typed: Character) {
+        guard let engine = workspace.engine, workspace.isEngineReady, let document else { return }
+        let offset = selectedRange().location
+        completionTask?.cancel()
+        completionTask = Task {
+            try? await Task.sleep(for: .milliseconds(typed == "." ? 0 : 40))
+            guard !Task.isCancelled else { return }
+            workspace.syncNow(document)
+            // Only the first letter of a word opens the list; later letters filter it.
+            if typed.isLetter || typed == "_" {
+                let word = wordRange(at: max(0, offset - 1))
+                guard word.length == 1 else { return }
+            }
+            guard (try? await engine.shouldTriggerCompletion(document.path, offset: offset, typed: typed)) == true else { return }
+            await loadCompletion(at: offset)
+        }
+    }
+
+    private func requestCompletion() {
+        completionTask?.cancel()
+        completionTask = Task { await loadCompletion(at: selectedRange().location) }
+    }
+
+    private func loadCompletion(at offset: Int) async {
+        guard let engine = workspace.engine, workspace.isEngineReady, let document else { return }
+        workspace.syncNow(document)
+        guard let list = try? await engine.completion(document.path, offset: offset), !Task.isCancelled, selectedRange().location >= list.spanStart else {
+            return
+        }
+        var items = list.items
+        let prefixStart = list.spanStart
+        let prefix = (string as NSString).substring(with: NSRange(location: prefixStart, length: max(0, selectedRange().location - prefixStart)))
+        let snippets = Snippet.csharp.filter { !prefix.isEmpty && $0.shortcut.hasPrefix(prefix.lowercased()) }.enumerated().map { index, snippet in
+            CompletionItem(displayText: snippet.shortcut, filterText: snippet.shortcut, sortText: snippet.shortcut, kind: .snippet, inlineDescription: snippet.title, handle: -(index + 1))
+        }
+        items = snippets + items
+        completionList = CompletionList(items: items, spanStart: list.spanStart, spanLength: list.spanLength)
+        completionStart = list.spanStart
+        updateCompletionFilter(show: true)
+    }
+
+    private func updateCompletionFilter(show: Bool = false) {
+        guard let list = completionList, show || completion.isVisible else { return }
+        let caret = selectedRange().location
+        guard caret >= completionStart else {
+            dismissCompletion()
+            return
+        }
+        let prefix = typedPrefix
+        let filtered: [CompletionItem]
+        if prefix.isEmpty {
+            filtered = list.items.sorted { $0.sortText.localizedCaseInsensitiveCompare($1.sortText) == .orderedAscending }
+        } else {
+            let scored = list.items.compactMap { item -> (CompletionItem, Int)? in
+                guard let score = FuzzyMatcher.score(prefix, item.filterText) else { return nil }
+                let exactPrefix = item.filterText.lowercased().hasPrefix(prefix.lowercased()) ? 100 : 0
+                let caseBonus = item.filterText.hasPrefix(prefix) ? 20 : 0
+                return (item, score + exactPrefix + caseBonus)
+            }
+            filtered = scored.sorted { $0.1 != $1.1 ? $0.1 > $1.1 : $0.0.sortText < $1.0.sortText }.map(\.0)
+        }
+        if filtered.isEmpty || (filtered.count == 1 && filtered[0].filterText == prefix && filtered[0].kind != .snippet) {
+            dismissCompletion()
+            return
+        }
+        guard let window, let anchor = screenRect(at: completionStart) else { return }
+        completion.show(Array(filtered.prefix(400)), near: anchor, in: window)
+    }
+
+    private func dismissCompletion() {
+        completion.dismiss()
+        completionList = nil
+        detailTask?.cancel()
+    }
+
+    private func loadCompletionDetail(_ item: CompletionItem) {
+        detailTask?.cancel()
+        guard item.handle >= 0, let engine = workspace.engine, let document else {
+            completion.setDetail(item.kind == .snippet ? Snippet.find(item.displayText)?.body.replacingOccurrences(of: "\t", with: "    ") : nil)
+            return
+        }
+        detailTask = Task {
+            try? await Task.sleep(for: .milliseconds(120))
+            guard !Task.isCancelled else { return }
+            let text = try? await engine.completionDescription(document.path, handle: item.handle)
+            guard !Task.isCancelled, completion.isVisible else { return }
+            completion.setDetail(text)
+        }
+    }
+
+    private func commitCompletion(_ item: CompletionItem, thenType character: Character? = nil) {
+        let start = completionStart
+        let end = selectedRange().location
+        dismissCompletion()
+        if item.kind == .snippet, let definition = Snippet.find(item.displayText) {
+            expand(definition, replacing: NSRange(location: start, length: end - start))
+            return
+        }
+        guard let engine = workspace.engine, let document else { return }
+        workspace.syncNow(document)
+        Task {
+            if let edit = try? await engine.resolveCompletion(document.path, handle: item.handle), let file = edit.files.first(where: { RealPath.resolve($0.filePath) == document.path }), !file.edits.isEmpty {
+                undoManager?.beginUndoGrouping()
+                var caretShift = 0
+                var caret = end
+                for change in file.edits.sorted(by: { $0.start > $1.start }) {
+                    let range = NSRange(location: change.start, length: change.length)
+                    if shouldChangeText(in: range, replacementString: change.newText) {
+                        textStorage?.replaceCharacters(in: range, with: change.newText)
+                        didChangeText()
+                    }
+                    let delta = (change.newText as NSString).length - change.length
+                    if change.start + change.length <= end - (end - start) {
+                        caretShift += delta
+                    }
+                    if change.start <= start && change.start + change.length >= start {
+                        caret = change.start + (change.newText as NSString).length
+                    }
+                }
+                undoManager?.endUndoGrouping()
+                if let target = edit.caretOffset, edit.caretFile.map(RealPath.resolve) == document.path {
+                    setSelectedRange(NSRange(location: target, length: 0))
+                } else {
+                    setSelectedRange(NSRange(location: caret + caretShift, length: 0))
+                }
+            } else {
+                insertText(item.displayText, replacementRange: NSRange(location: start, length: end - start))
+            }
+            if let character {
+                insertText(String(character), replacementRange: selectedRange())
+            } else if item.kind == .method || item.kind == .extensionMethod {
+                refreshSignatureHelp()
+            }
+        }
+    }
+
+    // MARK: Signature help
+
+    func showSignatureHelp() {
+        refreshSignatureHelp()
+    }
+
+    private func refreshSignatureHelp() {
+        guard let engine = workspace.engine, workspace.isEngineReady, let document else { return }
+        signatureTask?.cancel()
+        let offset = selectedRange().location
+        signatureTask = Task {
+            try? await Task.sleep(for: .milliseconds(30))
+            workspace.syncNow(document)
+            guard !Task.isCancelled else { return }
+            guard let help = try? await engine.signatureHelp(document.path, offset: offset), !help.signatures.isEmpty, !Task.isCancelled else {
+                signaturePopup.dismiss()
+                return
+            }
+            guard let window, let anchor = screenRect(at: offset) else { return }
+            signaturePopup.show(SignatureHelpCard(help: help), near: anchor, in: window, above: true)
+        }
+    }
+
+    private func positionPopups() {
+        if completion.isVisible { updateCompletionFilter() }
+        if signaturePopup.isVisible { refreshSignatureHelp() }
+    }
+
+    // MARK: Hover
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        if let trackingArea { removeTrackingArea(trackingArea) }
+        let area = NSTrackingArea(rect: visibleRect, options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect, .mouseEnteredAndExited], owner: self)
+        addTrackingArea(area)
+        trackingArea = area
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        super.mouseMoved(with: event)
+        hoverTask?.cancel()
+        let point = convert(event.locationInWindow, from: nil)
+        guard let offset = characterOffset(at: point) else {
+            hoverPopup.dismiss()
+            return
+        }
+        if event.modifierFlags.contains(.command) {
+            NSCursor.pointingHand.set()
+        }
+        hoverTask = Task {
+            try? await Task.sleep(for: .milliseconds(450))
+            guard !Task.isCancelled else { return }
+            await showHover(at: offset, point: event.locationInWindow)
+        }
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        hoverTask?.cancel()
+        hoverPopup.dismiss()
+    }
+
+    private func showHover(at offset: Int, point: NSPoint) async {
+        guard let document, let window else { return }
+        let anchor = window.convertToScreen(NSRect(origin: point, size: NSSize(width: 1, height: 1))).offsetBy(dx: 0, dy: -8)
+        if workspace.debugger.isStopped {
+            let word = expression(at: offset)
+            if let value = await workspace.debugger.hoverValue(word), !Task.isCancelled {
+                hoverPopup.show(Text(value).font(.system(size: 12, design: .monospaced)).textSelection(.enabled), near: anchor, in: window, above: false)
+                return
+            }
+        }
+        let local = diagnostics.filter { $0.start <= offset && offset <= $0.start + max($0.length, 1) && $0.severity != .hidden }
+        var signature = ""
+        var documentation: String?
+        if let engine = workspace.engine, workspace.isEngineReady, document.isCSharp {
+            workspace.syncNow(document)
+            if let info = try? await engine.quickInfo(document.path, offset: offset) {
+                signature = info.signature
+                documentation = info.documentation
+            }
+        }
+        guard !Task.isCancelled, !signature.isEmpty || !local.isEmpty else { return }
+        hoverPopup.show(QuickInfoCard(signature: signature, documentation: documentation, diagnostics: local), near: anchor, in: window, above: false)
+    }
+
+    /// The identifier chain under the mouse (`car.Name`) for debugger hover.
+    private func expression(at offset: Int) -> String {
+        let string = self.string as NSString
+        var start = offset
+        var end = offset
+        let isPart: (unichar) -> Bool = { CSharpLexer.isIdentifierPart($0) }
+        while start > 0 && (isPart(string.character(at: start - 1)) || string.character(at: start - 1) == 46) { start -= 1 }
+        while end < string.length && isPart(string.character(at: end)) { end += 1 }
+        return string.substring(with: NSRange(location: start, length: end - start))
+    }
+
+    private func characterOffset(at point: NSPoint) -> Int? {
+        guard let layoutManager, let textContainer else { return nil }
+        let containerPoint = NSPoint(x: point.x - textContainerInset.width, y: point.y - textContainerInset.height)
+        var fraction: CGFloat = 0
+        let glyph = layoutManager.glyphIndex(for: containerPoint, in: textContainer, fractionOfDistanceThroughGlyph: &fraction)
+        let rect = layoutManager.boundingRect(forGlyphRange: NSRange(location: glyph, length: 1), in: textContainer)
+        guard rect.insetBy(dx: -2, dy: -2).contains(containerPoint) else { return nil }
+        return layoutManager.characterIndexForGlyph(at: glyph)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        hoverPopup.dismiss()
+        dismissCompletion()
+        if event.modifierFlags.contains(.command), let offset = characterOffset(at: convert(event.locationInWindow, from: nil)), let document {
+            setSelectedRange(NSRange(location: offset, length: 0))
+            Task { await workspace.goToDefinition(document, offset: offset) }
+            return
+        }
+        super.mouseDown(with: event)
+    }
+
+    func screenRect(at offset: Int) -> NSRect? {
+        guard let window else { return nil }
+        var actual = NSRange()
+        let rect = firstRect(forCharacterRange: NSRange(location: min(offset, (string as NSString).length), length: 0), actualRange: &actual)
+        guard rect.width.isFinite else { return nil }
+        _ = window
+        return rect
+    }
+
+    // MARK: Quick actions (⌘⇧.)
+
+    func showQuickActions() {
+        guard let document else { return }
+        dismissCompletion()
+        let range = selectedRange()
+        Task {
+            let actions = await workspace.codeActions(document, range: range)
+            presentQuickActions(actions, at: range.location)
+        }
+    }
+
+    private func presentQuickActions(_ actions: [CodeAction], at offset: Int) {
+        let menu = NSMenu(title: String(localized: "Quick Actions"))
+        menu.autoenablesItems = false
+        let fixes = actions.filter { $0.isFix && !$0.isFixAll }
+        let fixAll = actions.filter(\.isFixAll)
+        let refactorings = actions.filter { !$0.isFix }
+        func add(_ action: CodeAction, symbol: String, tint: NSColor) {
+            let item = QuickActionItem(title: action.title, action: #selector(QuickActionItem.run), keyEquivalent: "")
+            item.target = item
+            item.handler = { [weak self] in
+                guard let self else { return }
+                Task { await self.workspace.perform(action) }
+            }
+            item.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?.withSymbolConfiguration(.init(paletteColors: [tint]))
+            if action.isFix, action.group.count > 2 {
+                item.badge = NSMenuItemBadge(string: action.group)
+            }
+            menu.addItem(item)
+        }
+        if actions.isEmpty {
+            let empty = NSMenuItem(title: String(localized: "No quick actions here"), action: nil, keyEquivalent: "")
+            empty.isEnabled = false
+            menu.addItem(empty)
+        }
+        if !fixes.isEmpty {
+            menu.addItem(.sectionHeader(title: String(localized: "Fixes")))
+            fixes.forEach { add($0, symbol: $0.group.hasPrefix("SA") ? "checkmark.seal" : "lightbulb.fill", tint: $0.group.hasPrefix("SA") ? Palette.styleCop : Palette.warning) }
+        }
+        if !fixAll.isEmpty {
+            menu.addItem(.sectionHeader(title: String(localized: "Fix All")))
+            fixAll.forEach { add($0, symbol: "wand.and.stars", tint: Palette.styleCop) }
+        }
+        if !refactorings.isEmpty {
+            menu.addItem(.sectionHeader(title: String(localized: "Refactorings")))
+            refactorings.prefix(40).forEach { add($0, symbol: "hammer", tint: Palette.accent) }
+        }
+        guard let rect = screenRect(at: offset), let window else { return }
+        let windowPoint = window.convertPoint(fromScreen: NSPoint(x: rect.minX, y: rect.minY - 4))
+        menu.popUp(positioning: nil, at: convert(windowPoint, from: nil), in: self)
+    }
+
+    // MARK: Navigation and refactoring
+
+    func goToDefinition() {
+        guard let document else { return }
+        Task { await workspace.goToDefinition(document, offset: selectedRange().location) }
+    }
+
+    func findReferences() {
+        guard let document else { return }
+        Task { await workspace.findReferences(document, offset: selectedRange().location) }
+    }
+
+    func renameSymbol() {
+        guard let document else { return }
+        Task { await workspace.rename(document, offset: selectedRange().location) }
+    }
+
+    func promptGoToLine() {
+        workspace.prompt = PromptRequest(title: String(localized: "Go to Line"), message: String(localized: "Line 1 – \(lineCount)"), placeholder: "42", confirmTitle: String(localized: "Go")) { [weak self] text in
+            guard let self, let line = Int(text.trimmingCharacters(in: .whitespaces)) else { return }
+            self.reveal(NSRange(location: self.offset(ofLine: line), length: 0))
+        }
+    }
+
+    func reveal(_ range: NSRange) {
+        let length = (string as NSString).length
+        let clamped = NSRange(location: min(range.location, length), length: min(range.length, length - min(range.location, length)))
+        setSelectedRange(clamped)
+        scrollRangeToVisible(clamped)
+        if let layoutManager, let textContainer {
+            let glyphs = layoutManager.glyphRange(forCharacterRange: clamped, actualCharacterRange: nil)
+            var rect = layoutManager.boundingRect(forGlyphRange: glyphs, in: textContainer)
+            rect.origin.y -= visibleRect.height / 3
+            rect.size.height = visibleRect.height * 2 / 3
+            scrollToVisible(rect)
+        }
+        showFindIndicator(for: clamped)
+    }
+
+    // MARK: Breakpoints
+
+    func toggleBreakpointAtCaret() {
+        toggleBreakpoint(line: caretLine)
+    }
+
+    func toggleBreakpoint(line: Int) {
+        guard let document else { return }
+        document.toggleBreakpoint(line: line)
+        workspace.debugger.breakpointsChanged(in: document)
+        enclosingScrollView?.verticalRulerView?.needsDisplay = true
+        setDiagnostics(diagnostics)
+    }
+
+    func editBreakpointCondition(line: Int) {
+        guard let document else { return }
+        workspace.prompt = PromptRequest(
+            title: String(localized: "Breakpoint Condition"),
+            message: String(localized: "Line \(line). The program stops only when the expression is true; leave empty to always stop."),
+            placeholder: "count > 10",
+            initialValue: document.breakpoints[line]?.condition ?? "",
+            confirmTitle: String(localized: "Set")
+        ) { [weak self] condition in
+            guard let self else { return }
+            document.breakpoints[line] = SourceBreakpoint(line: line, condition: condition.isEmpty ? nil : condition)
+            self.workspace.debugger.breakpointsChanged(in: document)
+            self.enclosingScrollView?.verticalRulerView?.needsDisplay = true
+        }
+    }
+
+    // MARK: Context menu
+
+    override func menu(for event: NSEvent) -> NSMenu? {
+        let menu = NSMenu()
+        if let offset = characterOffset(at: convert(event.locationInWindow, from: nil)), selectedRange().length == 0 || !NSLocationInRange(offset, selectedRange()) {
+            setSelectedRange(NSRange(location: offset, length: 0))
+        }
+        func item(_ title: String, _ symbol: String, _ key: String = "", _ modifiers: NSEvent.ModifierFlags = [], action: @escaping () -> Void) {
+            let entry = QuickActionItem(title: title, action: #selector(QuickActionItem.run), keyEquivalent: key)
+            entry.keyEquivalentModifierMask = modifiers
+            entry.target = entry
+            entry.handler = action
+            entry.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)
+            menu.addItem(entry)
+        }
+        if document?.isCSharp == true {
+            item(String(localized: "Quick Actions and Fixes…"), "lightbulb", ".", [.command, .shift]) { [weak self] in self?.showQuickActions() }
+            menu.addItem(.separator())
+            item(String(localized: "Go to Definition"), "arrow.right.circle") { [weak self] in self?.goToDefinition() }
+            item(String(localized: "Find References"), "magnifyingglass") { [weak self] in self?.findReferences() }
+            item(String(localized: "Rename Symbol…"), "pencil") { [weak self] in self?.renameSymbol() }
+            menu.addItem(.separator())
+            item(String(localized: "Format Document"), "text.alignleft") { [weak self] in
+                guard let self, let document = self.document else { return }
+                Task { await self.workspace.formatDocument(document) }
+            }
+            item(String(localized: "Toggle Comment"), "text.badge.minus", "/", .command) { [weak self] in self?.toggleComment() }
+            item(String(localized: "Toggle Breakpoint"), "circle.fill") { [weak self] in self?.toggleBreakpointAtCaret() }
+            menu.addItem(.separator())
+        }
+        menu.addItem(withTitle: String(localized: "Cut"), action: #selector(cut(_:)), keyEquivalent: "x")
+        menu.addItem(withTitle: String(localized: "Copy"), action: #selector(copy(_:)), keyEquivalent: "c")
+        menu.addItem(withTitle: String(localized: "Paste"), action: #selector(paste(_:)), keyEquivalent: "v")
+        return menu
+    }
+
+    override func becomeFirstResponder() -> Bool {
+        let result = super.becomeFirstResponder()
+        workspace.activeEditor = self
+        needsDisplay = true
+        return result
+    }
+
+    override func resignFirstResponder() -> Bool {
+        dismissCompletion()
+        signaturePopup.dismiss()
+        hoverPopup.dismiss()
+        needsDisplay = true
+        return super.resignFirstResponder()
+    }
+}
+
+extension CodeTextView: NSTextStorageDelegate {
+    nonisolated func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
+        guard editedMask.contains(.editedCharacters) else { return }
+        MainActor.assumeIsolated {
+            storageEdited(range: editedRange, delta: delta)
+        }
+    }
+}
+
+extension CodeTextView: NSTextViewDelegate {
+    func undoManager(for view: NSTextView) -> UndoManager? { document?.undoManager }
+
+    func textView(_ textView: NSTextView, shouldChangeTextIn affectedCharRange: NSRange, replacementString: String?) -> Bool {
+        if let replacementString {
+            snippet?.textWillChange(in: affectedCharRange, replacement: replacementString)
+        }
+        return true
+    }
+}
+
+/// A menu item that runs a closure.
+final class QuickActionItem: NSMenuItem {
+    var handler: (() -> Void)?
+
+    @objc func run() {
+        handler?()
+    }
+}
+
+/// Tab stops of an inserted snippet; linked placeholders (same index) are edited together.
+@MainActor
+final class SnippetSession {
+    private(set) var stops: [Int]
+    private var placeholders: [ExpandedSnippet.Placeholder]
+    private var finalCaret: Int
+    private var current = 0
+
+    init(snippet: ExpandedSnippet, base: Int) {
+        stops = snippet.stops
+        placeholders = snippet.placeholders.map { .init(index: $0.index, start: $0.start + base, length: $0.length) }
+        finalCaret = snippet.finalCaret + base
+    }
+
+    var firstSelection: NSRange? {
+        guard let first = stops.first, let placeholder = placeholders.first(where: { $0.index == first }) else { return nil }
+        return NSRange(location: placeholder.start, length: placeholder.length)
+    }
+
+    func next(in view: NSTextView) -> Bool {
+        current += 1
+        if current >= stops.count {
+            view.setSelectedRange(NSRange(location: finalCaret, length: 0))
+            return true
+        }
+        select(in: view)
+        return true
+    }
+
+    func previous(in view: NSTextView) -> Bool {
+        guard current > 0 else { return false }
+        current -= 1
+        select(in: view)
+        return true
+    }
+
+    private func select(in view: NSTextView) {
+        guard let placeholder = placeholders.first(where: { $0.index == stops[current] }) else { return }
+        view.setSelectedRange(NSRange(location: placeholder.start, length: placeholder.length))
+    }
+
+    /// Keeps placeholder positions up to date while the user types into one.
+    func textWillChange(in range: NSRange, replacement: String) {
+        let delta = (replacement as NSString).length - range.length
+        guard current < stops.count else { return }
+        let index = stops[current]
+        let active = placeholders.first { $0.index == index && range.location >= $0.start && NSMaxRange(range) <= $0.start + $0.length }
+        placeholders = placeholders.map { placeholder in
+            if let active, placeholder == active {
+                return .init(index: placeholder.index, start: placeholder.start, length: placeholder.length + delta)
+            }
+            if placeholder.start >= NSMaxRange(range) {
+                return .init(index: placeholder.index, start: placeholder.start + delta, length: placeholder.length)
+            }
+            return placeholder
+        }
+        if finalCaret >= NSMaxRange(range) {
+            finalCaret += delta
+        }
+    }
+
+    func selectionChanged(_ range: NSRange) {}
+}

@@ -10,16 +10,31 @@ public struct SolutionProject: Sendable, Hashable, Identifiable {
     /// Solution folder such as `/src/`, `/` for the root.
     public let solutionFolder: String
 
+    public init(name: String, filePath: String, solutionFolder: String) {
+        self.name = name
+        self.filePath = filePath
+        self.solutionFolder = solutionFolder
+    }
+
     public var id: String { filePath }
 
     public var directory: URL { URL(fileURLWithPath: filePath).deletingLastPathComponent() }
 }
 
-public struct SolutionModel: Sendable, Hashable {
+public struct SolutionModel: Sendable, Hashable, Identifiable {
+    public var id: String { filePath }
+
     public let filePath: String
     public let format: SolutionFormat
     public let projects: [SolutionProject]
     public let folders: [String]
+
+    public init(filePath: String, format: SolutionFormat, projects: [SolutionProject], folders: [String]) {
+        self.filePath = filePath
+        self.format = format
+        self.projects = projects
+        self.folders = folders
+    }
 
     public var name: String { URL(fileURLWithPath: filePath).deletingPathExtension().lastPathComponent }
 
