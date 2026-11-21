@@ -2,17 +2,17 @@
 
 ## 1. Prepare
 
-1. Update `VERSION` (for example `0.2.1`).
-2. Add a `## [0.2.1] - YYYY-MM-DD` section to `CHANGELOG.md`. The workflow copies it into the release notes.
+1. Update `VERSION` (for example `1.0.1`).
+2. Add a `## [1.0.1] - YYYY-MM-DD` section to `CHANGELOG.md`. The workflow copies it into the release notes.
 3. Check locally: `./release.sh` (engine tests, Swift tests, build, smoke test of the bundle, zip).
-4. Commit: `git commit -am "chore: release 0.2.1"`.
+4. Commit: `git commit -am "chore: release 1.0.1"`.
 
 ## 2. Tag and push
 
 ```sh
-git tag v0.2.1
+git tag v1.0.1
 git push origin main
-git push origin v0.2.1     # tags are not pushed by a plain `git push`
+git push origin v1.0.1     # tags are not pushed by a plain `git push`
 ```
 
 The tag starts `.github/workflows/release.yml` on a `macos-26` (Apple Silicon) runner. It checks that the tag matches
@@ -33,5 +33,5 @@ brew install --cask LaJuMiRa/tap/vslike
 Without the secret, render the cask yourself and add it to the tap:
 
 ```sh
-packaging/homebrew/render-cask.sh 0.2.1 <sha256 from the .sha256 file> Casks/vslike.rb
+packaging/homebrew/render-cask.sh 1.0.1 <sha256 from the .sha256 file> Casks/vslike.rb
 ```
