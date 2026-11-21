@@ -7,8 +7,8 @@
 #
 # Steps:
 #   1. engine tests      dotnet test engine/VsLike.Engine.slnx (Roslyn, StyleCop, diagram writer, JSON-RPC end to end)
-#   2. app tests         swift test (library, engine client, dotnet CLI, debugger, app workspace against the real engine)
-#   3. build             ./build.sh  -> build/VsLike.app
+#   2. build             ./build.sh  -> build/VsLike.app (also caches netcoredbg for the debugger tests)
+#   3. app tests         swift test (library, engine client, dotnet CLI, debugger, app workspace against the real engine)
 #   4. smoke test        starts the built engine from the bundle and loads a sample solution
 #   5. package           dist/VsLike-<version>-arm64.zip + .sha256
 #
@@ -26,13 +26,16 @@ if [[ "${SKIP_TESTS:-0}" != "1" ]]; then
     echo "==> Engine tests"
     dotnet build engine/VsLike.Engine.slnx -nologo -v:quiet
     dotnet test engine/VsLike.Engine.slnx --no-build -nologo
+fi
 
+# Before the app tests: build.sh downloads netcoredbg into the cache, where the debugger tests find it.
+./build.sh
+
+if [[ "${SKIP_TESTS:-0}" != "1" ]]; then
     echo "==> App tests"
     # The engine tests built the engine that the Swift integration tests start.
     swift test --scratch-path "$WORK/spm-tests"
 fi
-
-./build.sh
 
 echo "==> Smoke test of the bundled engine"
 APP="build/VsLike.app"
