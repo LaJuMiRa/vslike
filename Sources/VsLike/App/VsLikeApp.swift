@@ -53,10 +53,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Self.open(urls)
     }
 
-    /// Opens a solution, project or folder first (if any), then the remaining files as tabs.
+    /// Opens a solution, project or folder first (if any), then the remaining files as tabs. A file opened on its
+    /// own (a class diagram or source file from the Finder) brings its solution or project along, so that the code
+    /// behind it is analysed.
     static func open(_ urls: [URL]) {
         let isRoot: (URL) -> Bool = { ["sln", "slnx", "csproj"].contains($0.pathExtension.lowercased()) || $0.hasDirectoryPath }
-        let root = urls.first(where: isRoot) ?? urls.first
+        let enclosing = workspace.rootURL == nil ? urls.first.flatMap(enclosingSolution(of:)) : nil
+        let root = urls.first(where: isRoot) ?? enclosing ?? urls.first
         guard let root else { return }
         Task {
             if workspace.rootURL == nil || isRoot(root) {
@@ -66,6 +69,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 workspace.openFile(file)
             }
         }
+    }
+
+    /// The nearest solution above a file (preferred), otherwise the nearest project, searching up to six folders.
+    static func enclosingSolution(of file: URL) -> URL? {
+        guard !file.hasDirectoryPath else { return nil }
+        var folder = file.deletingLastPathComponent()
+        var project: URL?
+        for _ in 0..<6 {
+            let entries = (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? []
+            if let solution = entries.filter({ ["slnx", "sln"].contains($0.pathExtension.lowercased()) }).min(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+                return solution
+            }
+            project = project ?? entries.first { $0.pathExtension.lowercased() == "csproj" }
+            let parent = folder.deletingLastPathComponent()
+            if parent.path == folder.path { break }
+            folder = parent
+        }
+        return project
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }

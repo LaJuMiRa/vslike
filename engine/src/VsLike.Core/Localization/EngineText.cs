@@ -12,6 +12,7 @@ public static class EngineText
     {
         ["CodeAction.FixAllDocument"] = ("Fix all in document: {0}", "Alle im Dokument beheben: {0}"),
         ["CodeAction.FixAllProject"] = ("Fix all in project: {0}", "Alle im Projekt beheben: {0}"),
+        ["CodeAction.AddDocumentation"] = ("Add documentation comment", "Dokumentationskommentar hinzufügen"),
     };
 
     /// <summary>Gets a value indicating whether German texts are used.</summary>

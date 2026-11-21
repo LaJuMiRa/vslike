@@ -13,6 +13,11 @@ Neubau als native macOS-App (nur macOS 26, Apple Silicon).
 - Haltepunkte werden pro Solution gespeichert und wandern beim Bearbeiten mit.
 - C#-Analyse als Hintergrundprozess `VsLikeEngine` (Roslyn, StyleCop, Diagramm-Writer) hinter JSON-RPC; Build, Tests, NuGet, Vorlagen, Solution-Dateien und Debugger-Anbindung (netcoredbg) sind neu in Swift.
 - `build.sh` und `release.sh` wie im Projekt Seasons; `release.sh` führt alle Tests aus, baut und packt das Zip.
+- Debuggen im Terminal: Das Programm läuft in einem Terminal-Tab und kann Eingaben lesen. Ein Starthelfer (`VsLike.DebugStartupHook`, im App-Paket) hält es an, bis netcoredbg verbunden ist und die Haltepunkte gesetzt sind, damit auch ein Haltepunkt in der ersten Zeile greift. Das Ende des Programms wird zuverlässig erkannt; bisher blieb der Tab gelegentlich auf „läuft“ und der Prozess als Zombie zurück.
+- Fehler und Warnungen werden als Wellenlinie genau unter den betroffenen Zeichen unterstrichen.
+- Klassendiagramme im `.cd`-Format öffnen und speichern, auch per Doppelklick im Finder. Positionen und der eingeklappte Zustand bleiben erhalten, die passende Solution oder das Projekt wird automatisch mitgeöffnet.
+- StyleCop SA1600: Der Fix ergänzt Dokumentationskommentare im Wortlaut von StyleCop, z. B. „Gets or sets …“, „Initializes a new instance of …“, `<param>`, `<typeparam>`, `<returns>` und `<inheritdoc/>` bei Überschreibungen. Mit „Alle beheben“ geht das für die ganze Datei oder das ganze Projekt. Quick-Actions, die in anderen IDEs nur einen Optionsdialog öffnen („…“), werden ausgeblendet.
+- Debug-Panel: Die Spalten teilen sich die verfügbare Breite und schieben die Seitenleisten nicht mehr aus dem Fenster.
 - Entfernt: Avalonia-Oberfläche, Linux-Pakete und Intel-Build.
 
 ## Avalonia-Version (Phasen 0–11, nicht veröffentlicht)

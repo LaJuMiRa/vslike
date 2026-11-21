@@ -27,6 +27,9 @@ final class DebugController {
     @ObservationIgnored private unowned let workspace: Workspace
     @ObservationIgnored private var session: DebugSession?
     @ObservationIgnored private var eventTask: Task<Void, Never>?
+    /// The terminal tab the debugged program runs in, and the file that releases it from the startup hook.
+    @ObservationIgnored private var terminalSession: TerminalSession?
+    @ObservationIgnored private var readyFile: URL?
 
     private(set) var isActive = false
     private(set) var isStarting = false
@@ -82,18 +85,43 @@ final class DebugController {
             if let url = profile?.applicationURL {
                 environment["ASPNETCORE_URLS"] = url
             }
-            let launch = LaunchConfiguration(
-                program: program,
-                arguments: arguments,
-                workingDirectory: BuildService.workingDirectory(project: project, profile: profile).path,
-                environment: environment
-            )
             console = []
-            appendConsole(String(localized: "Starting \(URL(fileURLWithPath: program).lastPathComponent) with netcoredbg…"))
-            let (session, _) = try await DebugSession.start(adapter: adapter, launch: launch, breakpoints: workspace.allBreakpoints, dotnet: runner.executable)
+            // The program runs in a terminal tab (so it can read input) and waits in the startup hook until the
+            // debugger has attached and set the breakpoints.
+            guard let hook = DebugStartupHook.locate() else {
+                workspace.alert = AlertMessage(title: String(localized: "Debug"), message: String(localized: "The debug startup hook is missing from the app bundle."))
+                return
+            }
+            let readyFile = FileManager.default.temporaryDirectory.appendingPathComponent("vslike-debug-\(UUID().uuidString)")
+            self.readyFile = readyFile
+            guard let terminal = workspace.terminals.run(
+                title: String(localized: "Debug: \(workspace.build.startupProjectName ?? "")"),
+                arguments: [program] + arguments,
+                in: BuildService.workingDirectory(project: project, profile: profile),
+                environment: DebugStartupHook.environment(environment, hook: hook, readyFile: readyFile)
+            ) else {
+                return
+            }
+            terminalSession = terminal
+            appendConsole(String(localized: "Attaching netcoredbg to \(URL(fileURLWithPath: program).lastPathComponent) (process \(terminal.processID))…"))
+            let session: DebugSession
+            do {
+                (session, _) = try await DebugSession.attach(
+                    adapter: adapter,
+                    processID: terminal.processID,
+                    breakpoints: workspace.allBreakpoints,
+                    dotnet: runner.executable,
+                    readyFile: readyFile
+                )
+            } catch {
+                terminal.terminate()
+                terminalSession = nil
+                removeReadyFile()
+                throw error
+            }
             self.session = session
             isActive = true
-            workspace.bottomTab = .debug
+            workspace.bottomTab = .terminal
             workspace.isBottomPanelVisible = true
             workspace.status = StatusMessage(text: String(localized: "Debugging \(workspace.build.startupProjectName ?? "")"), style: .progress)
             eventTask = Task { [weak self] in
@@ -135,6 +163,7 @@ final class DebugController {
         selectedFrameID = top?.id
         await loadFrame()
         isStopped = true
+        workspace.bottomTab = .debug
         workspace.status = StatusMessage(text: String(localized: "Paused: \(stopReason ?? "")"), style: .warning)
     }
 
@@ -215,7 +244,14 @@ final class DebugController {
         return result.type.map { "\(expression) = \(result.value)  (\($0))" } ?? "\(expression) = \(result.value)"
     }
 
-    func resume() async { await run { try await $0.resume(threadID: $1) } }
+    /// Continues; the terminal comes to the front again, as the program may wait for input.
+    func resume() async {
+        if terminalSession?.isRunning == true {
+            workspace.bottomTab = .terminal
+            workspace.terminals.activeID = terminalSession?.id
+        }
+        await run { try await $0.resume(threadID: $1) }
+    }
 
     func stepOver() async { await run { try await $0.stepOver(threadID: $1) } }
 
@@ -244,6 +280,7 @@ final class DebugController {
     func stop() async {
         guard let session else { return }
         await session.stop()
+        terminalSession?.terminate()
         finish()
     }
 
@@ -259,6 +296,8 @@ final class DebugController {
         guard isActive || session != nil else { return }
         eventTask?.cancel()
         session = nil
+        terminalSession = nil
+        removeReadyFile()
         isActive = false
         isStopped = false
         frames = []
@@ -266,6 +305,13 @@ final class DebugController {
         variables = []
         clearExecutionLine()
         workspace.status = StatusMessage(text: String(localized: "Debugging ended"), style: .neutral)
+    }
+
+    private func removeReadyFile() {
+        if let readyFile {
+            try? FileManager.default.removeItem(at: readyFile)
+        }
+        readyFile = nil
     }
 
     private func showExecutionLine(_ frame: StackFrame) {

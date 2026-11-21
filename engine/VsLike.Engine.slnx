@@ -4,6 +4,7 @@
     <Project Path="src/VsLike.Roslyn/VsLike.Roslyn.csproj" />
     <Project Path="src/VsLike.Diagram/VsLike.Diagram.csproj" />
     <Project Path="src/VsLike.Engine/VsLike.Engine.csproj" />
+    <Project Path="src/VsLike.DebugStartupHook/VsLike.DebugStartupHook.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/VsLike.Roslyn.Tests/VsLike.Roslyn.Tests.csproj" />

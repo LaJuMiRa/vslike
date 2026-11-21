@@ -38,8 +38,11 @@ echo "==> Smoke test of the bundled engine"
 APP="build/VsLike.app"
 VSLIKE_ENGINE_DLL="$PWD/$APP/Contents/Resources/engine/VsLikeEngine.dll" \
     VSLIKE_NETCOREDBG="$PWD/$APP/Contents/Resources/netcoredbg/netcoredbg" \
-    swift test --scratch-path "$WORK/spm-tests" --filter "engine_loadsSolutionAndServesIntelliSenseDiagnosticsAndDiagram|debugger_stopsAtBreakpointAndShowsLocals" >/dev/null
+    VSLIKE_DEBUG_HOOK="$PWD/$APP/Contents/Resources/debughook/VsLike.DebugStartupHook.dll" \
+    swift test --scratch-path "$WORK/spm-tests" \
+    --filter "engine_loadsSolutionAndServesIntelliSenseDiagnosticsAndDiagram|debugger_stopsAtBreakpointAndShowsLocals|debugger_attachesToProgramHeldByStartupHook" >/dev/null
 test -x "$APP/Contents/Resources/netcoredbg/netcoredbg"
+test -f "$APP/Contents/Resources/debughook/VsLike.DebugStartupHook.dll"
 # Verify the staging copy: build/ may sit in iCloud Drive, which adds metadata that breaks the seal of the copy.
 codesign --verify --strict "$WORK/stage/VsLike.app"
 echo "    bundled engine and debugger OK"

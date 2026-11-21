@@ -7,7 +7,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace VsLike.Roslyn.Analyzers;
 
-/// <summary>Lädt Analyzer und Code-Fix-Provider von StyleCop einmal pro Prozess aus dem NuGet-Cache.</summary>
+/// <summary>
+/// Lädt Analyzer und Code-Fix-Provider von StyleCop einmal pro Prozess aus dem NuGet-Cache. StyleCops SA1600-Fix
+/// (nur „Inherit documentation“, oft ohne Änderung) wird durch <see cref="DocumentationCommentFixProvider"/> ersetzt.
+/// </summary>
 public static class StyleCopAnalyzers
 {
     private static readonly object Gate = new();
@@ -36,7 +39,9 @@ public static class StyleCopAnalyzers
             var fixAssembly = Loader.Instance.LoadFromPath(StyleCopPackage.CodeFixAssembly);
             var fixes = fixAssembly.GetTypes()
                 .Where(t => !t.IsAbstract && typeof(CodeFixProvider).IsAssignableFrom(t) && t.GetCustomAttribute<ExportCodeFixProviderAttribute>() is not null && t.GetConstructor(Type.EmptyTypes) is not null)
+                .Where(t => t.Name != "SA1600CodeFixProvider")
                 .Select(t => (CodeFixProvider)Activator.CreateInstance(t)!)
+                .Append(new DocumentationCommentFixProvider())
                 .ToImmutableArray();
             _loaded = (analyzers, fixes);
             return _loaded.Value;

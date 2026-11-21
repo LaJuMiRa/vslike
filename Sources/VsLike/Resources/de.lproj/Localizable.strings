@@ -298,7 +298,6 @@
 "Solution" = "Solution";
 "Solution, project, folder or file" = "Solution, Projekt, Ordner oder Datei";
 "Solutions you open appear here." = "Geöffnete Solutions erscheinen hier.";
-"Starting %@ with netcoredbg…" = "Starte %@ mit netcoredbg …";
 "Starting analysis…" = "Starte Analyse …";
 "Start Debugging" = "Debuggen starten";
 "Startup project" = "Startprojekt";
@@ -366,3 +365,6 @@
 "Errors, warnings and StyleCop findings appear here while you type." = "Fehler, Warnungen und StyleCop-Meldungen erscheinen hier schon beim Tippen.";
 "Change the filter to see more." = "Ändere den Filter, um mehr zu sehen.";
 "Run without Debugging" = "Ohne Debugger starten";
+"Debug: %@" = "Debuggen: %@";
+"Attaching netcoredbg to %@ (process %d)…" = "Verbinde netcoredbg mit %@ (Prozess %d) …";
+"The debug startup hook is missing from the app bundle." = "Der Debug-Starthelfer fehlt im App-Paket.";

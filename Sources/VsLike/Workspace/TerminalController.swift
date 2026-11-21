@@ -14,6 +14,7 @@ final class TerminalSession: Identifiable {
     private(set) var exitCode: Int32?
     @ObservationIgnored let view: LocalProcessTerminalView
     @ObservationIgnored private var delegateBox: TerminalDelegate?
+    @ObservationIgnored private var exitMonitor: DispatchSourceProcess?
 
     init(title: String, isRun: Bool, font: NSFont) {
         self.title = title
@@ -36,9 +37,36 @@ final class TerminalSession: Identifiable {
     }
 
     fileprivate func finished(_ code: Int32?) {
+        guard isRunning else { return }
         isRunning = false
         exitCode = code
+        exitMonitor?.cancel()
+        exitMonitor = nil
     }
+
+    /// WIFEXITED / WEXITSTATUS of a `waitpid` status; a signal ends the program with 128 + signal, as in a shell.
+    nonisolated static func exitCode(fromStatus status: Int32) -> Int32 {
+        (status & 0x7f) == 0 ? (status >> 8) & 0xff : 128 + (status & 0x7f)
+    }
+
+    /// Watches the process for its exit and collects its status. SwiftTerm 1.11 stops its own watcher when the
+    /// terminal reaches end of file, which often happens first, and then never reports the exit (the tab kept
+    /// "running" and the process stayed a zombie).
+    func monitorExit() {
+        let pid = processID
+        guard pid > 0 else { return }
+        let source = DispatchSource.makeProcessSource(identifier: pid, eventMask: .exit, queue: .main)
+        source.setEventHandler { [weak self] in
+            var status: Int32 = 0
+            let code = waitpid(pid, &status, WNOHANG) == pid ? TerminalSession.exitCode(fromStatus: status) : nil
+            MainActor.assumeIsolated { self?.finished(code) }
+        }
+        exitMonitor = source
+        source.activate()
+    }
+
+    /// The process ID of the program (0 before it started).
+    var processID: Int32 { view.process?.shellPid ?? 0 }
 
     func terminate() {
         if isRunning {
@@ -67,7 +95,8 @@ private final class TerminalDelegate: NSObject, @preconcurrency LocalProcessTerm
     func hostCurrentDirectoryUpdate(source: TerminalView, directory: String?) {}
 
     func processTerminated(source: TerminalView, exitCode: Int32?) {
-        session?.finished(exitCode)
+        // SwiftTerm passes the raw waitpid status.
+        session?.finished(exitCode.map(TerminalSession.exitCode(fromStatus:)))
     }
 }
 
@@ -107,22 +136,26 @@ final class TerminalController {
         let shell = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
         let session = TerminalSession(title: URL(fileURLWithPath: shell).lastPathComponent, isRun: false, font: terminalFont)
         session.view.startProcess(executable: shell, args: ["-l"], environment: environment(), execName: "-" + URL(fileURLWithPath: shell).lastPathComponent, currentDirectory: directory.path)
+        session.monitorExit()
         add(session)
         return session
     }
 
     /// Starts `dotnet <arguments>` in a new tab (replacing a finished run tab with the same title).
-    func run(title: String, arguments: [String], in directory: URL, environment extra: [String: String] = [:]) {
+    @discardableResult
+    func run(title: String, arguments: [String], in directory: URL, environment extra: [String: String] = [:]) -> TerminalSession? {
         guard let dotnet = DotnetLocator.locate() else {
             workspace.alert = AlertMessage(title: title, message: CommandError.dotnetNotFound.localizedDescription)
-            return
+            return nil
         }
         for old in sessions where old.isRun && !old.isRunning && old.title == title {
             close(old)
         }
         let session = TerminalSession(title: title, isRun: true, font: terminalFont)
         session.view.startProcess(executable: dotnet.path, args: arguments, environment: environment(extra: extra), currentDirectory: directory.path)
+        session.monitorExit()
         add(session)
+        return session
     }
 
     private func add(_ session: TerminalSession) {

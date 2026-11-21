@@ -26,7 +26,7 @@ final class CodeTextView: NSTextView {
     var trackingArea: NSTrackingArea?
 
     static func make(document: CodeDocument, workspace: Workspace) -> (NSScrollView, CodeTextView) {
-        let layoutManager = NSLayoutManager()
+        let layoutManager = SquiggleLayoutManager()
         layoutManager.allowsNonContiguousLayout = true
         document.storage.addLayoutManager(layoutManager)
         let container = NSTextContainer(size: NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
@@ -256,7 +256,7 @@ final class CodeTextView: NSTextView {
             let range = NSRange(location: min(start, full.length), length: max(0, min(length, full.length - min(start, full.length))))
             if range.length > 0 {
                 let color = diagnostic.isStyleCop ? Palette.styleCop : Palette.color(for: diagnostic.severity)
-                let style: NSUnderlineStyle = diagnostic.severity == .error ? [.thick, .patternDot] : [.single, .patternDot]
+                let style: NSUnderlineStyle = diagnostic.severity == .error ? .thick : .single
                 layoutManager.addTemporaryAttribute(.underlineStyle, value: style.rawValue, forCharacterRange: range)
                 layoutManager.addTemporaryAttribute(.underlineColor, value: color, forCharacterRange: range)
             }

@@ -7,6 +7,7 @@
 # Contents of the app:
 #   Contents/MacOS/VsLike              the native app (Swift)
 #   Contents/Resources/engine/         the analysis engine (Roslyn, StyleCop, diagram writer; runs on the installed .NET)
+#   Contents/Resources/debughook/      startup hook that holds a program debugged in the terminal until the debugger is attached
 #   Contents/Resources/netcoredbg/     the debugger (Samsung netcoredbg, MIT), downloaded once and checked by SHA-256
 #
 # The app is assembled and signed in a temporary folder and copied to build/ afterwards: folders synced by iCloud
@@ -41,6 +42,9 @@ rm -rf "$WORK/engine"
 dotnet publish engine/src/VsLike.Engine/VsLike.Engine.csproj -c Release -p:UseAppHost=false -p:Version="$VERSION" \
     -o "$WORK/engine" -nologo -v:quiet
 rm -f "$WORK/engine"/*.pdb
+rm -rf "$WORK/debughook"
+dotnet publish engine/src/VsLike.DebugStartupHook/VsLike.DebugStartupHook.csproj -c Release -p:Version="$VERSION" \
+    -o "$WORK/debughook" -nologo -v:quiet
 
 echo "==> Getting netcoredbg $NETCOREDBG_VERSION"
 ARCHIVE="$CACHE/netcoredbg-$NETCOREDBG_VERSION-osx-arm64.zip"
@@ -69,6 +73,7 @@ sed -e "s/__VERSION__/$VERSION/" -e "s/__BUILD__/$BUILD_NUMBER/" packaging/Info.
 plutil -lint -s "$CONTENTS/Info.plist"
 cp -R Sources/VsLike/Resources/*.lproj "$CONTENTS/Resources/"
 cp -R "$WORK/engine" "$CONTENTS/Resources/engine"
+cp -R "$WORK/debughook" "$CONTENTS/Resources/debughook"
 # The archive carries Finder metadata in __MACOSX/; it must not end up in the signed bundle.
 unzip -q "$ARCHIVE" -d "$CONTENTS/Resources" -x "__MACOSX/*"
 chmod +x "$CONTENTS/Resources/netcoredbg/netcoredbg"

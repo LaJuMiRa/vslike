@@ -64,7 +64,8 @@ internal sealed class CodeActionFeature
             results.AddRange(Flatten(registered, isFix: false, solution, group: null));
         }
 
-        return [.. results.DistinctBy(r => (r.Group, r.Title))];
+        // Actions ending in "..." open an options dialog in Visual Studio; without it they change nothing.
+        return [.. results.Where(r => !r.Title.EndsWith("...", StringComparison.Ordinal) && !r.Title.EndsWith('…')).DistinctBy(r => (r.Group, r.Title))];
     }
 
     private static async Task<IReadOnlyList<CodeActionInfo>> FixAllAsync(

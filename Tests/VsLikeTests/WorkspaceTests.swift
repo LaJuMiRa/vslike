@@ -96,6 +96,9 @@ struct WorkspaceTests {
         await workspace.fixAllStyleCop(in: document)
 
         #expect(!document.text.contains("{   \n"))
+        // SA1600: the undocumented property gets a comment in StyleCop's wording.
+        #expect(document.text.contains("/// Gets or initializes the horsepower."))
+        #expect(!workspace.diagnostics.diagnostics(for: document.path).contains { $0.code == "SA1600" })
         #expect(workspace.diagnostics.diagnostics(for: document.path).filter(\.isStyleCop).count < 3)
         _ = await workspace.closeAll()
     }
@@ -133,6 +136,66 @@ struct WorkspaceTests {
         #expect(!FileManager.default.fileExists(atPath: truckFile.path))
         await model.redo()
         #expect(FileManager.default.fileExists(atPath: truckFile.path))
+        _ = await workspace.closeAll()
+    }
+
+    @Test(.timeLimit(.minutes(3)))
+    func diagram_opensCdFileWithItsPositionsAndFindsTheEnclosingSolution() async throws {
+        let (workspace, folder) = try await openSample()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let url = folder.appendingPathComponent("Lib1/Model.cd")
+        try """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ClassDiagram MajorVersion="1" MinorVersion="1">
+          <Class Name="Lib1.Car">
+            <Position X="2" Y="1" Width="1.5" />
+            <TypeIdentifier><HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode><FileName>Car.cs</FileName></TypeIdentifier>
+          </Class>
+        </ClassDiagram>
+        """.write(to: url, atomically: true, encoding: .utf8)
+
+        #expect(AppDelegate.enclosingSolution(of: url)?.lastPathComponent == "Sample.slnx")
+        #expect(workspace.openFile(url) == nil)
+        guard case let .diagram(diagram) = workspace.activeTab else {
+            Issue.record("no diagram tab")
+            return
+        }
+        let loaded = await Samples.wait { diagram.boxes.contains { $0.type.fullName == "Lib1.Car" } }
+        #expect(loaded)
+        let car = try #require(diagram.boxes.first { $0.type.fullName == "Lib1.Car" })
+        #expect(car.frame.minX == 192)
+        #expect(car.frame.minY == 96)
+        _ = await workspace.closeAll()
+    }
+
+    @Test(.timeLimit(.minutes(4)))
+    func run_andDebug_startTheProgramInATerminalTabAndStopAtTheFirstLine() async throws {
+        let (workspace, folder) = try await openSample()
+        defer { try? FileManager.default.removeItem(at: folder) }
+
+        workspace.build.startWithoutDebugging()
+        let ran = await Samples.wait(40) { workspace.terminals.sessions.contains { $0.isRun && !$0.isRunning } }
+        #expect(ran, "sessions: \(workspace.terminals.sessions.map { "\($0.title) running=\($0.isRunning) pid=\($0.processID)" }) status: \(workspace.status.text)")
+        #expect(workspace.terminals.sessions.first { $0.isRun }?.exitCode == 0)
+        #expect(workspace.bottomTab == .terminal)
+
+        let program = try #require(workspace.openFile(folder.appendingPathComponent("App/Program.cs")))
+        program.toggleBreakpoint(line: 3)
+        workspace.debugger.breakpointsChanged(in: program)
+        await workspace.debugger.start()
+        let stopped = await Samples.wait(120) { workspace.debugger.isStopped }
+        #expect(stopped)
+        #expect(workspace.debugger.frames.first?.line == 3)
+        #expect(workspace.bottomTab == .debug)
+        let debugTab = try #require(workspace.terminals.sessions.last)
+        #expect(debugTab.isRun && debugTab.isRunning)
+
+        await workspace.debugger.resume()
+        #expect(workspace.bottomTab == .terminal)
+        let finished = await Samples.wait(30) { !debugTab.isRunning }
+        #expect(finished, "active=\(workspace.debugger.isActive) stopped=\(workspace.debugger.isStopped) reason=\(workspace.debugger.stopReason ?? "") console=\(workspace.debugger.console.map(\.text))")
+        #expect(debugTab.exitCode == 0)
+        await workspace.debugger.stop()
         _ = await workspace.closeAll()
     }
 

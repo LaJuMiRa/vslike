@@ -124,4 +124,69 @@ struct IntegrationTests {
         #expect(name.value == "\"Demo\"")
         await session.stop()
     }
+    /// A program started outside the debugger (as in the terminal) waits in the startup hook until the debugger has
+    /// attached, so a breakpoint on the first statement is hit; its output stays on its own stdout.
+    @Test
+    func debugger_attachesToProgramHeldByStartupHook() async throws {
+        let adapter = try #require(DebugSession.locateAdapter(), "netcoredbg missing: run ./build.sh once (it caches netcoredbg)")
+        let hook = try #require(DebugStartupHook.locate(), "build the engine solution first")
+        let folder = try Repository.copySample("ThreeProjects")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let project = folder.appendingPathComponent("App/App.csproj").path
+        #expect(try await BuildService(runner: runner).build(target: project, configuration: "Debug", kind: .build).succeeded)
+        let program = try #require(try await BuildService(runner: runner).targetPath(project: project, configuration: "Debug"))
+        let file = folder.appendingPathComponent("App/Program.cs").path
+        let readyFile = folder.appendingPathComponent("debug-ready")
+
+        let process = Process()
+        process.executableURL = runner.executable
+        process.arguments = [program]
+        process.currentDirectoryURL = folder.appendingPathComponent("App")
+        process.environment = DebugStartupHook.environment(runner.childEnvironment(), hook: hook, readyFile: readyFile)
+        let output = Pipe()
+        process.standardOutput = output
+        // waitUntilExit can hang on the main thread of an async test; the handler is registered before run(), and the
+        // stream buffers the status even if the program exits before it is awaited.
+        let exit = AsyncStream<Int32>.makeStream()
+        process.terminationHandler = { finished in
+            exit.continuation.yield(finished.terminationStatus)
+            exit.continuation.finish()
+        }
+        try process.run()
+        defer { if process.isRunning { process.terminate() } }
+
+        let (session, _) = try await DebugSession.attach(
+            adapter: adapter,
+            processID: process.processIdentifier,
+            breakpoints: [file: [SourceBreakpoint(line: 3)]],
+            dotnet: runner.executable,
+            readyFile: readyFile
+        )
+        var stoppedThread: Int?
+        for await event in session.events {
+            if case let .stopped(_, threadID, _) = event {
+                stoppedThread = threadID
+                break
+            }
+            if case .terminated = event {
+                break
+            }
+        }
+        let thread = try #require(stoppedThread)
+        #expect(try await session.stackTrace(threadID: thread).first?.line == 3)
+        try await session.resume(threadID: thread)
+        let watchdog = Task {
+            try await Task.sleep(for: .seconds(60))
+            process.terminate()
+        }
+        defer { watchdog.cancel() }
+        let text = String(decoding: output.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+        var status: Int32?
+        for await code in exit.stream {
+            status = code
+        }
+        #expect(status == 0)
+        #expect(!text.isEmpty)
+        await session.stop()
+    }
 }

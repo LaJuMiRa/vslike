@@ -118,12 +118,49 @@ public final class DebugSession: @unchecked Sendable {
     }
 
     /// Starts netcoredbg, launches the program, sets the breakpoints and runs. Subscribe to `events` right after
-    /// this returns; events that arrived earlier are buffered.
+    /// this returns; events that arrived earlier are buffered. The program's output arrives as `.output` events and
+    /// it cannot read input; `attach` is the variant for programs that run in a terminal.
     public static func start(
         adapter: URL,
         launch: LaunchConfiguration,
         breakpoints: [String: [SourceBreakpoint]],
         dotnet: URL?
+    ) async throws -> (session: DebugSession, breakpoints: [String: [BreakpointState]]) {
+        var environment: [String: JSONValue] = [:]
+        for (key, value) in launch.environment {
+            environment[key] = .string(value)
+        }
+        return try await connect(adapter: adapter, dotnet: dotnet, breakpoints: breakpoints, command: "launch", arguments: [
+            "name": "VsLike", "type": "coreclr", "request": "launch", "program": .string(launch.program),
+            "args": .strings(launch.arguments), "cwd": .string(launch.workingDirectory), "env": .object(environment),
+            "stopAtEntry": .bool(launch.stopAtEntry), "console": "internalConsole", "justMyCode": true,
+        ])
+    }
+
+    /// Attaches netcoredbg to a running .NET process (a program started in a terminal), sets the breakpoints and
+    /// then creates `readyFile`, which releases a program held by the debug startup hook (`DebugStartupHook`).
+    public static func attach(
+        adapter: URL,
+        processID: Int32,
+        breakpoints: [String: [SourceBreakpoint]],
+        dotnet: URL?,
+        readyFile: URL?
+    ) async throws -> (session: DebugSession, breakpoints: [String: [BreakpointState]]) {
+        let result = try await connect(adapter: adapter, dotnet: dotnet, breakpoints: breakpoints, command: "attach", arguments: [
+            "name": "VsLike", "type": "coreclr", "request": "attach", "processId": .int(Int(processID)), "justMyCode": true,
+        ])
+        if let readyFile {
+            FileManager.default.createFile(atPath: readyFile.path, contents: nil)
+        }
+        return result
+    }
+
+    private static func connect(
+        adapter: URL,
+        dotnet: URL?,
+        breakpoints: [String: [SourceBreakpoint]],
+        command: String,
+        arguments: JSONValue
     ) async throws -> (session: DebugSession, breakpoints: [String: [BreakpointState]]) {
         let session = DebugSession()
         try session.spawn(adapter: adapter, dotnet: dotnet)
@@ -132,24 +169,14 @@ public final class DebugSession: @unchecked Sendable {
                 "clientID": "vslike", "clientName": "VsLike", "adapterID": "coreclr", "linesStartAt1": true,
                 "columnsStartAt1": true, "pathFormat": "path", "supportsVariableType": true,
             ])
-            var environment: [String: JSONValue] = [:]
-            for (key, value) in launch.environment {
-                environment[key] = .string(value)
-            }
-            let launchTask = Task {
-                try await session.request("launch", [
-                    "name": "VsLike", "type": "coreclr", "request": "launch", "program": .string(launch.program),
-                    "args": .strings(launch.arguments), "cwd": .string(launch.workingDirectory), "env": .object(environment),
-                    "stopAtEntry": .bool(launch.stopAtEntry), "console": "internalConsole", "justMyCode": true,
-                ])
-            }
+            let startTask = Task { try await session.request(command, arguments) }
             try await session.waitForInitialized(timeout: 30)
             var states: [String: [BreakpointState]] = [:]
             for (file, list) in breakpoints {
                 states[file] = try await session.setBreakpoints(file: file, list)
             }
             _ = try await session.request("configurationDone", .null)
-            _ = try await launchTask.value
+            _ = try await startTask.value
             return (session, states)
         } catch {
             session.kill()

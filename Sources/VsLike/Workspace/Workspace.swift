@@ -474,7 +474,7 @@ final class Workspace {
 
     @discardableResult
     func openFile(_ url: URL, line: Int? = nil, column: Int = 1, selectLength: Int = 0) -> CodeDocument? {
-        if url.lastPathComponent.hasSuffix(DiagramDocument.fileExtension) {
+        if DiagramDocument.isDiagram(url) {
             openDiagram(url)
             return nil
         }

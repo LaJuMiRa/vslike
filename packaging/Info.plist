@@ -39,6 +39,12 @@
       <key>CFBundleTypeExtensions</key><array><string>cs</string></array>
     </dict>
     <dict>
+      <key>CFBundleTypeName</key><string>Class Diagram</string>
+      <key>CFBundleTypeRole</key><string>Editor</string>
+      <key>LSHandlerRank</key><string>Owner</string>
+      <key>CFBundleTypeExtensions</key><array><string>cd</string></array>
+    </dict>
+    <dict>
       <key>CFBundleTypeName</key><string>Folder</string>
       <key>CFBundleTypeRole</key><string>Viewer</string>
       <key>LSItemContentTypes</key><array><string>public.folder</string></array>

@@ -105,20 +105,27 @@ private struct TerminalHost: NSViewRepresentable {
     }
 }
 
-/// Variables and watch, call stack and threads, and the debug console.
+/// Variables and watch, call stack and threads, and the debug console. The columns share the panel width and
+/// never ask for more than it offers (a split view with minimum widths pushed the sidebars out of the window).
 struct DebugPanel: View {
     @Environment(Workspace.self) private var workspace
 
     var body: some View {
         let debugger = workspace.debugger
-        HSplitView {
+        HStack(spacing: 0) {
             VariablesPane(debugger: debugger)
-                .frame(minWidth: 220, idealWidth: 360)
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .layoutPriority(1)
+            Divider()
             CallStackPane(debugger: debugger)
-                .frame(minWidth: 180, idealWidth: 260)
+                .frame(minWidth: 0, maxWidth: .infinity)
+            Divider()
             DebugConsolePane(debugger: debugger)
-                .frame(minWidth: 220, idealWidth: 360)
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .layoutPriority(1)
         }
+        .frame(minWidth: 0, maxWidth: .infinity)
+        .clipped()
     }
 }
 

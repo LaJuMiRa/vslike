@@ -82,7 +82,14 @@ final class DiagramEditorModel: Identifiable {
             names.insert(relation.to)
         }
         let document = DiagramDocument(types: names.sorted().map { TypePlacement(fullName: $0, x: .nan, y: .nan) })
-        try AutoLayout.arrange(document, model: model, all: true).save(to: url)
+        try AutoLayout.arrange(document, model: model, all: true).save(to: url, types: classDiagramTypes(model, url: url))
+    }
+
+    /// Element names and source files for types written into a `.cd` file for the first time.
+    private static func classDiagramTypes(_ model: DiagramModel, url: URL) -> [String: ClassDiagramFile.TypeInfo] {
+        guard ClassDiagramFile.isClassDiagram(url) else { return [:] }
+        let folder = url.deletingLastPathComponent()
+        return Dictionary(model.types.filter { !$0.isExternal }.map { ($0.fullName, ClassDiagramFile.TypeInfo($0, diagramFolder: folder)) }, uniquingKeysWith: { first, _ in first })
     }
 
     func scheduleRefresh(immediately: Bool = false) {
@@ -396,7 +403,7 @@ final class DiagramEditorModel: Identifiable {
 
     private func saveLayout(_ next: DiagramDocument) {
         layout = next
-        try? next.save(to: url)
+        try? next.save(to: url, types: Self.classDiagramTypes(model, url: url))
     }
 
     /// Writes file contents (nil deletes). Open documents are edited in place so their tab and undo stay valid.

@@ -33,7 +33,7 @@ struct FileNode: Identifiable, Hashable {
     }
 
     static func symbol(forFile name: String) -> String {
-        if name.hasSuffix(DiagramDocument.fileExtension) {
+        if DiagramDocument.isDiagram(URL(fileURLWithPath: name)) {
             return "rectangle.3.group"
         }
         switch (name as NSString).pathExtension.lowercased() {

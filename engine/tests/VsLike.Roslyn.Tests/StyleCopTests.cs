@@ -94,6 +94,70 @@ public sealed class StyleCopTests
         }
     }
 
+    [Fact]
+    public async Task DocumentationFix_AddsStyleCopConformingComments_AndFixAllDocumentsEveryElement()
+    {
+        VsLike.Core.Localization.EngineText.SetCulture("en");
+        var fixture = await LoadAsync();
+        try
+        {
+            Assert.True(await fixture.Workspace.SetStyleCopEnabledAsync(true, NoCli, CancellationToken.None));
+            var path = fixture.PathOf("Lib2/Engine.cs");
+            const string text = """
+                namespace Lib2;
+
+                public sealed class Engine : IDisposable
+                {
+                    public Engine(int horsepower)
+                    {
+                        Horsepower = horsepower;
+                    }
+
+                    public int Horsepower { get; set; }
+
+                    public bool IsRunning { get; }
+
+                    public T Convert<T>(string value) => default!;
+
+                    public bool IsValid(int size) => size > 0;
+
+                    public void Dispose()
+                    {
+                    }
+
+                    public override string ToString() => "engine";
+                }
+
+                """;
+            fixture.Workspace.UpdateDocumentText(path, text);
+            var features = new RoslynLanguageFeatures(fixture.Workspace);
+
+            var single = await features.GetCodeActionsAsync(path, text.IndexOf("Horsepower {", StringComparison.Ordinal), 0, CancellationToken.None);
+            var add = Assert.Single(single, a => a.Group == "SA1600" && a.Title == "Add documentation comment");
+            var singleEdit = Assert.Single((await features.GetCodeActionEditAsync(add, CancellationToken.None)).Files);
+            Assert.Contains("    /// <summary>\n    /// Gets or sets the horsepower.\n    /// </summary>\n    public int Horsepower", Apply(text, singleEdit.Edits), StringComparison.Ordinal);
+
+            var fixAll = Assert.Single(single, a => a.Group == "SA1600" && a.Title == "Fix all in document: Add documentation comment");
+            var fixedText = Apply(text, Assert.Single((await features.GetCodeActionEditAsync(fixAll, CancellationToken.None)).Files).Edits);
+            Assert.Contains("/// Initializes a new instance of the <see cref=\"Engine\"/> class.", fixedText, StringComparison.Ordinal);
+            Assert.Contains("/// <param name=\"horsepower\">The horsepower.</param>", fixedText, StringComparison.Ordinal);
+            Assert.Contains("/// Gets a value indicating whether running.", fixedText, StringComparison.Ordinal);
+            Assert.Contains("/// <typeparam name=\"T\">The type of the value.</typeparam>", fixedText, StringComparison.Ordinal);
+            Assert.Contains("/// <returns><c>true</c> if valid; otherwise, <c>false</c>.</returns>", fixedText, StringComparison.Ordinal);
+            Assert.Contains("    /// <inheritdoc/>\n    public void Dispose()", fixedText, StringComparison.Ordinal);
+            Assert.Contains("    /// <inheritdoc/>\n    public override string ToString()", fixedText, StringComparison.Ordinal);
+            Assert.Contains("/// Represents an engine.", fixedText, StringComparison.Ordinal);
+
+            fixture.Workspace.UpdateDocumentText(path, fixedText);
+            var after = await fixture.Workspace.GetDocumentDiagnosticsAsync(path, CancellationToken.None);
+            Assert.DoesNotContain(after, d => d.Id is "SA1600" or "SA1623" or "SA1642" or "SA1629" or "SA1611" or "SA1615" or "SA1618" or "CS1570");
+        }
+        finally
+        {
+            await fixture.DisposeAsync();
+        }
+    }
+
     private static string Apply(string text, IReadOnlyList<TextEdit> edits)
     {
         foreach (var edit in edits.OrderByDescending(e => e.Start))

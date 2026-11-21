@@ -178,7 +178,7 @@ private struct FileRow: View {
         case .dependencies, .reference, .package: return .secondary
         case .file:
             if node.name.hasSuffix(".cs") { return Color(nsColor: SyntaxColors.type) }
-            if node.name.hasSuffix(DiagramDocument.fileExtension) { return .vsAccent }
+            if DiagramDocument.isDiagram(URL(fileURLWithPath: node.name)) { return .vsAccent }
             return .secondary
         }
     }

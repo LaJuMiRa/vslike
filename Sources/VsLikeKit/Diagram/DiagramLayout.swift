@@ -30,8 +30,8 @@ public struct TypePlacement: Codable, Sendable, Hashable {
     public func toggled() -> TypePlacement { TypePlacement(fullName: fullName, x: x, y: y, collapsed: !collapsed) }
 }
 
-/// The layout file `<Name>.cdiagram.json`: which types are shown where, plus view settings. Types and members always
-/// come from the code; this file holds no code information.
+/// The layout file `<Name>.cdiagram.json` (or a `.cd` class diagram, see `ClassDiagramFile`): which types are shown
+/// where, plus view settings. Types and members always come from the code; this file holds no code information.
 public struct DiagramDocument: Codable, Sendable, Hashable {
     public static let fileExtension = ".cdiagram.json"
 
@@ -58,14 +58,25 @@ public struct DiagramDocument: Codable, Sendable, Hashable {
         snapToGrid = try c.decodeIfPresent(Bool.self, forKey: .snapToGrid) ?? true
     }
 
+    /// Whether the file is a diagram VsLike opens on its canvas (`.cdiagram.json` or `.cd`).
+    public static func isDiagram(_ url: URL) -> Bool {
+        url.lastPathComponent.hasSuffix(fileExtension) || ClassDiagramFile.isClassDiagram(url)
+    }
+
     public static func name(of url: URL) -> String {
         let file = url.lastPathComponent
+        if ClassDiagramFile.isClassDiagram(url) {
+            return url.deletingPathExtension().lastPathComponent
+        }
         return file.hasSuffix(fileExtension) ? String(file.dropLast(fileExtension.count)) : file
     }
 
     public static func load(_ url: URL) -> DiagramDocument {
         guard let data = try? Data(contentsOf: url) else {
             return DiagramDocument()
+        }
+        if ClassDiagramFile.isClassDiagram(url) {
+            return (try? ClassDiagramFile.read(data)) ?? DiagramDocument()
         }
         let decoder = JSONDecoder()
         decoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
@@ -81,8 +92,14 @@ public struct DiagramDocument: Codable, Sendable, Hashable {
         return data
     }
 
-    public func save(to url: URL) throws {
-        try jsonData().write(to: url, options: .atomic)
+    /// Saves as JSON, or into the `.cd` file (`types` describes types that are new on the diagram).
+    public func save(to url: URL, types: [String: ClassDiagramFile.TypeInfo] = [:]) throws {
+        if ClassDiagramFile.isClassDiagram(url) {
+            let data = try ClassDiagramFile.write(self, existing: try? Data(contentsOf: url), types: types)
+            try data.write(to: url, options: .atomic)
+        } else {
+            try jsonData().write(to: url, options: .atomic)
+        }
     }
 
     public func find(_ fullName: String) -> TypePlacement? { types.first { $0.fullName == fullName } }
