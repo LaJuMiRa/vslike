@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using VsLike.Core.Build;
 using VsLike.Engine.Rpc;
 
 namespace VsLike.Engine.Tests;
@@ -26,13 +27,9 @@ public sealed class EngineProcess : IAsyncDisposable
 
     public static EngineProcess Start()
     {
-        var start = new ProcessStartInfo("dotnet")
-        {
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-        };
-        start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "VsLikeEngine.dll"));
+        // Clean environment like the app started from Finder: no MSBuild variables of this test host.
+        var start = new DotnetCli().CreateStartInfo([Path.Combine(AppContext.BaseDirectory, "VsLikeEngine.dll")], workingDirectory: null);
+        start.RedirectStandardInput = true;
         var process = Process.Start(start)!;
         process.ErrorDataReceived += (_, _) => { };
         process.BeginErrorReadLine();

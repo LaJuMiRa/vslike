@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json.Nodes;
+using VsLike.Core.Build;
 using VsLike.Core.Code;
 using VsLike.Core.Files;
 using VsLike.Diagram.Model;
@@ -26,9 +27,11 @@ public sealed class EngineProtocolTests : IAsyncLifetime
             File.Copy(file, target);
         }
 
-        using (var restore = Process.Start(new ProcessStartInfo("dotnet", ["restore", Solution]) { RedirectStandardOutput = true })!)
+        using (var restore = Process.Start(new DotnetCli().CreateStartInfo(["restore", Solution], workingDirectory: null))!)
         {
+            var errors = restore.StandardError.ReadToEndAsync();
             await restore.StandardOutput.ReadToEndAsync();
+            await errors;
             await restore.WaitForExitAsync();
             Assert.Equal(0, restore.ExitCode);
         }

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using VsLike.Core.Build;
 using VsLike.Core.Files;
 
 namespace VsLike.Roslyn.Tests;
@@ -37,13 +38,9 @@ public sealed class SampleSolutionFixture : IAsyncLifetime
 
     private static async Task RunDotnetAsync(params string[] args)
     {
-        var start = new ProcessStartInfo("dotnet") { RedirectStandardOutput = true, RedirectStandardError = true };
-
-        foreach (var arg in args)
-        {
-            start.ArgumentList.Add(arg);
-        }
-
+        // Like the IDE: without the MSBuild variables of this test host, otherwise a newer SDK chosen for the temp folder
+        // starts its task host with the SDK registered here (MSB4216).
+        var start = new DotnetCli().CreateStartInfo(args, workingDirectory: null);
         using var process = Process.Start(start)!;
         var output = await process.StandardOutput.ReadToEndAsync();
         await process.WaitForExitAsync();

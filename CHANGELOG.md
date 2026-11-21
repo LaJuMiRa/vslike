@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- Die Analyse-Engine läuft mit jedem installierten .NET ab Version 10. Bisher brauchte sie die .NET-10-Laufzeit und startete auf einem Mac mit nur SDK 11 nicht.
+- Tests starten `dotnet` wie die App ohne die MSBuild-Variablen des Testprozesses. Unter SDK 11 scheiterte sonst jeder `dotnet restore` der Testbeispiele mit MSB4216.
+- Release-Workflow: Abbruch nach 45 Minuten, Tests auch mit dem vorinstallierten SDK 11, Release-Notes enden an der nächsten `## `-Überschrift.
+
 ## [1.0.0] - 2026-11-21
 
 Neubau als native macOS-App (nur macOS 26, Apple Silicon).

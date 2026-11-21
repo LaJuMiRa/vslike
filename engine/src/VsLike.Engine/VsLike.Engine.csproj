@@ -4,6 +4,8 @@
     <UsesMSBuildLocator>true</UsesMSBuildLocator>
     <RootNamespace>VsLike.Engine</RootNamespace>
     <AssemblyName>VsLikeEngine</AssemblyName>
+    <!-- Runs on .NET 10 when installed, otherwise on the next newer runtime (a machine with only SDK 11 has no runtime 10). -->
+    <RollForward>Major</RollForward>
     <InvariantGlobalization>false</InvariantGlobalization>
     <SatelliteResourceLanguages>en;de</SatelliteResourceLanguages>
   </PropertyGroup>
