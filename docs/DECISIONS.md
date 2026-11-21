@@ -68,3 +68,5 @@
 | Inspektor | eigene rechte Spalte statt `.inspector` | `.inspector` verschiebt die rechten Toolbar-Knöpfe in seine (verborgene) Spalte. |
 | Lokalisierung | Englische Texte als Schlüssel, `de.lproj/Localizable.strings`, von `build.sh` ins Paket kopiert | SwiftPM-Ressourcenbündel neben dem Executable brechen die Code-Signatur; Muster aus Seasons. |
 | Bundle-ID | `io.github.lajumira.vslike` | Unverändert zur Avalonia-Version. |
+| Klassendiagramm-Datei | Neue Diagramme sind `<Projekt>.cd` (XML wie in VS) im Ordner des Startprojekts bzw. des gewählten Ordners; neue Typen landen im Diagrammordner, bei einem Diagramm außerhalb aller Projekte im Startprojekt | Wunsch des Nutzers (2026-11-21): Diagramm und neue Klassen gehören neben Program.cs, mit Namespace des Projekts. `.cdiagram.json` wird nur noch gelesen. |
+| Neue Projekte | `dotnet new … --use-program-main`; Vorlagen ohne diese Option (Exit-Code 127, nichts angelegt) ohne sie | Program.cs mit Namespace, Klasse `Program` und `Main` statt Top-Level-Anweisungen (Wunsch des Nutzers, 2026-11-21). |

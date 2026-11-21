@@ -169,7 +169,7 @@ struct DiagramEditorView: View {
             model.tool = .select
             workspace.prompt = PromptRequest(
                 title: String(localized: "New \(kind.keyword)"),
-                message: String(localized: "Creates a file in \(model.folder.lastPathComponent) with the namespace of the folder."),
+                message: String(localized: "Creates a file in \(model.newTypeFolder.lastPathComponent) with the namespace of the folder."),
                 placeholder: kind == .interface ? "IShape" : "Shape",
                 confirmTitle: String(localized: "Create")
             ) { name in

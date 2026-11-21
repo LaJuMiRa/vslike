@@ -104,6 +104,24 @@ struct WorkspaceTests {
     }
 
     @Test(.timeLimit(.minutes(3)))
+    func diagram_outsideEveryProjectCreatesTypesInTheStartupProject() async throws {
+        let (workspace, folder) = try await openSample()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        // An older diagram next to the solution file.
+        let model = DiagramEditorModel(url: folder.appendingPathComponent("Sample.cdiagram.json"), workspace: workspace)
+        await model.refresh()
+
+        await model.createType(.class, name: "Engine", at: CGPoint(x: 40, y: 40))
+
+        let file = folder.appendingPathComponent("App/Engine.cs")
+        let text = try String(contentsOf: file, encoding: .utf8)
+        #expect(text.contains("namespace Sample.App;"))  // RootNamespace of App.csproj
+        #expect(text.contains("public class Engine"))
+        #expect(!FileManager.default.fileExists(atPath: folder.appendingPathComponent("Engine.cs").path))
+        _ = await workspace.closeAll()
+    }
+
+    @Test(.timeLimit(.minutes(3)))
     func diagram_createsTypeAddsMemberAndUndoesBoth() async throws {
         let (workspace, folder) = try await openSample()
         defer { try? FileManager.default.removeItem(at: folder) }
@@ -114,10 +132,13 @@ struct WorkspaceTests {
         }
         let loaded = await Samples.wait { diagram.boxes.count == 2 }
         #expect(loaded)
-        #expect(FileManager.default.fileExists(atPath: folder.appendingPathComponent("Sample.cdiagram.json").path))
+        // The diagram is a .cd file in the startup project, next to Program.cs.
+        #expect(diagram.url.path == folder.appendingPathComponent("App/App.cd").path)
+        #expect(FileManager.default.fileExists(atPath: folder.appendingPathComponent("App/App.cd").path))
+        #expect(diagram.newTypeFolder.path == folder.appendingPathComponent("App").path)
 
         let lib1 = folder.appendingPathComponent("Lib1")
-        let model = DiagramEditorModel(url: lib1.appendingPathComponent("Lib1.cdiagram.json"), workspace: workspace)
+        let model = DiagramEditorModel(url: lib1.appendingPathComponent("Lib1.cd"), workspace: workspace)
         await model.refresh()
         await model.createType(.class, name: "Truck", at: CGPoint(x: 400, y: 40))
         let truckFile = lib1.appendingPathComponent("Truck.cs")

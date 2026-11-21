@@ -18,6 +18,9 @@ Neubau als native macOS-App (nur macOS 26, Apple Silicon).
 - Klassendiagramme im `.cd`-Format öffnen und speichern, auch per Doppelklick im Finder. Positionen und der eingeklappte Zustand bleiben erhalten, die passende Solution oder das Projekt wird automatisch mitgeöffnet.
 - StyleCop SA1600: Der Fix ergänzt Dokumentationskommentare im Wortlaut von StyleCop, z. B. „Gets or sets …“, „Initializes a new instance of …“, `<param>`, `<typeparam>`, `<returns>` und `<inheritdoc/>` bei Überschreibungen. Mit „Alle beheben“ geht das für die ganze Datei oder das ganze Projekt. Quick-Actions, die in anderen IDEs nur einen Optionsdialog öffnen („…“), werden ausgeblendet.
 - Debug-Panel: Die Spalten teilen sich die verfügbare Breite und schieben die Seitenleisten nicht mehr aus dem Fenster.
+- Neue Konsolenprojekte bekommen in `Program.cs` den Namespace des Projekts, eine Klasse `Program` und `Main` mit „Hello, World!“ statt Top-Level-Anweisungen. Vorlagen ohne diese Option werden unverändert angelegt.
+- Klassendiagramme werden als `<Projekt>.cd` (Format wie in Visual Studio) im Ordner des Startprojekts neben `Program.cs` angelegt. Ältere `.cdiagram.json`-Dateien lassen sich weiter öffnen.
+- Neue Typen aus dem Klassendiagramm landen im Ordner des Diagramms mit dem Namespace des Projekts. Liegt das Diagramm außerhalb aller Projekte, z. B. ein älteres Diagramm neben der Solution, landen sie im Startprojekt.
 - Entfernt: Avalonia-Oberfläche, Linux-Pakete und Intel-Build.
 
 ## Avalonia-Version (Phasen 0–11, nicht veröffentlicht)

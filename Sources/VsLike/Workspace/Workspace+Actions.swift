@@ -15,27 +15,31 @@ extension Workspace {
         }
     }
 
-    /// Opens (or creates) `<Solution>.cdiagram.json` next to the solution with all source types.
+    /// Opens (or creates) `<Project>.cd` in the folder of the startup project (where Program.cs is) with all source
+    /// types of the solution.
     func openSolutionDiagram() async {
         guard let solutionURL else { return }
-        let url = solutionURL.deletingLastPathComponent().appendingPathComponent(solutionURL.deletingPathExtension().lastPathComponent + DiagramDocument.fileExtension)
-        await openDiagram(at: url)
+        let project = (build.startupProject ?? solution?.projects.first?.filePath).map { URL(fileURLWithPath: $0) }
+        let folder = RealPath.resolve(project?.deletingLastPathComponent() ?? solutionURL.deletingLastPathComponent())
+        let name = (project ?? solutionURL).deletingPathExtension().lastPathComponent
+        let url = folder.appendingPathComponent(name + "." + ClassDiagramFile.fileExtension)
+        await openDiagram(at: url, typesBelow: RealPath.resolve(solutionURL.deletingLastPathComponent()))
     }
 
-    /// Opens (or creates) a diagram for a folder or project.
+    /// Opens (or creates) `<Folder>.cd` for a folder or project.
     func openDiagram(forFolder folder: URL) async {
-        let url = folder.appendingPathComponent(folder.lastPathComponent + DiagramDocument.fileExtension)
-        await openDiagram(at: url)
+        let url = folder.appendingPathComponent(folder.lastPathComponent + "." + ClassDiagramFile.fileExtension)
+        await openDiagram(at: url, typesBelow: folder)
     }
 
-    private func openDiagram(at url: URL) async {
+    private func openDiagram(at url: URL, typesBelow scope: URL) async {
         if !FileManager.default.fileExists(atPath: url.path) {
             guard isEngineReady else {
                 status = StatusMessage(text: String(localized: "Wait until the solution is loaded"), style: .warning)
                 return
             }
             do {
-                try await DiagramEditorModel.create(at: url, workspace: self)
+                try await DiagramEditorModel.create(at: url, typesBelow: scope, workspace: self)
                 refreshTree()
             } catch {
                 alert = AlertMessage(title: String(localized: "Class Diagram"), message: error.localizedDescription)

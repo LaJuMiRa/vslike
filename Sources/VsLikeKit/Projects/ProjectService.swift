@@ -26,6 +26,8 @@ public struct InstalledPackage: Sendable, Hashable, Identifiable {
 /// Solutions, projects, references and packages through the dotnet CLI (`dotnet new`, `sln`, `add`, `remove`, `list`).
 public struct ProjectService: Sendable {
     public static let preferredTemplates = ["console", "classlib", "xunit", "nunit", "mstest", "worker", "webapi", "web", "blazor"]
+    /// Exit code of `dotnet new` for an option the template does not know (aka.ms/templating-exit-codes#127).
+    static let invalidOptionExitCode: Int32 = 127
     static let windowsOnly: Set<String> = ["winforms", "winformslib", "winformscontrollib", "wpf", "wpflib", "wpfcustomcontrollib", "wpfusercontrollib"]
 
     public let runner: CommandRunner
@@ -47,7 +49,14 @@ public struct ProjectService: Sendable {
         if let framework, !framework.isEmpty {
             arguments += ["--framework", framework]
         }
-        try await runner.runChecked(arguments, in: directory)
+        // A Program class with Main in the project's namespace instead of top-level statements. Templates without the
+        // option end with exit code 127 ("invalid option") before creating anything and are created without it.
+        let withMain = try await runner.run(arguments + ["--use-program-main"], in: directory)
+        if withMain.exitCode == Self.invalidOptionExitCode && !withMain.wasCancelled {
+            try await runner.runChecked(arguments, in: directory)
+        } else if !withMain.succeeded {
+            throw CommandError.failed(command: "dotnet " + arguments.joined(separator: " "), exitCode: withMain.exitCode, output: withMain.allText)
+        }
         let project = output.appendingPathComponent(name + ".csproj")
         guard FileManager.default.fileExists(atPath: project.path) else {
             throw CommandError.failed(command: "dotnet new \(template)", exitCode: 0, output: "No project file was created at \(project.path).")

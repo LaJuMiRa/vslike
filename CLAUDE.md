@@ -40,7 +40,7 @@ packaging/ scripts/ docs/
 - Neue Klasse ⇒ `<Typname>.cs` im gewählten Ordner, file-scoped Namespace aus RootNamespace + Ordner.
 - Jede Diagrammänderung per Roslyn in die richtige Datei, nur betroffener Knoten, Formatierung/Kommentare bleiben.
 - Codeänderungen (auch extern, FileSystemWatcher) aktualisieren das Diagramm inkrementell, Positionen bleiben.
-- Layout nur in `<Name>.cdiagram.json`.
+- Layout nur in `<Name>.cd` (Format wie in VS) im Projektordner neben Program.cs; alte `.cdiagram.json` werden weiter geöffnet.
 - Rename/Löschen über Roslyn inkl. Referenzen, mit Bestätigung. Fremdtypen „extern“ (read-only, grau).
 - Gemeinsames Undo/Redo Diagramm+Code. Zoom/Pan/Raster/Snap/Auto-Layout, Export SVG/PNG.
 - Writer zuerst per Snapshot-Tests (Eingabecode + Aktion → erwarteter Code).

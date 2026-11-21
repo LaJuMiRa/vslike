@@ -4,7 +4,7 @@ import VsLikeKit
 
 /// A class diagram tab. Types and members always come from the code (read by the engine); every diagram action
 /// rewrites only the affected declaration and is one undo step for code and layout together. Positions live in
-/// `<Name>.cdiagram.json`.
+/// `<Name>.cd` (older `<Name>.cdiagram.json` files still open).
 @MainActor
 @Observable
 final class DiagramEditorModel: Identifiable {
@@ -53,6 +53,21 @@ final class DiagramEditorModel: Identifiable {
 
     var folder: URL { url.deletingLastPathComponent() }
 
+    /// Where new types go: the diagram's folder, or the startup project's folder (where Program.cs is) when the
+    /// diagram lies outside every project, such as an older diagram next to the solution.
+    /// Paths are compared resolved (the engine resolves symlinks such as /var → /private/var).
+    var newTypeFolder: URL {
+        let diagramFolder = RealPath.resolve(folder)
+        let isInsideProject = workspace.solution?.projects.contains { project in
+            let directory = RealPath.resolve(project.directory).path
+            return diagramFolder.path == directory || diagramFolder.path.hasPrefix(directory + "/")
+        } ?? false
+        if isInsideProject {
+            return diagramFolder
+        }
+        return workspace.build.startupProject.map { RealPath.resolve(URL(fileURLWithPath: $0).deletingLastPathComponent()) } ?? diagramFolder
+    }
+
     var selectedType: DiagramType? { selection.flatMap(model.find) }
 
     var boxes: [DiagramBox] {
@@ -71,12 +86,12 @@ final class DiagramEditorModel: Identifiable {
     // MARK: Creating and refreshing
 
     /// Creates a diagram showing all source types below a folder (and the external types they derive from).
-    static func create(at url: URL, workspace: Workspace) async throws {
+    static func create(at url: URL, typesBelow scope: URL, workspace: Workspace) async throws {
         guard let engine = workspace.engine, workspace.isEngineReady else {
             throw EngineError.notRunning
         }
         let model = try await engine.diagramModel()
-        let prefix = url.deletingLastPathComponent().path + "/"
+        let prefix = RealPath.resolve(scope).path + "/"
         var names = Set(model.types.filter { !$0.isExternal && $0.filePaths.contains { $0.hasPrefix(prefix) } }.map(\.fullName))
         for relation in model.relations where names.contains(relation.from) && model.find(relation.to)?.isExternal == true {
             names.insert(relation.to)
@@ -178,11 +193,11 @@ final class DiagramEditorModel: Identifiable {
 
     // MARK: Code actions
 
-    /// Creates `<Name>.cs` in the diagram's folder with the namespace from RootNamespace plus the folder.
+    /// Creates `<Name>.cs` in `newTypeFolder` with the namespace from RootNamespace plus the folder.
     func createType(_ kind: DiagramTypeKind, name: String, at point: CGPoint) async {
         guard let engine = workspace.engine else { return }
         do {
-            let created = try await engine.newType(kind: kind, name: name, folder: folder.path)
+            let created = try await engine.newType(kind: kind, name: name, folder: newTypeFolder.path)
             if FileManager.default.fileExists(atPath: created.path) {
                 workspace.alert = AlertMessage(title: String(localized: "Class Diagram"), message: String(localized: "\(URL(fileURLWithPath: created.path).lastPathComponent) already exists."))
                 return
