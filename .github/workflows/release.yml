@@ -16,6 +16,8 @@ jobs:
   release:
     # Apple Silicon runner with Xcode 26 (the app targets macOS 26).
     runs-on: macos-26
+    # A healthy run takes a fraction of this; a hanging restore or debugger test must not block for hours.
+    timeout-minutes: 45
     outputs:
       version: ${{ steps.version.outputs.version }}
       sha256: ${{ steps.package.outputs.sha256 }}
@@ -29,6 +31,11 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           global-json-file: engine/global.json
+
+      # The image also ships newer SDKs (11.x). They stay visible on purpose: the engine is built with SDK 10, and the
+      # test samples in temporary folders without global.json are restored with the newest SDK, as on a user's Mac.
+      - name: List .NET SDKs
+        run: dotnet --list-sdks
 
       - name: Derive version from tag
         id: version
@@ -55,7 +62,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          NOTES="$(awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {f=1; next} /^## \[/ {f=0} f' CHANGELOG.md)"
+          NOTES="$(awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {f=1; next} /^## / {f=0} f' CHANGELOG.md)"
           printf '%s\n\nSHA-256: `%s`\n' "$NOTES" "${{ steps.package.outputs.sha256 }}" > release-notes.md
           gh release create "$GITHUB_REF_NAME" \
             "${{ steps.package.outputs.zip }}" \
