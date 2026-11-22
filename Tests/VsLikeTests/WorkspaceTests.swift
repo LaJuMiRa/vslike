@@ -313,4 +313,37 @@ struct WorkspaceTests {
         #expect(document.text.contains("\"Car\";"))
         _ = await workspace.closeAll()
     }
+
+    /// Drives the real editor against the engine: `pub` + Tab after the list opened on `p`, and Return in `Test(){|}`.
+    @Test(.timeLimit(.minutes(3)))
+    func editor_completionReplacesTypedPrefixAndReturnMovesBraceDown() async throws {
+        let (workspace, folder) = try await openSample()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let document = try #require(workspace.openFile(folder.appendingPathComponent("Lib1/Car.cs")))
+        let (scroll, editor) = CodeTextView.make(document: document, workspace: workspace)
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
+        window.contentView = scroll
+        window.makeFirstResponder(editor)
+
+        let anchor = (document.text as NSString).range(of: "    public string Name").location
+        editor.setSelectedRange(NSRange(location: anchor, length: 0))
+        editor.insertText("    \n", replacementRange: editor.selectedRange())
+        editor.setSelectedRange(NSRange(location: anchor + 4, length: 0))
+        editor.insertText("p", replacementRange: editor.selectedRange())
+        #expect(await Samples.wait(30) { editor.completionList != nil })
+        editor.insertText("u", replacementRange: editor.selectedRange())
+        editor.insertText("b", replacementRange: editor.selectedRange())
+        let item = try #require(editor.completionList?.items.first { $0.displayText == "public" })
+        editor.commitCompletion(item)
+        #expect(await Samples.wait(10) { document.text.contains("    public\n    public string Name") })
+        #expect(!document.text.contains("publicub"))
+
+        let member = (document.text as NSString).range(of: "    public string Name").location
+        editor.insertText("    public void Test()\n", replacementRange: NSRange(location: member, length: 0))
+        editor.setSelectedRange(NSRange(location: member + 22, length: 0))
+        editor.insertText("{", replacementRange: editor.selectedRange())
+        editor.insertNewline(nil)
+        #expect(document.text.contains("    public void Test()\n    {\n        \n    }\n"), "\(document.text)")
+        _ = await workspace.closeAll()
+    }
 }
