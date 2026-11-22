@@ -9,8 +9,9 @@ struct DiagramInspector: View {
 
     var body: some View {
         if let type = model.selectedType {
+            // Keyed by type only, so the chosen member kind survives adding a member.
             TypeInspector(model: model, type: type)
-                .id(type.fullName + "\(type.members.count)")
+                .id(type.fullName)
         } else {
             VStack(spacing: 14) {
                 ContentUnavailableView("No Type Selected", systemImage: "rectangle.3.group", description: Text("Click a type on the diagram to edit it."))
@@ -107,8 +108,13 @@ private struct TypeInspector: View {
                         }
                         .labelsHidden()
                         .fixedSize()
-                        TextField(MemberKindText.placeholder(newMemberKind), text: $newMemberText)
+                        // An empty title with a prompt: in a grouped form a titled field shows the title as a label
+                        // and collapses the field itself, so nothing could be typed.
+                        TextField("", text: $newMemberText, prompt: Text(MemberKindText.placeholder(newMemberKind)))
+                            .labelsHidden()
+                            .textFieldStyle(.roundedBorder)
                             .font(.system(size: 11.5, design: .monospaced))
+                            .frame(maxWidth: .infinity)
                             .onSubmit(addMember)
                         Button(action: addMember) { Image(systemName: "plus.circle.fill") }
                             .buttonStyle(.borderless)
@@ -130,6 +136,7 @@ private struct TypeInspector: View {
             name = type.name
             newMemberKind = type.kind == .enum ? .enumValue : .property
         }
+        .onChange(of: type.name) { _, newName in name = newName }
     }
 
     private var icon: String {
@@ -173,6 +180,8 @@ private struct MemberRow: View {
         HStack(spacing: 6) {
             if isEditing {
                 TextField("", text: $text)
+                    .labelsHidden()
+                    .textFieldStyle(.roundedBorder)
                     .font(.system(size: 11.5, design: .monospaced))
                     .onSubmit {
                         isEditing = false
