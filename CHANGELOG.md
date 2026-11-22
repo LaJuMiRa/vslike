@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.1.1] - 2026-11-22
 
 - Unteres Panel: Im Tab „Probleme“ (und „Ausgabe“) wird bei schmalem Fenster nichts mehr links und rechts abgeschnitten. Die Kopfzeile war mit Filter-Segmenten und Suchfeld breiter als der Platz, dadurch wurde das ganze Panel samt Tabelle zentriert und an beiden Rändern beschnitten. Jetzt werden die Filter bei wenig Platz zum Auswahlmenü und die Tabs zeigen zuletzt nur noch ihr Symbol (Name als Tooltip).
 - Editor: Enter in `void Run() {|}` (oder hinter getipptem `{}`) setzt `{` auf eine eigene Zeile unter die Deklaration, die Schreibmarke eingerückt in die Zeile darunter und `}` in die dritte Zeile. Steht `{` schon allein auf der Zeile oder in einem Kommentar, bleibt es stehen.
