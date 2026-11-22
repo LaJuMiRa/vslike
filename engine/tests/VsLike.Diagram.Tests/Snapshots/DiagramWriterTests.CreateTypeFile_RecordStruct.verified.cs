@@ -1,5 +1,6 @@
-﻿namespace Shop;
-
-public record struct Money
+﻿namespace Shop
 {
+    public record struct Money
+    {
+    }
 }

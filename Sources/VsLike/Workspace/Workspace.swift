@@ -445,6 +445,35 @@ final class Workspace {
         await applyStyleCop(!styleCopEnabled, persist: true)
     }
 
+    /// Opens the solution's stylecop.json, creating it first with the company name and copyright text from the settings.
+    func openStyleCopSettings() async {
+        guard let solutionURL else { return }
+        let url = StyleCopSettingsFile.url(forSolution: solutionURL)
+        if !FileManager.default.fileExists(atPath: url.path) {
+            do {
+                let text = try StyleCopSettingsFile.contents(companyName: preferences.styleCopCompanyName, copyrightText: preferences.styleCopCopyrightText)
+                try text.write(to: url, atomically: true, encoding: .utf8)
+            } catch {
+                alert = AlertMessage(title: "StyleCop", message: error.localizedDescription)
+                return
+            }
+            refreshTree()
+            await reloadStyleCopSettings()
+        }
+        openFile(url)
+    }
+
+    /// Makes the engine read stylecop.json again (after it was created or saved).
+    func reloadStyleCopSettings() async {
+        guard styleCopEnabled, let engine, isEngineReady else { return }
+        do {
+            _ = try await engine.setStyleCop(true)
+            status = StatusMessage(text: String(localized: "StyleCop settings loaded"), style: .success)
+        } catch {
+            alert = AlertMessage(title: "StyleCop", message: error.localizedDescription)
+        }
+    }
+
     func applyStyleCop(_ enabled: Bool, persist: Bool) async {
         styleCopEnabled = enabled
         if persist, let solutionURL {
@@ -553,6 +582,9 @@ final class Workspace {
         do {
             try document.save()
             status = StatusMessage(text: String(localized: "Saved \(document.name)"), style: .neutral)
+            if document.name.lowercased() == StyleCopSettingsFile.fileName {
+                Task { await reloadStyleCopSettings() }
+            }
         } catch {
             alert = AlertMessage(title: String(localized: "Saving failed"), message: error.localizedDescription)
         }

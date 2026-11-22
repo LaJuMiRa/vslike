@@ -66,6 +66,27 @@ public sealed class StyleCopTests
     }
 
     [Fact]
+    public async Task EnablingAgain_RereadsAnEditedStyleCopJson()
+    {
+        var fixture = await LoadAsync(root => File.WriteAllText(Path.Combine(root, "stylecop.json"), """{ "settings": { } }"""));
+        try
+        {
+            var car = fixture.PathOf("Lib1/Car.cs");
+            Assert.True(await fixture.Workspace.SetStyleCopEnabledAsync(true, NoCli, CancellationToken.None));
+            Assert.Contains(await fixture.Workspace.GetDocumentDiagnosticsAsync(car, CancellationToken.None), d => d.Id == "SA1200");
+
+            File.WriteAllText(Path.Combine(fixture.Root, "stylecop.json"), """{ "settings": { "orderingRules": { "usingDirectivesPlacement": "outsideNamespace" } } }""");
+            Assert.True(await fixture.Workspace.SetStyleCopEnabledAsync(true, NoCli, CancellationToken.None));
+
+            Assert.DoesNotContain(await fixture.Workspace.GetDocumentDiagnosticsAsync(car, CancellationToken.None), d => d.Id == "SA1200");
+        }
+        finally
+        {
+            await fixture.DisposeAsync();
+        }
+    }
+
+    [Fact]
     public async Task CodeFix_AndFixAllInDocument_RemoveTrailingWhitespace()
     {
         VsLike.Core.Localization.EngineText.SetCulture("en");

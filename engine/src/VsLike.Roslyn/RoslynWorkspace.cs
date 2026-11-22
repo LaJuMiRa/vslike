@@ -108,7 +108,9 @@ public sealed class RoslynWorkspace : ICodeWorkspace
             _analyzers = enabled ? StyleCopAnalyzers.Analyzers : [];
             if (_solution is { } solution)
             {
-                _solution = enabled ? StyleCopConfiguration.AddStyleCopJson(solution, SolutionPath) : StyleCopConfiguration.RemoveStyleCopJson(solution);
+                // Removing first re-reads stylecop.json, so switching on again also picks up an edited file.
+                var withoutSettings = StyleCopConfiguration.RemoveStyleCopJson(solution);
+                _solution = enabled ? StyleCopConfiguration.Reparse(StyleCopConfiguration.AddStyleCopJson(withoutSettings, SolutionPath)) : withoutSettings;
             }
         }
 

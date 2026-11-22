@@ -220,6 +220,9 @@ private struct AnalysisControls: View {
         .foregroundStyle(workspace.styleCopEnabled ? Color.vsStyleCop : .secondary)
         .help(workspace.styleCopEnabled ? "StyleCop is on for this solution" : "StyleCop is off for this solution")
         .disabled(workspace.solution == nil || workspace.isStyleCopLoading)
+        .contextMenu {
+            Button("StyleCop Settings…") { Task { await workspace.openStyleCopSettings() } }
+        }
 
         Button {
             Task { await workspace.openSolutionDiagram() }

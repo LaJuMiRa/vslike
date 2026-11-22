@@ -33,6 +33,21 @@ internal static class StyleCopConfiguration
         return solution;
     }
 
+    /// <summary>
+    /// Gives every C# document a fresh syntax tree with the same text. StyleCop caches its settings per syntax tree, so
+    /// without this an edited stylecop.json would only take effect in files edited afterwards.
+    /// </summary>
+    public static Solution Reparse(Solution solution)
+    {
+        foreach (var document in solution.Projects.SelectMany(p => p.Documents).ToList())
+        {
+            var text = document.TryGetText(out var loaded) ? loaded : document.GetTextAsync().GetAwaiter().GetResult();
+            solution = solution.WithDocumentText(document.Id, SourceText.From(text.ToString(), text.Encoding, text.ChecksumAlgorithm));
+        }
+
+        return solution;
+    }
+
     public static Solution RemoveStyleCopJson(Solution solution)
     {
         foreach (var project in solution.Projects.ToList())

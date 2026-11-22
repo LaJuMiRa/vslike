@@ -104,6 +104,27 @@ struct WorkspaceTests {
     }
 
     @Test(.timeLimit(.minutes(3)))
+    func styleCopSettings_createdWithCompanyAndUsedForTheFileHeader() async throws {
+        let (workspace, folder) = try await openSample()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        preferences.styleCopCompanyName = "Acme"
+        await workspace.toggleStyleCop()
+
+        await workspace.openStyleCopSettings()
+
+        let settings = folder.appendingPathComponent("stylecop.json")
+        #expect(try String(contentsOf: settings, encoding: .utf8).contains("\"companyName\" : \"Acme\""))
+        #expect(workspace.activeDocument?.name == "stylecop.json")
+        let document = try #require(workspace.openFile(folder.appendingPathComponent("Lib2/Engine.cs")))
+        let found = await Samples.wait { workspace.diagnostics.diagnostics(for: document.path).contains { $0.code == "SA1633" } }
+        #expect(found)
+        await workspace.fixAllStyleCop(in: document)
+        #expect(document.text.contains("Copyright (c) Acme. All rights reserved."))
+        #expect(!document.text.contains("PlaceholderCompany"))
+        _ = await workspace.closeAll()
+    }
+
+    @Test(.timeLimit(.minutes(3)))
     func diagram_outsideEveryProjectCreatesTypesInTheStartupProject() async throws {
         let (workspace, folder) = try await openSample()
         defer { try? FileManager.default.removeItem(at: folder) }
@@ -115,8 +136,8 @@ struct WorkspaceTests {
 
         let file = folder.appendingPathComponent("App/Engine.cs")
         let text = try String(contentsOf: file, encoding: .utf8)
-        #expect(text.contains("namespace Sample.App;"))  // RootNamespace of App.csproj
-        #expect(text.contains("public class Engine"))
+        #expect(text.contains("namespace Sample.App\n{"))  // RootNamespace of App.csproj
+        #expect(text.contains("    public class Engine"))
         #expect(!FileManager.default.fileExists(atPath: folder.appendingPathComponent("Engine.cs").path))
         _ = await workspace.closeAll()
     }
@@ -142,7 +163,7 @@ struct WorkspaceTests {
         await model.refresh()
         await model.createType(.class, name: "Truck", at: CGPoint(x: 400, y: 40))
         let truckFile = lib1.appendingPathComponent("Truck.cs")
-        #expect(try String(contentsOf: truckFile, encoding: .utf8).contains("namespace Lib1;"))
+        #expect(try String(contentsOf: truckFile, encoding: .utf8).contains("namespace Lib1\n{"))
         let truck = try #require(model.model.find("Lib1.Truck"))
         await model.addMember(to: truck, kind: .property, text: "+ Wheels: int")
         #expect(try String(contentsOf: truckFile, encoding: .utf8).contains("public int Wheels { get; set; }"))

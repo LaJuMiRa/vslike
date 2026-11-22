@@ -72,11 +72,15 @@ public static class CodeText
     public static string BaseList(string? baseType, IReadOnlyList<string> interfaces)
         => string.Join(", ", new[] { baseType }.Concat(interfaces).Where(b => !string.IsNullOrWhiteSpace(b)));
 
-    /// <summary>A complete file with a file-scoped namespace and one empty type.</summary>
+    /// <summary>A complete file with a block-scoped namespace (<c>namespace X { … }</c>) and one empty type.</summary>
     public static string TypeFile(DiagramType type, string? fileNamespace)
     {
-        var body = $"{TypeHeader(type, "\n", "    ")}\n{{\n}}\n";
-        return string.IsNullOrEmpty(fileNamespace) ? body : $"namespace {fileNamespace};\n\n{body}";
+        if (string.IsNullOrEmpty(fileNamespace))
+        {
+            return $"{TypeHeader(type, "\n", "    ")}\n{{\n}}\n";
+        }
+
+        return $"namespace {fileNamespace}\n{{\n    {TypeHeader(type, "\n    ", "    ")}\n    {{\n    }}\n}}\n";
     }
 
     public static string Member(DiagramMember member, DiagramType owner)

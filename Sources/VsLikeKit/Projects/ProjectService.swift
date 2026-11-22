@@ -61,7 +61,20 @@ public struct ProjectService: Sendable {
         guard FileManager.default.fileExists(atPath: project.path) else {
             throw CommandError.failed(command: "dotnet new \(template)", exitCode: 0, output: "No project file was created at \(project.path).")
         }
+        try useBlockScopedNamespaces(in: output)
         return project
+    }
+
+    /// The templates write `namespace X;`; VsLike's new files use `namespace X { … }`.
+    private func useBlockScopedNamespaces(in folder: URL) throws {
+        let files = (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? []
+        for file in files where file.pathExtension == "cs" {
+            let source = try String(contentsOf: file, encoding: .utf8)
+            let converted = NamespaceStyle.blockScoped(source)
+            if converted != source {
+                try converted.write(to: file, atomically: true, encoding: .utf8)
+            }
+        }
     }
 
     public func addProject(_ project: String, to solution: String, folder: String? = nil) async throws {

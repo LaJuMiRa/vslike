@@ -11,6 +11,26 @@ struct TextTests {
         }
     }
 
+    @Test func namespace_fileScopedBecomesBlockScopedWithIndentedBody() {
+        let source = "\u{FEFF}namespace test;\n\nclass Program\n{\n    static void Main(string[] args)\n    {\n        Console.WriteLine(\"Hello, World!\");\n    }\n}\n"
+
+        let converted = NamespaceStyle.blockScoped(source)
+
+        #expect(converted == "\u{FEFF}namespace test\n{\n    class Program\n    {\n        static void Main(string[] args)\n        {\n            Console.WriteLine(\"Hello, World!\");\n        }\n    }\n}\n")
+        #expect(NamespaceStyle.blockScoped(converted) == converted)
+        #expect(NamespaceStyle.blockScoped("using System;\r\nnamespace A.B;\r\npublic class C { }\r\n") == "using System;\r\nnamespace A.B\r\n{\r\n    public class C { }\r\n}\r\n")
+    }
+
+    @Test func styleCopSettings_containCompanyAndCopyright() throws {
+        let text = try StyleCopSettingsFile.contents(companyName: "Acme \"GmbH\"", copyrightText: "")
+        let json = try #require(try JSONSerialization.jsonObject(with: Data(text.utf8)) as? [String: Any])
+        let rules = try #require((json["settings"] as? [String: Any])?["documentationRules"] as? [String: String])
+
+        #expect(rules["companyName"] == "Acme \"GmbH\"")
+        #expect(rules["copyrightText"] == StyleCopSettingsFile.defaultCopyrightText)
+        #expect(StyleCopSettingsFile.url(forSolution: URL(fileURLWithPath: "/x/App.slnx")).path == "/x/stylecop.json")
+    }
+
     @Test func lexer_classifiesKeywordsTypesLiteralsAndComments() {
         let tokens = kinds("public int Count = 42; // total\nif (x) return \"a\\\"b\";")
 

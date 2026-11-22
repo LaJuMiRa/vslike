@@ -135,13 +135,13 @@ struct IntegrationTests {
 
         let app = try await service.createProject(template: "console", name: "Garage", in: folder)
         let program = try String(contentsOf: app.deletingLastPathComponent().appendingPathComponent("Program.cs"), encoding: .utf8)
-        #expect(program.contains("namespace Garage;"))
+        #expect(program.contains("namespace Garage\n{\n    class Program\n    {\n        static void Main(string[] args)"))
         #expect(program.contains("static void Main(string[] args)"))
         #expect(program.contains("Console.WriteLine(\"Hello, World!\");"))
 
         let library = try await service.createProject(template: "classlib", name: "Garage.Core", in: folder)
         let class1 = try String(contentsOf: library.deletingLastPathComponent().appendingPathComponent("Class1.cs"), encoding: .utf8)
-        #expect(class1.contains("namespace Garage.Core;"))
+        #expect(class1.contains("namespace Garage.Core\n{\n    public class Class1"))
     }
 
     /// A program started outside the debugger (as in the terminal) waits in the startup hook until the debugger has

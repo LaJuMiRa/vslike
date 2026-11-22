@@ -210,6 +210,8 @@ struct AppCommands: Commands {
             Divider()
             Toggle("StyleCop Analysis", isOn: Binding(get: { workspace.styleCopEnabled }, set: { _ in Task { await workspace.toggleStyleCop() } }))
                 .disabled(workspace.solution == nil)
+            Button("StyleCop Settings…") { Task { await workspace.openStyleCopSettings() } }
+                .disabled(workspace.solutionURL == nil)
         }
         CommandMenu("Navigate") {
             Button("Quick Open…") { workspace.isQuickOpenPresented = true }

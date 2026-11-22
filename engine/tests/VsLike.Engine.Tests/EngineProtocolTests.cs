@@ -127,7 +127,7 @@ public sealed class EngineProtocolTests : IAsyncLifetime
 
         Assert.Contains("public void Honk(int times)", edited.Text, StringComparison.Ordinal);
         Assert.Equal("Lib1.Models.IVehicle", created.FullName);
-        Assert.StartsWith("namespace Lib1.Models;", created.Text, StringComparison.Ordinal);
+        Assert.StartsWith("namespace Lib1.Models\n{\n    public interface IVehicle", created.Text, StringComparison.Ordinal);
     }
 
     [Fact]

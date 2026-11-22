@@ -37,7 +37,7 @@ packaging/ scripts/ docs/
 - Elemente: class, interface, struct, enum, record (+ record struct), Namespaces, Zugriffsmodifizierer, abstract/static/sealed/partial, Generics mit Constraints.
 - Mitglieder: Felder, Properties (auto/init/required), Methoden, Konstruktoren, Events, Enum-Werte.
 - Vererbung/Interface-Implementierung per Pfeil ⇒ `: Basis, IFoo`. Assoziation/Komposition aus Feld-/Property-Typen abgeleitet.
-- Neue Klasse ⇒ `<Typname>.cs` im gewählten Ordner, file-scoped Namespace aus RootNamespace + Ordner.
+- Neue Klasse ⇒ `<Typname>.cs` im gewählten Ordner, Block-Namespace (`namespace X { … }`) aus RootNamespace + Ordner.
 - Jede Diagrammänderung per Roslyn in die richtige Datei, nur betroffener Knoten, Formatierung/Kommentare bleiben.
 - Codeänderungen (auch extern, FileSystemWatcher) aktualisieren das Diagramm inkrementell, Positionen bleiben.
 - Layout nur in `<Name>.cd` (Format wie in VS) im Projektordner neben Program.cs; alte `.cdiagram.json` werden weiter geöffnet.

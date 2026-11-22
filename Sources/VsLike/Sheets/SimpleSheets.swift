@@ -38,6 +38,16 @@ struct SettingsView: View {
             .tabItem { Label("General", systemImage: "gearshape") }
 
             Form {
+                TextField("Company name", text: $preferences.styleCopCompanyName)
+                TextField("Copyright text", text: $preferences.styleCopCopyrightText, axis: .vertical)
+                    .lineLimit(2...4)
+                Text("Used when VsLike creates a stylecop.json for a solution (Code › StyleCop Settings…). {companyName} and {fileName} are replaced by StyleCop. An existing stylecop.json is edited directly and applies after saving.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .tabItem { Label("StyleCop", systemImage: "checkmark.seal") }
+
+            Form {
                 Slider(value: $preferences.fontSize, in: 9...28, step: 1) {
                     Text("Font size")
                 } minimumValueLabel: {

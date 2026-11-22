@@ -1,5 +1,6 @@
 import AppKit
 import Observation
+import VsLikeKit
 
 /// Global settings (UserDefaults). Per-solution settings live in `.vslike/settings.json`.
 @MainActor
@@ -48,6 +49,10 @@ final class Preferences {
     /// Folder suggested for new solutions (default ~/Developer).
     var projectsFolder: URL { didSet { defaults.set(projectsFolder.path, forKey: "projectsFolder") } }
 
+    /// Written into a new solution's stylecop.json (file header rules).
+    var styleCopCompanyName: String { didSet { defaults.set(styleCopCompanyName, forKey: "styleCopCompanyName") } }
+    var styleCopCopyrightText: String { didSet { defaults.set(styleCopCopyrightText, forKey: "styleCopCopyrightText") } }
+
     static let defaultProjectsFolder = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Developer")
 
     init(defaults: UserDefaults = .standard) {
@@ -60,6 +65,8 @@ final class Preferences {
         appearance = Appearance(rawValue: defaults.string(forKey: "appearance") ?? "") ?? .system
         language = Language(rawValue: defaults.string(forKey: "language") ?? "") ?? .system
         recentSolutions = defaults.stringArray(forKey: "recentSolutions") ?? []
+        styleCopCompanyName = defaults.string(forKey: "styleCopCompanyName") ?? NSFullUserName()
+        styleCopCopyrightText = defaults.string(forKey: "styleCopCopyrightText") ?? StyleCopSettingsFile.defaultCopyrightText
         projectsFolder = defaults.string(forKey: "projectsFolder").map { URL(fileURLWithPath: $0) } ?? Self.defaultProjectsFolder
     }
 

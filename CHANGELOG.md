@@ -2,6 +2,8 @@
 
 ## [1.1.0] - 2026-11-22
 
+- Neue Dateien verwenden einen Block-Namespace (`namespace Demo { … }`) mit eingerücktem Inhalt statt `namespace Demo;`: `Program.cs` und die übrigen Dateien neuer Projekte sowie neue Typen aus dem Klassendiagramm.
+- StyleCop-Einstellungsdatei: „Code › StyleCop-Einstellungen …“ (auch per Rechtsklick auf den StyleCop-Knopf der Toolbar) legt neben der Solution eine `stylecop.json` mit Firmenname und Copyright-Text an und öffnet sie. Die Vorgaben dafür stehen unter Einstellungen › StyleCop (Firmenname vorbelegt mit dem macOS-Benutzernamen). Der Fix für den fehlenden Dateikopf (SA1633) schreibt damit z. B. „Copyright (c) Acme. All rights reserved.“ statt „PlaceholderCompany“. Nach dem Speichern der `stylecop.json` gelten die Änderungen sofort für alle Dateien.
 - Editor: Der feine graue Strich, der an der Kante der Zeilenleiste bis in Tableiste und Toolbar lief, ist weg (Zeilenleiste und Scrollbereich schneiden wieder an ihren Grenzen ab).
 - Klassendiagramm: Für neue Mitglieder genügt der Name. Ohne Typ wird es `int` (Methoden geben weiterhin `void` zurück, Ereignisse `EventHandler`, Parameter ohne Typ `int`), ohne Zugriffszeichen `public` (auch Felder, bisher `private`), Methoden brauchen keine Klammern. Typ und Zugriff können weiterhin in UML-Schreibweise angegeben werden.
 - Klassendiagramm: Im Inspektor lässt sich wieder ein neues Mitglied eintippen. Das Eingabefeld wurde in der gruppierten Liste nur als Beschriftung „+ Name: string“ gezeichnet und war nicht anklickbar. Die gewählte Art (Property, Methode …) bleibt nach dem Hinzufügen erhalten statt auf „Property“ zurückzuspringen.
