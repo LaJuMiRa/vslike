@@ -406,8 +406,11 @@ final class CodeTextView: NSTextView {
     override func insertNewline(_ sender: Any?) {
         snippet = nil
         let string = self.string as NSString
-        let result = TextEditing.newline(at: selectedRange().location, in: string)
-        let insertAt = selectedRange()
+        var insertAt = selectedRange()
+        if insertAt.length == 0 {
+            insertAt.location = TextEditing.newlineLocation(for: insertAt.location, in: string)
+        }
+        let result = TextEditing.newline(at: insertAt.location, in: string)
         insertText(result.text, replacementRange: insertAt)
         setSelectedRange(NSRange(location: insertAt.location + result.caret, length: 0))
         scrollRangeToVisible(selectedRange())

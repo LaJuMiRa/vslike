@@ -41,6 +41,18 @@ public enum TextEditing {
         return text.substring(with: NSRange(location: line.location, length: end - line.location))
     }
 
+    /// Where Return inserts its text: between the braces when the caret sits right after an empty `{}` at the end of
+    /// the line (typed with its closing brace), so that `{}` opens a block like `{|}` does; otherwise at the caret.
+    public static func newlineLocation(for offset: Int, in text: NSString) -> Int {
+        guard offset >= 2, offset <= text.length, text.character(at: offset - 2) == UInt16(UnicodeScalar("{").value), text.character(at: offset - 1) == UInt16(UnicodeScalar("}").value) else {
+            return offset
+        }
+        let line = text.lineRange(for: NSRange(location: offset, length: 0))
+        let lineEnd = NSMaxRange(line) - (NSMaxRange(line) > line.location && text.character(at: NSMaxRange(line) - 1) == 10 ? 1 : 0)
+        let rest = offset < lineEnd ? text.substring(with: NSRange(location: offset, length: lineEnd - offset)) : ""
+        return rest.trimmingCharacters(in: .whitespaces).isEmpty ? offset - 1 : offset
+    }
+
     /// Text to insert for Return at `offset`: newline plus indentation, one level deeper after `{`, and the closing
     /// brace on its own line when the caret sits between `{` and `}`. Returns the text and the caret offset in it.
     public static func newline(at offset: Int, in text: NSString) -> (text: String, caret: Int) {

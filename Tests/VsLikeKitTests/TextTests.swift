@@ -93,6 +93,19 @@ struct TextTests {
         #expect(TextEditing.newline(at: 7, in: text).text == "\n")
     }
 
+    @Test func newline_afterTypedEmptyBracesOpensTheBlock() {
+        let text = "public void test()\n{}\n" as NSString
+        let location = TextEditing.newlineLocation(for: 21, in: text)
+        let result = TextEditing.newline(at: location, in: text)
+
+        #expect(location == 20)
+        #expect(TextEditing.apply([TextEdit(start: location, length: 0, newText: result.text)], to: text as String) == "public void test()\n{\n    \n}\n")
+        #expect(location + result.caret == 25)
+        // Not after `{}` followed by more code, and not elsewhere.
+        #expect(TextEditing.newlineLocation(for: 6, in: "x = {} + y" as NSString) == 6)
+        #expect(TextEditing.newlineLocation(for: 3, in: "a()" as NSString) == 3)
+    }
+
     @Test func toggleComment_commentsAndUncommentsLinesAtCommonIndent() {
         let text = "    a();\n      b();\n" as NSString
         let commented = TextEditing.toggleLineComment(in: text, range: NSRange(location: 0, length: text.length))
