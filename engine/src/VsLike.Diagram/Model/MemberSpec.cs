@@ -3,12 +3,15 @@ namespace VsLike.Diagram.Model;
 /// <summary>
 /// Liest Mitglieder in der UML-Notation der Boxen: <c>+ Total(withTax: bool): decimal</c>, <c>- _items: List&lt;Item&gt;</c>,
 /// <c>Name: string = ""</c>. Nur der Name ist Pflicht: ohne Zugriffssymbol (+ - # ~) ist das Mitglied öffentlich, ohne Typ
-/// <c>int</c> (Ereignisse: <c>EventHandler</c>), ohne Klammern hat eine Methode keine Parameter.
+/// <c>int</c> (Methoden: <c>void</c>, Ereignisse: <c>EventHandler</c>), ohne Klammern hat eine Methode keine Parameter.
 /// </summary>
 public static class MemberSpec
 {
-    /// <summary>Typ für Felder, Properties, Methoden und Parameter, wenn keiner angegeben ist.</summary>
+    /// <summary>Typ für Felder, Properties und Parameter, wenn keiner angegeben ist.</summary>
     public const string DefaultType = "int";
+
+    /// <summary>Rückgabetyp für Methoden, wenn keiner angegeben ist.</summary>
+    public const string DefaultReturnType = "void";
 
     /// <summary>Typ für Ereignisse, wenn keiner angegeben ist.</summary>
     public const string DefaultEventType = "EventHandler";
@@ -92,7 +95,8 @@ public static class MemberSpec
         {
             type = kind switch
             {
-                MemberKind.Field or MemberKind.Property or MemberKind.Method => DefaultType,
+                MemberKind.Field or MemberKind.Property => DefaultType,
+                MemberKind.Method => DefaultReturnType,
                 MemberKind.Event => DefaultEventType,
                 _ => type,
             };

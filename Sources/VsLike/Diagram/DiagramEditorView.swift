@@ -537,7 +537,7 @@ enum MemberKindText {
         case .constructor, .enumValue:
             return String(localized: "UML notation: + public, - private, # protected, ~ internal. Example: \(placeholder(kind))")
         default:
-            return String(localized: "Only the name is required: without a type it becomes int (events: EventHandler), without a symbol public. Optional UML notation: + public, - private, # protected, ~ internal. Example: \(placeholder(kind))")
+            return String(localized: "Only the name is required: without a type it becomes int (methods: void, events: EventHandler), without a symbol public. Optional UML notation: + public, - private, # protected, ~ internal. Example: \(placeholder(kind))")
         }
     }
 }

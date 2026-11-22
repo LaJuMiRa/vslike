@@ -114,7 +114,7 @@ private struct TypeInspector: View {
                             .buttonStyle(.borderless)
                             .disabled(newMemberText.isEmpty)
                     }
-                    Text("Only the name is required (default: public, int). Optional: + public  - private  # protected  ~ internal").font(.caption2).foregroundStyle(.tertiary)
+                    Text("Only the name is required (default: public, int, methods void). Optional: + public  - private  # protected  ~ internal").font(.caption2).foregroundStyle(.tertiary)
                 }
             }
 

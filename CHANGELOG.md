@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 - Editor: Der feine graue Strich, der an der Kante der Zeilenleiste bis in Tableiste und Toolbar lief, ist weg (Zeilenleiste und Scrollbereich schneiden wieder an ihren Grenzen ab).
-- Klassendiagramm: Für neue Mitglieder genügt der Name. Ohne Typ wird es `int` (Ereignisse `EventHandler`, Parameter ohne Typ ebenfalls `int`), ohne Zugriffszeichen `public` (auch Felder, bisher `private`), Methoden brauchen keine Klammern. Typ und Zugriff können weiterhin in UML-Schreibweise angegeben werden.
+- Klassendiagramm: Für neue Mitglieder genügt der Name. Ohne Typ wird es `int` (Methoden geben weiterhin `void` zurück, Ereignisse `EventHandler`, Parameter ohne Typ `int`), ohne Zugriffszeichen `public` (auch Felder, bisher `private`), Methoden brauchen keine Klammern. Typ und Zugriff können weiterhin in UML-Schreibweise angegeben werden.
 - Klassendiagramm: Rechtsklick auf eine freie Stelle öffnet ein Menü mit „Neue Klasse/Interface/Record/Struct/Enum …“ (an der Klickposition), „Vorhandenen Typ hinzufügen“, „Automatisch anordnen“ und „An Fenster anpassen“.
 - Klassendiagramm: Das Kontextmenü einer Box enthält „Basisklasse“ und „Implementiert Interfaces“ (bei Interfaces „Erweitert Interfaces“) zum direkten Setzen der Vererbung.
 - Klassendiagramm flüssiger bei vielen Typen: Zoom und Scrollposition werden erst 0,5 s nach der letzten Bewegung in die `.cd`-Datei geschrieben statt bei jedem Trackpad-Ereignis, Boxen und Linien werden nur noch bei Änderungen berechnet, nur die ausgewählte Box hat einen Schatten. Pinch-Zoom funktioniert jetzt auch über den Boxen (bisher nur auf freier Fläche).

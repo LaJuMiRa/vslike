@@ -381,5 +381,5 @@
 "New Struct…" = "Neue Struct …";
 "New Enum…" = "Neue Enum …";
 "Add Existing Type" = "Vorhandenen Typ hinzufügen";
-"Only the name is required (default: public, int). Optional: + public  - private  # protected  ~ internal" = "Nur der Name ist Pflicht (Standard: public, int). Optional: + public  - private  # protected  ~ internal";
-"Only the name is required: without a type it becomes int (events: EventHandler), without a symbol public. Optional UML notation: + public, - private, # protected, ~ internal. Example: %@" = "Nur der Name ist Pflicht: ohne Typ wird es int (Ereignisse: EventHandler), ohne Zeichen public. Optional in UML-Schreibweise: + public, - private, # protected, ~ internal. Beispiel: %@";
+"Only the name is required (default: public, int, methods void). Optional: + public  - private  # protected  ~ internal" = "Nur der Name ist Pflicht (Standard: public, int, Methoden void). Optional: + public  - private  # protected  ~ internal";
+"Only the name is required: without a type it becomes int (methods: void, events: EventHandler), without a symbol public. Optional UML notation: + public, - private, # protected, ~ internal. Example: %@" = "Nur der Name ist Pflicht: ohne Typ wird es int (Methoden: void, Ereignisse: EventHandler), ohne Zeichen public. Optional in UML-Schreibweise: + public, - private, # protected, ~ internal. Beispiel: %@";

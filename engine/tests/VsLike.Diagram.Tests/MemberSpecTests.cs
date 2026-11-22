@@ -35,13 +35,20 @@ public sealed class MemberSpecTests
     [Theory]
     [InlineData(MemberKind.Field, "Count")]
     [InlineData(MemberKind.Property, "Count")]
-    [InlineData(MemberKind.Method, "Count")]
-    [InlineData(MemberKind.Method, "Count()")]
     [InlineData(MemberKind.Method, "+ Count: int")]
     public void OnlyName_DefaultsToPublicInt(MemberKind kind, string text)
     {
         Assert.True(MemberSpec.TryParse(kind, text, "A", out var member));
         Assert.Equal((Access.Public, "Count", "int"), (member.Access, member.Name, member.Type));
+    }
+
+    [Theory]
+    [InlineData("Run")]
+    [InlineData("Run()")]
+    public void MethodWithoutType_ReturnsVoid(string text)
+    {
+        Assert.True(MemberSpec.TryParse(MemberKind.Method, text, "A", out var member));
+        Assert.Equal((Access.Public, "Run", "void"), (member.Access, member.Name, member.Type));
     }
 
     [Fact]
