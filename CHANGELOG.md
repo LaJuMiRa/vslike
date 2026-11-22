@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.1.0] - 2026-11-22
 
 - Editor: Der feine graue Strich, der an der Kante der Zeilenleiste bis in Tableiste und Toolbar lief, ist weg (Zeilenleiste und Scrollbereich schneiden wieder an ihren Grenzen ab).
 - Klassendiagramm: Für neue Mitglieder genügt der Name. Ohne Typ wird es `int` (Methoden geben weiterhin `void` zurück, Ereignisse `EventHandler`, Parameter ohne Typ `int`), ohne Zugriffszeichen `public` (auch Felder, bisher `private`), Methoden brauchen keine Klammern. Typ und Zugriff können weiterhin in UML-Schreibweise angegeben werden.
