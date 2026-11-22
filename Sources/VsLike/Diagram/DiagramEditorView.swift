@@ -12,7 +12,6 @@ struct DiagramEditorView: View {
     @State private var offset: CGSize = .zero
     @State private var dragOffsets: [String: CGSize] = [:]
     @State private var panStart: CGSize?
-    @State private var zoomStart: Double?
     @State private var connection: (from: String, to: CGPoint)?
     @State private var viewSize: CGSize = .zero
     @State private var didRestoreView = false
@@ -29,10 +28,12 @@ struct DiagramEditorView: View {
                 Color.clear
                     .contentShape(Rectangle())
                     .gesture(backgroundDrag)
-                    .simultaneousGesture(magnify)
                     .onTapGesture(coordinateSpace: .local) { location in backgroundTapped(at: location) }
                     .onContinuousHover { phase in
                         if case let .active(location) = phase { hoverLocation = location }
+                    }
+                    .contextMenu {
+                        CanvasContextMenu(model: model, newType: { kind in promptNewType(kind, at: diagramPoint(hoverLocation)) }, fit: { fit(in: geometry.size) })
                     }
 
                 RelationsLayer(edges: edges, zoom: zoom, offset: offset)
@@ -72,13 +73,14 @@ struct DiagramEditorView: View {
             .onAppear {
                 viewSize = geometry.size
                 restoreView(size: geometry.size)
-                scrollMonitor.install(frame: { geometry.frame(in: .global) }) { delta, isZoom in
-                    if isZoom {
-                        zoom(by: 1 + delta.height * 0.01, around: hoverLocation)
-                    } else {
+                scrollMonitor.install(frame: { geometry.frame(in: .global) }) { event in
+                    switch event {
+                    case let .pan(delta):
                         offset.width += delta.width
                         offset.height += delta.height
                         persistView()
+                    case let .zoom(factor, location):
+                        zoom(by: factor, around: location)
                     }
                 }
             }
@@ -112,16 +114,6 @@ struct DiagramEditorView: View {
 
     private func select(_ name: String?) {
         model.selection = name
-    }
-
-    private var magnify: some Gesture {
-        MagnifyGesture()
-            .onChanged { value in
-                if zoomStart == nil { zoomStart = zoom }
-                let target = min(3, max(0.2, zoomStart! * value.magnification))
-                zoom(by: target / zoom, around: value.startLocation)
-            }
-            .onEnded { _ in zoomStart = nil }
     }
 
     private var backgroundDrag: some Gesture {
@@ -165,18 +157,21 @@ struct DiagramEditorView: View {
         case .select:
             select(nil)
         case let .create(kind):
-            let point = diagramPoint(location)
             model.tool = .select
-            workspace.prompt = PromptRequest(
-                title: String(localized: "New \(kind.keyword)"),
-                message: String(localized: "Creates a file in \(model.newTypeFolder.lastPathComponent) with the namespace of the folder."),
-                placeholder: kind == .interface ? "IShape" : "Shape",
-                confirmTitle: String(localized: "Create")
-            ) { name in
-                await model.createType(kind, name: name, at: point)
-            }
+            promptNewType(kind, at: diagramPoint(location))
         case .inherit:
             model.tool = .select
+        }
+    }
+
+    private func promptNewType(_ kind: DiagramTypeKind, at point: CGPoint) {
+        workspace.prompt = PromptRequest(
+            title: String(localized: "New \(kind.keyword)"),
+            message: String(localized: "Creates a file in \(model.newTypeFolder.lastPathComponent) with the namespace of the folder."),
+            placeholder: kind == .interface ? "IShape" : "Shape",
+            confirmTitle: String(localized: "Create")
+        ) { name in
+            await model.createType(kind, name: name, at: point)
         }
     }
 
@@ -398,8 +393,9 @@ struct TypeBoxView: View {
             RoundedRectangle(cornerRadius: 9, style: .continuous)
                 .strokeBorder(isSelected ? Color.vsAccent : Color.primary.opacity(type.isExternal ? 0.15 : 0.22), style: StrokeStyle(lineWidth: isSelected ? 2 : 1, dash: type.isExternal ? [4, 3] : []))
         }
-        .shadow(color: .black.opacity(isSelected ? 0.22 : 0.1), radius: isSelected ? 10 : 4, y: isSelected ? 4 : 2)
-        .contextMenu { if let model { TypeContextMenu(model: model, type: type) } }
+        // Only the selected box casts a shadow: a shadow per box is an extra render pass on every zoom step.
+        .shadow(color: .black.opacity(isSelected ? 0.22 : 0), radius: isSelected ? 10 : 0, y: isSelected ? 4 : 0)
+        .contextMenu { if let model { TypeContextMenu(model: model, type: type, collapsed: box.collapsed) } }
     }
 }
 
@@ -444,6 +440,7 @@ private struct TypeContextMenu: View {
     @Environment(Workspace.self) private var workspace
     let model: DiagramEditorModel
     let type: DiagramType
+    let collapsed: Bool
 
     var body: some View {
         if !type.isExternal {
@@ -453,12 +450,41 @@ private struct TypeContextMenu: View {
                     Button(MemberKindText.title(kind)) { promptMember(kind) }
                 }
             }
+            if type.kind == .class || type.kind == .record {
+                Menu("Base Class", systemImage: "arrow.up.square") {
+                    Picker("Base Class", selection: Binding(get: { type.baseType ?? "" }, set: { base in
+                        Task { await model.setBaseList(type, baseType: base.isEmpty ? nil : base, interfaces: type.interfaces) }
+                    })) {
+                        Text("None").tag("")
+                        ForEach(model.baseCandidates(for: type)) { Text($0.displayName).tag($0.displayName) }
+                        if let base = type.baseType, !model.baseCandidates(for: type).contains(where: { $0.displayName == base }) {
+                            Text(base).tag(base)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                    .labelsHidden()
+                }
+            }
+            if type.kind != .enum {
+                Menu(type.kind == .interface ? "Extends Interfaces" : "Implements Interfaces", systemImage: "i.square") {
+                    let candidates = model.interfaceCandidates(for: type)
+                    if candidates.isEmpty {
+                        Text("The project has no interfaces")
+                    }
+                    ForEach(candidates) { candidate in
+                        Toggle(candidate.displayName, isOn: Binding(get: { type.interfaces.contains(candidate.displayName) }, set: { on in
+                            let list = on ? type.interfaces + [candidate.displayName] : type.interfaces.filter { $0 != candidate.displayName }
+                            Task { await model.setBaseList(type, baseType: type.baseType, interfaces: list) }
+                        }))
+                    }
+                }
+            }
             Button("Rename…", systemImage: "pencil") {
                 workspace.prompt = PromptRequest(title: String(localized: "Rename \(type.name)"), message: String(localized: "All references are updated."), placeholder: type.name, initialValue: type.name, confirmTitle: String(localized: "Rename")) { name in
                     await model.renameType(type, to: name)
                 }
             }
-            Button(model.layout.find(type.fullName)?.collapsed == true ? "Expand" : "Collapse", systemImage: "rectangle.compress.vertical") { model.toggleCollapsed(type.fullName) }
+            Button(collapsed ? "Expand" : "Collapse", systemImage: "rectangle.compress.vertical") { model.toggleCollapsed(type.fullName) }
             Divider()
         }
         Button("Remove from Diagram", systemImage: "eye.slash") { model.removeFromDiagram(type.fullName) }
@@ -507,7 +533,41 @@ enum MemberKindText {
     }
 
     static func example(_ kind: MemberKind) -> String {
-        String(localized: "UML notation: + public, - private, # protected, ~ internal. Example: \(placeholder(kind))")
+        switch kind {
+        case .constructor, .enumValue:
+            return String(localized: "UML notation: + public, - private, # protected, ~ internal. Example: \(placeholder(kind))")
+        default:
+            return String(localized: "Only the name is required: without a type it becomes int (events: EventHandler), without a symbol public. Optional UML notation: + public, - private, # protected, ~ internal. Example: \(placeholder(kind))")
+        }
+    }
+}
+
+/// Right-click on the empty canvas: create types at the click position, add existing types, arrange.
+private struct CanvasContextMenu: View {
+    let model: DiagramEditorModel
+    let newType: (DiagramTypeKind) -> Void
+    let fit: () -> Void
+
+    var body: some View {
+        Button("New Class…", systemImage: "c.square") { newType(.class) }
+        Button("New Interface…", systemImage: "i.square") { newType(.interface) }
+        Button("New Record…", systemImage: "r.square") { newType(.record) }
+        Button("New Struct…", systemImage: "s.square") { newType(.struct) }
+        Button("New Enum…", systemImage: "e.square") { newType(.enum) }
+        Divider()
+        Menu("Add Existing Type", systemImage: "plus.rectangle.on.rectangle") {
+            if model.missingTypes.isEmpty {
+                Text("All types are on the diagram")
+            } else {
+                Button("Add All") { model.addExisting(model.missingTypes.map(\.fullName)) }
+                Divider()
+                ForEach(model.missingTypes) { type in
+                    Button(type.displayName) { model.addExisting([type.fullName]) }
+                }
+            }
+        }
+        Button("Arrange automatically", systemImage: "wand.and.rays") { withAnimation(.snappy) { model.arrangeAll() } }
+        Button("Fit to window", systemImage: "arrow.up.left.and.down.right.magnifyingglass", action: fit)
     }
 }
 
@@ -642,24 +702,40 @@ private struct DiagramSnapshot: View {
     }
 }
 
-/// Two-finger scrolling pans the canvas (⌘ + scroll zooms). A local event monitor is used because SwiftUI has no
-/// scroll-wheel gesture on macOS; events outside the canvas pass through.
+/// Two-finger scrolling pans the canvas, pinching (or ⌘ + scroll) zooms around the pointer. A local event monitor is
+/// used because SwiftUI has no scroll-wheel gesture on macOS, and because a pinch must also work over the type boxes
+/// (a SwiftUI magnify gesture on the background never sees it there). Events outside the canvas pass through.
 @MainActor
 final class ScrollMonitor {
+    enum CanvasEvent {
+        case pan(CGSize)
+        case zoom(Double, around: CGPoint)
+    }
+
     private var monitor: Any?
 
-    func install(frame: @escaping @MainActor () -> CGRect, handler: @escaping @MainActor (CGSize, Bool) -> Void) {
+    func install(frame: @escaping @MainActor () -> CGRect, handler: @escaping @MainActor (CanvasEvent) -> Void) {
         remove()
-        monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
+        monitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel, .magnify]) { event in
             guard let window = event.window, let content = window.contentView else { return event }
             let point = event.locationInWindow
             let flipped = CGPoint(x: point.x, y: content.bounds.height - point.y)
-            let factor: CGFloat = event.hasPreciseScrollingDeltas ? 1 : 10
-            let delta = CGSize(width: event.scrollingDeltaX * factor, height: event.scrollingDeltaY * factor)
-            let isZoom = event.modifierFlags.contains(.command)
+            let canvasEvent: CanvasEvent
+            if event.type == .magnify {
+                canvasEvent = .zoom(1 + event.magnification, around: .zero)
+            } else {
+                let factor: CGFloat = event.hasPreciseScrollingDeltas ? 1 : 10
+                let delta = CGSize(width: event.scrollingDeltaX * factor, height: event.scrollingDeltaY * factor)
+                canvasEvent = event.modifierFlags.contains(.command) ? .zoom(1 + delta.height * 0.01, around: .zero) : .pan(delta)
+            }
             let handled = MainActor.assumeIsolated { () -> Bool in
-                guard frame().contains(flipped) else { return false }
-                handler(delta, isZoom)
+                let canvas = frame()
+                guard canvas.contains(flipped) else { return false }
+                let location = CGPoint(x: flipped.x - canvas.minX, y: flipped.y - canvas.minY)
+                switch canvasEvent {
+                case .pan: handler(canvasEvent)
+                case let .zoom(factor, _): handler(.zoom(factor, around: location))
+                }
                 return true
             }
             return handled ? nil : event

@@ -146,10 +146,23 @@ struct WorkspaceTests {
         let truck = try #require(model.model.find("Lib1.Truck"))
         await model.addMember(to: truck, kind: .property, text: "+ Wheels: int")
         #expect(try String(contentsOf: truckFile, encoding: .utf8).contains("public int Wheels { get; set; }"))
+        // Only a name: public and int by default.
+        await model.addMember(to: try #require(model.model.find("Lib1.Truck")), kind: .field, text: "Count")
+        #expect(try String(contentsOf: truckFile, encoding: .utf8).contains("public int Count;"))
         let car = try #require(model.model.find("Lib1.Car"))
         await model.connect(from: "Lib1.Truck", to: car.fullName)
         #expect(try String(contentsOf: truckFile, encoding: .utf8).contains("class Truck : Car"))
 
+        // Zoom and scroll position are written once, after the gestures stop.
+        let layoutFile = lib1.appendingPathComponent("Lib1.cd")
+        let savedLayout = try String(contentsOf: layoutFile, encoding: .utf8)
+        model.setView(zoom: 1.5, offset: CGPoint(x: 10, y: 20))
+        model.setView(zoom: 1.7, offset: CGPoint(x: 30, y: 40))
+        #expect(try String(contentsOf: layoutFile, encoding: .utf8) == savedLayout)
+        let viewSaved = await Samples.wait { model.layout.zoom == 1.7 }
+        #expect(viewSaved)
+
+        await model.undo()
         await model.undo()
         await model.undo()
         #expect(try !String(contentsOf: truckFile, encoding: .utf8).contains("Wheels"))

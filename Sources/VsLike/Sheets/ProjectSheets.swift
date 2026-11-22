@@ -205,6 +205,7 @@ struct ProjectPropertiesSheet: View {
     @State private var originalReferences: Set<String> = []
     @State private var error: String?
     @State private var isSaving = false
+    @State private var frameworks: [TargetFrameworkOption] = []
 
     private var candidates: [SolutionProject] {
         (workspace.solution?.projects ?? []).filter { $0.filePath != project }
@@ -253,12 +254,25 @@ struct ProjectPropertiesSheet: View {
         }
         .frame(width: 560, height: 620)
         .onAppear(perform: load)
+        .task {
+            if let runner = try? CommandRunner.dotnet() {
+                frameworks = DotnetLocator.targetFrameworks(for: await DotnetLocator.listSdks(runner: runner))
+            }
+        }
     }
 
     @ViewBuilder private func propertyField(_ key: String) -> some View {
         let binding = Binding(get: { values[key] ?? "" }, set: { values[key] = $0 })
         switch key {
-        case "Nullable":
+        case "TargetFramework":
+            Picker(key, selection: binding) {
+                ForEach(frameworks) { option in
+                    Text("\(option.moniker)  (.NET SDK \(option.sdkVersions.joined(separator: ", ")))").tag(option.moniker)
+                }
+                if let current = values[key], !current.isEmpty, !frameworks.contains(where: { $0.moniker == current }) {
+                    Text(current).tag(current)
+                }
+            }
             Picker(key, selection: binding) {
                 Text("–").tag("")
                 ForEach(["enable", "disable", "warnings", "annotations"], id: \.self) { Text($0).tag($0) }

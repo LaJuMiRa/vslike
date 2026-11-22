@@ -36,6 +36,20 @@ public enum DotnetLocator {
         .sorted { $0.version > $1.version }
     }
 
+    /// One target framework (`net10.0`) per installed SDK major.minor, newest first, with the SDKs that provide it.
+    public static func targetFrameworks(for sdks: [SdkInfo]) -> [TargetFrameworkOption] {
+        var options: [TargetFrameworkOption] = []
+        for sdk in sdks.sorted(by: { $0.version > $1.version }) {
+            let moniker = "net\(sdk.version.major).\(sdk.version.minor)"
+            if let index = options.firstIndex(where: { $0.moniker == moniker }) {
+                options[index] = TargetFrameworkOption(moniker: moniker, sdkVersions: options[index].sdkVersions + [sdk.fullVersion])
+            } else {
+                options.append(TargetFrameworkOption(moniker: moniker, sdkVersions: [sdk.fullVersion]))
+            }
+        }
+        return options
+    }
+
     public static func listSdks(runner: CommandRunner) async -> [SdkInfo] {
         guard let result = try? await runner.run(["--list-sdks"]), result.succeeded else {
             return []
@@ -50,6 +64,19 @@ public struct SdkInfo: Sendable, Hashable {
     public let path: String
 
     public var isSupported: Bool { version.major >= DotnetLocator.minimumMajorVersion }
+}
+
+/// A target framework moniker such as `net10.0` and the installed SDK versions that provide it (newest first).
+public struct TargetFrameworkOption: Sendable, Hashable, Identifiable {
+    public let moniker: String
+    public let sdkVersions: [String]
+
+    public var id: String { moniker }
+
+    public init(moniker: String, sdkVersions: [String]) {
+        self.moniker = moniker
+        self.sdkVersions = sdkVersions
+    }
 }
 
 /// `major.minor.patch` with an optional pre-release suffix (ignored for ordering of equal numbers).

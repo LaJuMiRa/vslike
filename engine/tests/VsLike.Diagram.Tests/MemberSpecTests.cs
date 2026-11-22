@@ -13,10 +13,10 @@ public sealed class MemberSpecTests
     }
 
     [Fact]
-    public void FieldDefaultsToPrivate_PropertyKeepsInitializer()
+    public void FieldDefaultsToPublic_PropertyKeepsInitializer()
     {
-        Assert.True(MemberSpec.TryParse(MemberKind.Field, "_count: int", "A", out var field));
-        Assert.Equal(Access.Private, field.Access);
+        Assert.True(MemberSpec.TryParse(MemberKind.Field, "_count: string", "A", out var field));
+        Assert.Equal((Access.Public, "string"), (field.Access, field.Type));
         Assert.True(MemberSpec.TryParse(MemberKind.Property, "+ Name: string = \"\"", "A", out var property));
         Assert.Equal(("Name", "string", "\"\""), (property.Name, property.Type, property.Value));
     }
@@ -26,15 +26,36 @@ public sealed class MemberSpecTests
     {
         Assert.True(MemberSpec.TryParse(MemberKind.Constructor, "id: int", "Order", out var ctor));
         Assert.Equal("Order(int)", ctor.Signature);
-        Assert.True(MemberSpec.TryParse(MemberKind.Method, "Run()", "A", out var run));
-        Assert.Equal("void", run.Type);
+        Assert.True(MemberSpec.TryParse(MemberKind.Method, "- Run(): void", "A", out var run));
+        Assert.Equal((Access.Private, "void"), (run.Access, run.Type));
         Assert.True(MemberSpec.TryParse(MemberKind.EnumValue, "Paid = 5", "Status", out var value));
         Assert.Equal("5", value.Value);
     }
 
     [Theory]
-    [InlineData(MemberKind.Property, "Name")]
-    [InlineData(MemberKind.Method, "Run(x): int")]
+    [InlineData(MemberKind.Field, "Count")]
+    [InlineData(MemberKind.Property, "Count")]
+    [InlineData(MemberKind.Method, "Count")]
+    [InlineData(MemberKind.Method, "Count()")]
+    [InlineData(MemberKind.Method, "+ Count: int")]
+    public void OnlyName_DefaultsToPublicInt(MemberKind kind, string text)
+    {
+        Assert.True(MemberSpec.TryParse(kind, text, "A", out var member));
+        Assert.Equal((Access.Public, "Count", "int"), (member.Access, member.Name, member.Type));
+    }
+
+    [Fact]
+    public void ParameterWithoutType_IsInt_EventWithoutType_IsEventHandler()
+    {
+        Assert.True(MemberSpec.TryParse(MemberKind.Method, "Add(a, b: long)", "A", out var add));
+        Assert.Equal(["int", "long"], add.ParameterList.Select(p => p.Type));
+        Assert.True(MemberSpec.TryParse(MemberKind.Event, "Changed", "A", out var changed));
+        Assert.Equal("EventHandler", changed.Type);
+    }
+
+    [Theory]
+    [InlineData(MemberKind.Property, "")]
+    [InlineData(MemberKind.Method, "Run(: int): int")]
     [InlineData(MemberKind.Field, "1abc: int")]
     public void Invalid_IsRejected(MemberKind kind, string text) => Assert.False(MemberSpec.TryParse(kind, text, "A", out _));
 }

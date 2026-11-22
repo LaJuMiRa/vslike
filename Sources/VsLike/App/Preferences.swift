@@ -45,6 +45,11 @@ final class Preferences {
 
     var recentSolutions: [String] { didSet { defaults.set(recentSolutions, forKey: "recentSolutions") } }
 
+    /// Folder suggested for new solutions (default ~/Developer).
+    var projectsFolder: URL { didSet { defaults.set(projectsFolder.path, forKey: "projectsFolder") } }
+
+    static let defaultProjectsFolder = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Developer")
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         styleCopByDefault = defaults.object(forKey: "styleCopByDefault") as? Bool ?? false
@@ -55,6 +60,7 @@ final class Preferences {
         appearance = Appearance(rawValue: defaults.string(forKey: "appearance") ?? "") ?? .system
         language = Language(rawValue: defaults.string(forKey: "language") ?? "") ?? .system
         recentSolutions = defaults.stringArray(forKey: "recentSolutions") ?? []
+        projectsFolder = defaults.string(forKey: "projectsFolder").map { URL(fileURLWithPath: $0) } ?? Self.defaultProjectsFolder
     }
 
     var editorFont: NSFont { NSFont.monospacedSystemFont(ofSize: fontSize, weight: .regular) }

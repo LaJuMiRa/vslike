@@ -176,6 +176,15 @@ struct ProjectsTests {
         #expect(sdks[0].isSupported && !sdks[2].isSupported)
     }
 
+    @Test func targetFrameworks_onePerSdkMajorMinorNewestFirst() {
+        let sdks = DotnetLocator.parseSdks("9.0.100 [/a]\n10.0.401 [/a]\n10.0.402 [/a]")
+
+        let options = DotnetLocator.targetFrameworks(for: sdks)
+
+        #expect(options.map(\.moniker) == ["net10.0", "net9.0"])
+        #expect(options[0].sdkVersions == ["10.0.402", "10.0.401"])
+    }
+
     @Test func solutionSettings_roundTrip() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: folder) }

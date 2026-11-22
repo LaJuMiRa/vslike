@@ -47,6 +47,8 @@ final class CodeTextView: NSTextView {
         scroll.backgroundColor = Palette.editorBackground
         scroll.verticalScroller = MarkerScroller()
         scroll.scrollerStyle = .overlay
+        // Since macOS 14 views do not clip by default; the ruler's separator line would run up through the tab bar.
+        scroll.clipsToBounds = true
         textView.minSize = NSSize(width: 0, height: 0)
         textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
         textView.isVerticallyResizable = true
@@ -54,6 +56,7 @@ final class CodeTextView: NSTextView {
         textView.autoresizingMask = [.width]
 
         let gutter = LineGutter(textView: textView)
+        gutter.clipsToBounds = true
         scroll.verticalRulerView = gutter
         scroll.hasVerticalRuler = true
         scroll.rulersVisible = true

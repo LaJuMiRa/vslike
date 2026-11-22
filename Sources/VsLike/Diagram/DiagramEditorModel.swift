@@ -33,20 +33,26 @@ final class DiagramEditorModel: Identifiable {
     @ObservationIgnored private var refreshTask: Task<Void, Never>?
     @ObservationIgnored private var undoStack: [UndoEntry] = []
     @ObservationIgnored private var redoStack: [UndoEntry] = []
+    @ObservationIgnored private var viewSaveTask: Task<Void, Never>?
 
-    private(set) var model = DiagramModel.empty
-    private(set) var layout: DiagramDocument
+    private(set) var model = DiagramModel.empty { didSet { updateGeometry() } }
+    private(set) var layout: DiagramDocument { didSet { updateGeometry() } }
     private(set) var isLoading = false
     private(set) var canUndo = false
     private(set) var canRedo = false
     var selection: String?
     var tool: Tool = .select
-    var showsExternal = true
+    var showsExternal = true { didSet { updateGeometry() } }
+
+    /// Boxes and relation lines, computed once per change of code, layout or filter (not on every redraw).
+    private(set) var boxes: [DiagramBox] = []
+    private(set) var edges: [DiagramEdge] = []
 
     init(url: URL, workspace: Workspace) {
         self.url = url
         self.workspace = workspace
         layout = DiagramDocument.load(url)
+        updateGeometry()
     }
 
     var name: String { DiagramDocument.name(of: url) }
@@ -70,12 +76,21 @@ final class DiagramEditorModel: Identifiable {
 
     var selectedType: DiagramType? { selection.flatMap(model.find) }
 
-    var boxes: [DiagramBox] {
+    private func updateGeometry() {
         let all = DiagramGeometry.boxes(model: model, document: layout)
-        return showsExternal ? all : all.filter { !$0.type.isExternal }
+        boxes = showsExternal ? all : all.filter { !$0.type.isExternal }
+        edges = DiagramGeometry.edges(model: model, boxes: boxes)
     }
 
-    var edges: [DiagramEdge] { DiagramGeometry.edges(model: model, boxes: boxes) }
+    /// Classes or records the type may derive from: same kind, not sealed or static, not itself.
+    func baseCandidates(for type: DiagramType) -> [DiagramType] {
+        model.types.filter { $0.kind == type.kind && $0.fullName != type.fullName && !$0.modifiers.contains(.sealed) && !$0.modifiers.contains(.static) }
+    }
+
+    /// Interfaces the type may implement (or, for an interface, extend).
+    func interfaceCandidates(for type: DiagramType) -> [DiagramType] {
+        model.types.filter { $0.kind == .interface && $0.fullName != type.fullName }
+    }
 
     /// Source types that are not on the diagram yet (for "Add existing type").
     var missingTypes: [DiagramType] {
@@ -176,12 +191,19 @@ final class DiagramEditorModel: Identifiable {
         if selection == fullName { selection = nil }
     }
 
+    /// Remembers zoom and scroll position. Written half a second after the last change, so that zooming and panning
+    /// do not rewrite the `.cd` file (and redraw every box) on each trackpad event.
     func setView(zoom: Double, offset: CGPoint) {
-        var next = layout
-        next.zoom = zoom
-        next.offsetX = offset.x
-        next.offsetY = offset.y
-        if next != layout { saveLayout(next) }
+        viewSaveTask?.cancel()
+        viewSaveTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled, let self else { return }
+            var next = layout
+            next.zoom = zoom
+            next.offsetX = offset.x
+            next.offsetY = offset.y
+            if next != layout { saveLayout(next) }
+        }
     }
 
     func setGrid(show: Bool, snap: Bool) {

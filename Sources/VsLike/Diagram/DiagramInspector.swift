@@ -34,13 +34,9 @@ private struct TypeInspector: View {
     @State private var newMemberKind = MemberKind.property
     @State private var newMemberText = ""
 
-    private var bases: [DiagramType] {
-        model.model.types.filter { $0.kind == type.kind && $0.fullName != type.fullName && !$0.modifiers.contains(.sealed) && !$0.modifiers.contains(.static) }
-    }
+    private var bases: [DiagramType] { model.baseCandidates(for: type) }
 
-    private var interfaces: [DiagramType] {
-        model.model.types.filter { $0.kind == .interface && $0.fullName != type.fullName }
-    }
+    private var interfaces: [DiagramType] { model.interfaceCandidates(for: type) }
 
     var body: some View {
         Form {
@@ -118,7 +114,7 @@ private struct TypeInspector: View {
                             .buttonStyle(.borderless)
                             .disabled(newMemberText.isEmpty)
                     }
-                    Text("+ public  - private  # protected  ~ internal").font(.caption2).foregroundStyle(.tertiary)
+                    Text("Only the name is required (default: public, int). Optional: + public  - private  # protected  ~ internal").font(.caption2).foregroundStyle(.tertiary)
                 }
             }
 

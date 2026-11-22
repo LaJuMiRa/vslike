@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+- Editor: Der feine graue Strich, der an der Kante der Zeilenleiste bis in Tableiste und Toolbar lief, ist weg (Zeilenleiste und Scrollbereich schneiden wieder an ihren Grenzen ab).
+- Klassendiagramm: Für neue Mitglieder genügt der Name. Ohne Typ wird es `int` (Ereignisse `EventHandler`, Parameter ohne Typ ebenfalls `int`), ohne Zugriffszeichen `public` (auch Felder, bisher `private`), Methoden brauchen keine Klammern. Typ und Zugriff können weiterhin in UML-Schreibweise angegeben werden.
+- Klassendiagramm: Rechtsklick auf eine freie Stelle öffnet ein Menü mit „Neue Klasse/Interface/Record/Struct/Enum …“ (an der Klickposition), „Vorhandenen Typ hinzufügen“, „Automatisch anordnen“ und „An Fenster anpassen“.
+- Klassendiagramm: Das Kontextmenü einer Box enthält „Basisklasse“ und „Implementiert Interfaces“ (bei Interfaces „Erweitert Interfaces“) zum direkten Setzen der Vererbung.
+- Klassendiagramm flüssiger bei vielen Typen: Zoom und Scrollposition werden erst 0,5 s nach der letzten Bewegung in die `.cd`-Datei geschrieben statt bei jedem Trackpad-Ereignis, Boxen und Linien werden nur noch bei Änderungen berechnet, nur die ausgewählte Box hat einen Schatten. Pinch-Zoom funktioniert jetzt auch über den Boxen (bisher nur auf freier Fläche).
+- Neue Solutions: Der Speicherort wird gemerkt und als Standard vorgeschlagen; einstellbar unter Einstellungen › Allgemein › „Ordner für neue Solutions“ (Standard weiterhin `~/Developer`).
+- Projekteigenschaften: TargetFramework ist ein Auswahlmenü mit einem Eintrag pro installierter SDK-Version (z. B. `net10.0 (.NET SDK 10.0.402, 10.0.401)`); ein abweichender Wert aus der Projektdatei bleibt wählbar.
+
 ## [1.0.1] - 2026-11-21
 
 - Die Analyse-Engine läuft mit jedem installierten .NET ab Version 10. Bisher brauchte sie die .NET-10-Laufzeit und startete auf einem Mac mit nur SDK 11 nicht.

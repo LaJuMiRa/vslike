@@ -20,6 +20,16 @@ struct SettingsView: View {
                     Text("Deutsch").tag(Preferences.Language.de)
                 }
                 Text("The language changes after restarting VsLike.").font(.caption).foregroundStyle(.secondary)
+                LabeledContent("Folder for new solutions") {
+                    HStack {
+                        Text((preferences.projectsFolder.path as NSString).abbreviatingWithTildeInPath).lineLimit(1).truncationMode(.middle)
+                        Button("Choose…") {
+                            if let url = OpenPanel.chooseFolder(message: String(localized: "Choose where new solutions are created")) {
+                                preferences.projectsFolder = url
+                            }
+                        }
+                    }
+                }
                 Toggle("StyleCop for new solutions", isOn: $preferences.styleCopByDefault)
                 Text("Each solution remembers its own setting in .vslike/settings.json; the toolbar button switches it.")
                     .font(.caption)
@@ -126,9 +136,9 @@ struct ReferencesSheet: View {
 /// Creates a solution with a first project: name, location, template.
 struct NewSolutionSheet: View {
     @Environment(Workspace.self) private var workspace
+    @Environment(Preferences.self) private var preferences
     @Environment(\.dismiss) private var dismiss
     @State private var name = "MyApp"
-    @State private var location = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Developer")
     @State private var templates: [ProjectTemplate] = []
     @State private var template = "console"
     @State private var withTests = false
@@ -142,10 +152,13 @@ struct NewSolutionSheet: View {
                 TextField("Name", text: $name)
                 LabeledContent("Location") {
                     HStack {
-                        Text((location.path as NSString).abbreviatingWithTildeInPath).lineLimit(1).truncationMode(.middle)
+                        Text((preferences.projectsFolder.path as NSString).abbreviatingWithTildeInPath).lineLimit(1).truncationMode(.middle)
                         Button("Choose…") {
-                            if let url = OpenPanel.chooseFolder(message: String(localized: "Choose where the solution folder is created")) { location = url }
+                            if let url = OpenPanel.chooseFolder(message: String(localized: "Choose where the solution folder is created")) {
+                                preferences.projectsFolder = url
+                            }
                         }
+                        .help("The folder is remembered for new solutions")
                     }
                 }
                 Toggle("Add a test project (xUnit)", isOn: $withTests)
@@ -182,7 +195,7 @@ struct NewSolutionSheet: View {
         defer { isWorking = false }
         do {
             let service = ProjectService(runner: try CommandRunner.dotnet())
-            let folder = location.appendingPathComponent(name)
+            let folder = preferences.projectsFolder.appendingPathComponent(name)
             let solution = try await service.createSolution(in: folder, name: name)
             let project = try await service.createProject(template: template, name: name, in: folder)
             try await service.addProject(project.path, to: solution.path)

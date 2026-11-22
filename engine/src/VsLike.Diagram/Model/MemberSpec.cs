@@ -2,15 +2,22 @@ namespace VsLike.Diagram.Model;
 
 /// <summary>
 /// Liest Mitglieder in der UML-Notation der Boxen: <c>+ Total(withTax: bool): decimal</c>, <c>- _items: List&lt;Item&gt;</c>,
-/// <c>Name: string = ""</c>. Das Zugriffssymbol (+ - # ~) ist optional (Standard: öffentlich, bei Feldern privat).
+/// <c>Name: string = ""</c>. Nur der Name ist Pflicht: ohne Zugriffssymbol (+ - # ~) ist das Mitglied öffentlich, ohne Typ
+/// <c>int</c> (Ereignisse: <c>EventHandler</c>), ohne Klammern hat eine Methode keine Parameter.
 /// </summary>
 public static class MemberSpec
 {
+    /// <summary>Typ für Felder, Properties, Methoden und Parameter, wenn keiner angegeben ist.</summary>
+    public const string DefaultType = "int";
+
+    /// <summary>Typ für Ereignisse, wenn keiner angegeben ist.</summary>
+    public const string DefaultEventType = "EventHandler";
+
     public static bool TryParse(MemberKind kind, string text, string ownerName, out DiagramMember member)
     {
         member = new DiagramMember(kind, string.Empty);
         var rest = text.Trim();
-        var access = kind == MemberKind.Field ? Access.Private : Access.Public;
+        var access = Access.Public;
         if (rest.Length > 0 && "+-#~".Contains(rest[0], StringComparison.Ordinal))
         {
             access = rest[0] switch { '+' => Access.Public, '-' => Access.Private, '#' => Access.Protected, _ => Access.Internal };
@@ -38,6 +45,13 @@ public static class MemberSpec
                     open = 0;
                     close = rest.Length - 1;
                 }
+                else if (open < 0)
+                {
+                    var colon = TopLevelIndexOf(rest, ':');
+                    open = colon < 0 ? rest.Length : colon;
+                    rest = rest.Insert(open, "()");
+                    close = open + 1;
+                }
                 else
                 {
                     return false;
@@ -48,12 +62,14 @@ public static class MemberSpec
             foreach (var part in SplitTopLevel(rest[(open + 1)..close], ','))
             {
                 var colon = part.IndexOf(':', StringComparison.Ordinal);
-                if (colon <= 0)
+                var parameterName = (colon < 0 ? part : part[..colon]).Trim();
+                var parameterType = colon < 0 ? string.Empty : part[(colon + 1)..].Trim();
+                if (!IsIdentifier(parameterName))
                 {
                     return false;
                 }
 
-                parameters.Add(new DiagramParameter(part[..colon].Trim(), part[(colon + 1)..].Trim()));
+                parameters.Add(new DiagramParameter(parameterName, parameterType.Length == 0 ? DefaultType : parameterType));
             }
 
             rest = rest[..open] + rest[(close + 1)..];
@@ -67,12 +83,22 @@ public static class MemberSpec
             name = ownerName;
         }
 
-        if (!IsIdentifier(name) || (kind is MemberKind.Field or MemberKind.Property or MemberKind.Event && type.Length == 0))
+        if (!IsIdentifier(name))
         {
             return false;
         }
 
-        member = new DiagramMember(kind, name, kind == MemberKind.Method && type.Length == 0 ? "void" : type, access, Parameters: parameters, Value: value);
+        if (type.Length == 0)
+        {
+            type = kind switch
+            {
+                MemberKind.Field or MemberKind.Property or MemberKind.Method => DefaultType,
+                MemberKind.Event => DefaultEventType,
+                _ => type,
+            };
+        }
+
+        member = new DiagramMember(kind, name, type, access, Parameters: parameters, Value: value);
         return true;
     }
 
