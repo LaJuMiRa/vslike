@@ -7,26 +7,16 @@ struct BottomPanel: View {
     @Environment(Workspace.self) private var workspace
 
     var body: some View {
-        @Bindable var workspace = workspace
         VStack(spacing: 0) {
-            HStack(spacing: 4) {
-                PanelTabButton(title: "Problems", symbol: "exclamationmark.bubble", tab: .problems, badge: workspace.diagnostics.all.count)
-                PanelTabButton(title: "Output", symbol: "text.alignleft", tab: .output, badge: 0)
-                PanelTabButton(title: "Terminal", symbol: "terminal", tab: .terminal, badge: workspace.terminals.sessions.count)
-                if workspace.debugger.isActive || !workspace.debugger.console.isEmpty {
-                    PanelTabButton(title: "Debug", symbol: "ladybug", tab: .debug, badge: 0)
-                }
-                Spacer()
-                PanelAccessory()
-                Button {
-                    withAnimation(.snappy) { workspace.isBottomPanelVisible = false }
-                } label: {
-                    Image(systemName: "chevron.down")
-                }
-                .buttonStyle(.borderless)
-                .help("Hide Panel (⌘J)")
+            // Narrow panels fall back to a compact filter, then to icon-only tabs, instead of growing wider than the
+            // window (which centred the whole panel and cut off both edges).
+            ViewThatFits(in: .horizontal) {
+                header(compactAccessory: false, iconOnlyTabs: false)
+                header(compactAccessory: true, iconOnlyTabs: false)
+                header(compactAccessory: true, iconOnlyTabs: true)
             }
-            .padding(.horizontal, 10)
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+            .clipped()
             .frame(height: 34)
             .background(.bar)
             .overlay(alignment: .top) { Divider() }
@@ -43,6 +33,27 @@ struct BottomPanel: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
+
+    private func header(compactAccessory: Bool, iconOnlyTabs: Bool) -> some View {
+        HStack(spacing: 4) {
+            PanelTabButton(title: "Problems", symbol: "exclamationmark.bubble", tab: .problems, badge: workspace.diagnostics.all.count, iconOnly: iconOnlyTabs)
+            PanelTabButton(title: "Output", symbol: "text.alignleft", tab: .output, badge: 0, iconOnly: iconOnlyTabs)
+            PanelTabButton(title: "Terminal", symbol: "terminal", tab: .terminal, badge: workspace.terminals.sessions.count, iconOnly: iconOnlyTabs)
+            if workspace.debugger.isActive || !workspace.debugger.console.isEmpty {
+                PanelTabButton(title: "Debug", symbol: "ladybug", tab: .debug, badge: 0, iconOnly: iconOnlyTabs)
+            }
+            Spacer(minLength: 8)
+            PanelAccessory(compact: compactAccessory)
+            Button {
+                withAnimation(.snappy) { workspace.isBottomPanelVisible = false }
+            } label: {
+                Image(systemName: "chevron.down")
+            }
+            .buttonStyle(.borderless)
+            .help("Hide Panel (⌘J)")
+        }
+        .padding(.horizontal, 10)
+    }
 }
 
 private struct PanelTabButton: View {
@@ -51,6 +62,7 @@ private struct PanelTabButton: View {
     let symbol: String
     let tab: BottomTab
     let badge: Int
+    var iconOnly = false
 
     var body: some View {
         let isSelected = workspace.bottomTab == tab
@@ -59,7 +71,9 @@ private struct PanelTabButton: View {
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: symbol)
-                Text(title)
+                if !iconOnly {
+                    Text(title)
+                }
                 if badge > 0 {
                     Text("\(badge)")
                         .font(.system(size: 10, weight: .semibold).monospacedDigit())
@@ -76,12 +90,15 @@ private struct PanelTabButton: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .help(Text(title))
     }
 }
 
 /// Filters and actions that belong to the selected panel tab.
 private struct PanelAccessory: View {
     @Environment(Workspace.self) private var workspace
+    /// Filters as pop-up menus and a narrower search field, for narrow panels.
+    var compact = false
 
     var body: some View {
         @Bindable var diagnostics = workspace.diagnostics
@@ -95,22 +112,18 @@ private struct PanelAccessory: View {
                     Text("Warnings").tag(DiagnosticsStore.Filter.warnings)
                     Text("StyleCop \(workspace.diagnostics.styleCopCount)").tag(DiagnosticsStore.Filter.styleCop)
                 }
-                .pickerStyle(.segmented)
-                .controlSize(.small)
-                .fixedSize()
+                .compactPickerStyle(compact)
                 TextField("Filter", text: $diagnostics.search)
                     .textFieldStyle(.roundedBorder)
                     .controlSize(.small)
-                    .frame(width: 160)
+                    .frame(width: compact ? 110 : 160)
             }
         case .output:
             HStack(spacing: 8) {
                 Picker("", selection: $output.selectedChannel) {
                     ForEach(OutputLog.Channel.allCases) { Text($0.title).tag($0) }
                 }
-                .pickerStyle(.segmented)
-                .controlSize(.small)
-                .fixedSize()
+                .compactPickerStyle(compact)
                 Button { workspace.output.clear(workspace.output.selectedChannel) } label: { Image(systemName: "trash") }
                     .buttonStyle(.borderless)
                     .help("Clear")
@@ -121,6 +134,18 @@ private struct PanelAccessory: View {
                 .help("New Terminal")
         case .debug:
             EmptyView()
+        }
+    }
+}
+
+private extension View {
+    /// Segmented filter, or a pop-up menu when the panel is narrow.
+    @ViewBuilder
+    func compactPickerStyle(_ compact: Bool) -> some View {
+        if compact {
+            pickerStyle(.menu).controlSize(.small).fixedSize()
+        } else {
+            pickerStyle(.segmented).controlSize(.small).fixedSize()
         }
     }
 }
