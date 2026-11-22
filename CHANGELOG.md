@@ -1,11 +1,14 @@
 # Changelog
 
-## [1.1.0] - 2026-11-22
+## [Unreleased]
 
 - Unteres Panel: Im Tab „Probleme“ (und „Ausgabe“) wird bei schmalem Fenster nichts mehr links und rechts abgeschnitten. Die Kopfzeile war mit Filter-Segmenten und Suchfeld breiter als der Platz, dadurch wurde das ganze Panel samt Tabelle zentriert und an beiden Rändern beschnitten. Jetzt werden die Filter bei wenig Platz zum Auswahlmenü und die Tabs zeigen zuletzt nur noch ihr Symbol (Name als Tooltip).
 - Editor: Enter in `void Run() {|}` (oder hinter getipptem `{}`) setzt `{` auf eine eigene Zeile unter die Deklaration, die Schreibmarke eingerückt in die Zeile darunter und `}` in die dritte Zeile. Steht `{` schon allein auf der Zeile oder in einem Kommentar, bleibt es stehen.
 - IntelliSense: Tab/Enter ersetzt das bisher getippte Wort. Öffnete sich die Liste nach einem Leerzeichen oder beim ersten Buchstaben, wurde bisher nur der Rest eingefügt (`vo` → `voidvo`).
 - Parameterhilfe bleibt nicht mehr hängen: Sie schließt, sobald die Schreibmarke die Argumentliste verlässt (Klick, Pfeiltasten, Enter, Löschen), und eine verspätete Antwort der Engine nach `)` öffnet sie nicht wieder.
+
+## [1.1.0] - 2026-11-22
+
 - Editor: Enter direkt hinter selbst getipptem `{}` öffnet den Block wie bei `{|}`: `{` bleibt stehen, die Schreibmarke steht eingerückt in der nächsten Zeile, `}` darunter auf eigener Zeile. Bisher entstand nur eine neue Zeile hinter `}`.
 - Neue Dateien verwenden einen Block-Namespace (`namespace Demo { … }`) mit eingerücktem Inhalt statt `namespace Demo;`: `Program.cs` und die übrigen Dateien neuer Projekte sowie neue Typen aus dem Klassendiagramm.
 - StyleCop-Einstellungsdatei: „Code › StyleCop-Einstellungen …“ (auch per Rechtsklick auf den StyleCop-Knopf der Toolbar) legt neben der Solution eine `stylecop.json` mit Firmenname und Copyright-Text an und öffnet sie. Die Vorgaben dafür stehen unter Einstellungen › StyleCop (Firmenname vorbelegt mit dem macOS-Benutzernamen). Der Fix für den fehlenden Dateikopf (SA1633) schreibt damit z. B. „Copyright (c) Acme. All rights reserved.“ statt „PlaceholderCompany“. Nach dem Speichern der `stylecop.json` gelten die Änderungen sofort für alle Dateien.
