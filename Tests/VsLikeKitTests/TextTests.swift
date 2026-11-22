@@ -106,6 +106,42 @@ struct TextTests {
         #expect(TextEditing.newlineLocation(for: 3, in: "a()" as NSString) == 3)
     }
 
+    @Test func newlineEdit_movesBraceAfterCodeOntoItsOwnLine() {
+        let text = "    public void test() {}\n" as NSString
+        let result = TextEditing.newlineEdit(at: 24, in: text)
+
+        #expect(TextEditing.apply([result.edit], to: text as String) == "    public void test()\n    {\n        \n    }\n")
+        #expect(result.caret == 37)
+    }
+
+    @Test func newlineEdit_afterTypedBracesAfterCodeOpensTheBlock() {
+        let text = "void Run() {}" as NSString
+        let result = TextEditing.newlineEdit(at: TextEditing.newlineLocation(for: 13, in: text), in: text)
+
+        #expect(TextEditing.apply([result.edit], to: text as String) == "void Run()\n{\n    \n}")
+        #expect(result.caret == 17)
+    }
+
+    @Test func newlineEdit_leavesBraceAloneOnItsLineAndInComments() {
+        let alone = "void Run()\n{}" as NSString
+        #expect(TextEditing.apply([TextEditing.newlineEdit(at: 12, in: alone).edit], to: alone as String) == "void Run()\n{\n    \n}")
+        let comment = "// see {" as NSString
+        #expect(TextEditing.newlineEdit(at: 8, in: comment).edit == TextEdit(start: 8, length: 0, newText: "\n    "))
+    }
+
+    @Test func completionEdits_replaceEverythingTypedSinceTheListOpened() {
+        // List opened after a space (empty span), then `vo` was typed: the insertion must replace `vo`.
+        let text = "static vo"
+        let empty = TextEditing.completionEdits([TextEdit(start: 7, length: 0, newText: "void")], spanStart: 7, caret: 9)
+        #expect(TextEditing.apply(empty, to: text) == "static void")
+        // List opened on `v`.
+        let one = TextEditing.completionEdits([TextEdit(start: 7, length: 1, newText: "void")], spanStart: 7, caret: 9)
+        #expect(TextEditing.apply(one, to: text) == "static void")
+        // Other edits (an added using) stay as they are.
+        let using = TextEdit(start: 0, length: 0, newText: "using System.Text;\n")
+        #expect(TextEditing.completionEdits([using, TextEdit(start: 7, length: 2, newText: "void")], spanStart: 7, caret: 9).first == using)
+    }
+
     @Test func toggleComment_commentsAndUncommentsLinesAtCommonIndent() {
         let text = "    a();\n      b();\n" as NSString
         let commented = TextEditing.toggleLineComment(in: text, range: NSRange(location: 0, length: text.length))

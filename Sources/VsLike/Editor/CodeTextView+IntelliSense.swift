@@ -121,7 +121,7 @@ extension CodeTextView {
                 undoManager?.beginUndoGrouping()
                 var caretShift = 0
                 var caret = end
-                for change in file.edits.sorted(by: { $0.start > $1.start }) {
+                for change in TextEditing.completionEdits(file.edits, spanStart: start, caret: end).sorted(by: { $0.start > $1.start }) {
                     let range = NSRange(location: change.start, length: change.length)
                     if shouldChangeText(in: range, replacementString: change.newText) {
                         textStorage?.replaceCharacters(in: range, with: change.newText)
@@ -166,13 +166,20 @@ extension CodeTextView {
             try? await Task.sleep(for: .milliseconds(30))
             workspace.syncNow(document)
             guard !Task.isCancelled else { return }
-            guard let help = try? await engine.signatureHelp(document.path, offset: offset), !help.signatures.isEmpty, !Task.isCancelled else {
+            let help = try? await engine.signatureHelp(document.path, offset: offset)
+            // A newer refresh or a dismissal took over meanwhile, or the caret has moved on.
+            guard !Task.isCancelled, selectedRange().location == offset else { return }
+            guard let help, !help.signatures.isEmpty, let window, window.firstResponder === self, let anchor = screenRect(at: offset) else {
                 signaturePopup.dismiss()
                 return
             }
-            guard let window, let anchor = screenRect(at: offset) else { return }
             signaturePopup.show(SignatureHelpCard(help: help), near: anchor, in: window, above: true)
         }
+    }
+
+    func dismissSignatureHelp() {
+        signatureTask?.cancel()
+        signaturePopup.dismiss()
     }
 
     func positionPopups() {

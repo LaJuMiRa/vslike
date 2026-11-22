@@ -330,6 +330,10 @@ final class CodeTextView: NSTextView {
             if completion.isVisible && (selectedRange().location < completionStart || selectedRange().length > 0) {
                 dismissCompletion()
             }
+            // Parameter info follows the caret and closes once it leaves the argument list.
+            if signaturePopup.isVisible {
+                refreshSignatureHelp()
+            }
         }
     }
 
@@ -375,7 +379,7 @@ final class CodeTextView: NSTextView {
             }
         }
         if event.keyCode == 53 {
-            if signaturePopup.isVisible { signaturePopup.dismiss(); return }
+            if signaturePopup.isVisible { dismissSignatureHelp(); return }
             if snippet != nil { snippet = nil; return }
         }
         super.keyDown(with: event)
@@ -406,13 +410,16 @@ final class CodeTextView: NSTextView {
     override func insertNewline(_ sender: Any?) {
         snippet = nil
         let string = self.string as NSString
-        var insertAt = selectedRange()
-        if insertAt.length == 0 {
-            insertAt.location = TextEditing.newlineLocation(for: insertAt.location, in: string)
+        let selection = selectedRange()
+        if selection.length > 0 {
+            let result = TextEditing.newline(at: selection.location, in: string)
+            insertText(result.text, replacementRange: selection)
+            setSelectedRange(NSRange(location: selection.location + result.caret, length: 0))
+        } else {
+            let result = TextEditing.newlineEdit(at: TextEditing.newlineLocation(for: selection.location, in: string), in: string)
+            insertText(result.edit.newText, replacementRange: NSRange(location: result.edit.start, length: result.edit.length))
+            setSelectedRange(NSRange(location: result.caret, length: 0))
         }
-        let result = TextEditing.newline(at: insertAt.location, in: string)
-        insertText(result.text, replacementRange: insertAt)
-        setSelectedRange(NSRange(location: insertAt.location + result.caret, length: 0))
         scrollRangeToVisible(selectedRange())
     }
 
@@ -516,7 +523,7 @@ final class CodeTextView: NSTextView {
         case "(", ",":
             refreshSignatureHelp()
         case ")":
-            signaturePopup.dismiss()
+            dismissSignatureHelp()
         default:
             break
         }
@@ -669,7 +676,7 @@ final class CodeTextView: NSTextView {
 
     override func resignFirstResponder() -> Bool {
         dismissCompletion()
-        signaturePopup.dismiss()
+        dismissSignatureHelp()
         hoverPopup.dismiss()
         needsDisplay = true
         return super.resignFirstResponder()

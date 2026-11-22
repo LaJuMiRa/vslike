@@ -72,6 +72,37 @@ public enum TextEditing {
         return (inserted, inserted.utf16.count)
     }
 
+    /// The edit for Return at `offset` (see `newline(at:in:)`) and the absolute caret offset after it. When `{` ends a
+    /// line of code (`void Run() {|}`), the brace moves onto its own line at the line's indentation first, so that the
+    /// block reads `void Run()` / `{` / caret line / `}`.
+    public static func newlineEdit(at offset: Int, in text: NSString) -> (edit: TextEdit, caret: Int) {
+        let inner = newline(at: offset, in: text)
+        let lineStart = text.lineRange(for: NSRange(location: min(offset, text.length), length: 0)).location
+        let before = text.substring(with: NSRange(location: lineStart, length: offset - lineStart))
+        let code = before.trimmingCharacters(in: .whitespaces)
+        let head = code.hasSuffix("{") ? String(code.dropLast()).trimmingCharacters(in: .whitespaces) : ""
+        guard !head.isEmpty, !head.hasSuffix("\""), !head.contains("//"), !head.hasPrefix("*"), !head.hasPrefix("/*") else {
+            return (TextEdit(start: offset, length: 0, newText: inner.text), offset + inner.caret)
+        }
+        // Replace from the end of the code before `{` (dropping the spaces in between) up to the caret.
+        let braceLine = "\n" + indentation(ofLineAt: offset, in: text) + "{"
+        let headEnd = lineStart + NSMaxRange((before as NSString).range(of: head, options: .backwards))
+        let replacement = braceLine + inner.text
+        return (TextEdit(start: headEnd, length: offset - headEnd, newText: replacement), headEnd + braceLine.utf16.count + inner.caret)
+    }
+
+    /// Adapts the edits of a resolved completion item to the current text. The engine computes them against the text
+    /// at the time the list opened, but the user may have typed more since (`vo` after a list opened on `v` or on a
+    /// space). The edit that replaces the completion span therefore has to reach up to the current caret.
+    public static func completionEdits(_ edits: [TextEdit], spanStart: Int, caret: Int) -> [TextEdit] {
+        edits.map { edit in
+            guard edit.start <= spanStart, edit.start + edit.length >= spanStart, edit.start + edit.length < caret else {
+                return edit
+            }
+            return TextEdit(start: edit.start, length: caret - edit.start, newText: edit.newText)
+        }
+    }
+
     /// The closing character auto-inserted after typing `character`, if any.
     public static func closingPair(for character: Character) -> Character? {
         switch character {
