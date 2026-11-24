@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=VsLike
+GenericName=C# IDE
+GenericName[de]=C#-Entwicklungsumgebung
+Comment=C# and .NET IDE with class diagrams, StyleCop and debugger
+Comment[de]=C#- und .NET-IDE mit Klassendiagramm, StyleCop und Debugger
+Exec=vslike %F
+Icon=vslike
+Terminal=false
+Categories=Development;IDE;
+Keywords=csharp;dotnet;roslyn;ide;
+MimeType=application/x-vslike-solution;application/x-vslike-csproj;text/x-csharp;application/x-vslike-classdiagram;inode/directory;
+StartupWMClass=VsLike

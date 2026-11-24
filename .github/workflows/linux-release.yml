@@ -1,0 +1,92 @@
+name: Linux release
+
+# Linux releases are separate from the macOS releases (release.yml, tags v*.*.*): tag linux-vX.Y.Z, version in
+# linux/VERSION. Builds tarball, Fedora RPM and Arch package for x86_64 and the tarball and RPM for aarch64.
+on:
+  push:
+    tags:
+      - "linux-v*.*.*"
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - arch: x64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Check out
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: engine/global.json
+
+      - name: Check version against tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#linux-v}"
+          if [[ "$(tr -d '[:space:]' < linux/VERSION)" != "$VERSION" ]]; then
+            echo "linux/VERSION does not match tag $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+
+      # The headless UI tests need no display; fonts are needed for text layout.
+      - name: Install fonts
+        run: sudo apt-get update -q && sudo apt-get install -y -q fontconfig fonts-dejavu-core
+
+      - name: Test, build and package
+        env:
+          ARCH: ${{ matrix.arch }}
+        run: linux/release-linux.sh
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: linux-${{ matrix.arch }}
+          path: |
+            linux/dist/*.tar.gz
+            linux/dist/*.sha256
+            linux/dist/*.rpm
+            linux/dist/*.pkg.tar.zst
+            linux/dist/arch/
+
+  release:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          path: artifacts
+      - name: Render PKGBUILD with both checksums
+        run: |
+          VERSION="${GITHUB_REF_NAME#linux-v}"
+          SHA_X64="$(cut -d' ' -f1 < artifacts/linux-x64/vslike-$VERSION-linux-x64.tar.gz.sha256)"
+          SHA_ARM64="$(cut -d' ' -f1 < artifacts/linux-arm64/vslike-$VERSION-linux-arm64.tar.gz.sha256)"
+          mkdir -p out
+          sed -e "s/__VERSION__/$VERSION/" -e "s/__SHA256_X64__/$SHA_X64/" -e "s/__SHA256_ARM64__/$SHA_ARM64/" \
+            linux/packaging/PKGBUILD.in > out/PKGBUILD
+          find artifacts -maxdepth 2 -type f \( -name '*.tar.gz' -o -name '*.sha256' -o -name '*.rpm' -o -name '*.pkg.tar.zst' \) -exec cp {} out/ \;
+          ls -l out
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#linux-v}"
+          NOTES="$(awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {f=1; next} /^## / {f=0} f' linux/CHANGELOG.md)"
+          printf '%s\n' "$NOTES" > release-notes.md
+          gh release create "$GITHUB_REF_NAME" out/* --title "VsLike for Linux $VERSION" --notes-file release-notes.md --latest=false

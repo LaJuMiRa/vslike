@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Results>
+    <UnitTestResult testName="Calc.Tests.MathTests.Add_Works" outcome="Passed" duration="00:00:00.0123000" />
+    <UnitTestResult testName="Calc.Tests.MathTests.Divide_ByZero" outcome="Failed" duration="00:00:01.5000000">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure</Message>
+          <StackTrace>   at Calc.Tests.MathTests.Divide_ByZero() in /src/Calc.Tests/MathTests.cs:line 21</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult testName="Calc.Tests.MathTests.Skip_Me" outcome="NotExecuted" duration="00:00:00" />
+  </Results>
+</TestRun>

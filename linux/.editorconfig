@@ -1,0 +1,38 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{csproj,props,targets,slnx,xml,axaml,json,yml,yaml,resx}]
+indent_size = 2
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning
+dotnet_sort_system_directives_first = true
+# Same StyleCop exceptions as engine/.editorconfig.
+dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1601.severity = none
+dotnet_diagnostic.SA1602.severity = none
+dotnet_diagnostic.SA1633.severity = none
+dotnet_diagnostic.SA1101.severity = none
+dotnet_diagnostic.SA1309.severity = none
+dotnet_diagnostic.SA1413.severity = none
+dotnet_diagnostic.SA1010.severity = none
+dotnet_diagnostic.SA1009.severity = none
+dotnet_diagnostic.SA1000.severity = none
+# Ports of Swift files keep related small types together in one file, like the Swift originals.
+dotnet_diagnostic.SA1402.severity = none
+dotnet_diagnostic.SA1649.severity = none
+dotnet_diagnostic.SA1201.severity = none
+dotnet_diagnostic.SA1202.severity = none
+dotnet_diagnostic.SA1204.severity = none
+
+# Tests mirror the Swift tests, which pass no cancellation tokens; the per-test timeouts bound them.
+[tests/**.cs]
+dotnet_diagnostic.xUnit1051.severity = none

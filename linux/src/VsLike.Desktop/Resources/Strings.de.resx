@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from Sources/VsLike/Resources/de.lproj/Localizable.strings. Keys are the Swift keys (English text with
+     printf placeholders such as %@ and %lld); values use .NET placeholders ({0}, {1}). -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="%@ %@ installed." xml:space="preserve"><value>{0} {1} installiert.</value></data>
+  <data name="%@ already exists." xml:space="preserve"><value>{0} gibt es bereits.</value></data>
+  <data name="%@ cannot derive from %@." xml:space="preserve"><value>{0} kann nicht von {1} abgeleitet werden.</value></data>
+  <data name="%@ removed." xml:space="preserve"><value>{0} entfernt.</value></data>
+  <data name="%@ downloads" xml:space="preserve"><value>{0} Downloads</value></data>
+  <data name="%lld in %lld files" xml:space="preserve"><value>{0} in {1} Dateien</value></data>
+  <data name="%lld projects loaded" xml:space="preserve"><value>{0} Projekte geladen</value></data>
+  <data name="%lld references" xml:space="preserve"><value>{0} Verweise</value></data>
+  <data name="%lld references will be updated." xml:space="preserve"><value>{0} Verweise werden angepasst.</value></data>
+  <data name="%lld tests failed" xml:space="preserve"><value>{0} Tests fehlgeschlagen</value></data>
+  <data name="%lld tests found" xml:space="preserve"><value>{0} Tests gefunden</value></data>
+  <data name="%lld tests passed" xml:space="preserve"><value>{0} Tests bestanden</value></data>
+  <data name="+ public  - private  # protected  ~ internal" xml:space="preserve"><value>+ public  - private  # protected  ~ internal</value></data>
+  <data name="Access" xml:space="preserve"><value>Zugriff</value></data>
+  <data name="Actual Size" xml:space="preserve"><value>Originalgröße</value></data>
+  <data name="Add" xml:space="preserve"><value>Hinzufügen</value></data>
+  <data name="Add %@" xml:space="preserve"><value>{0} hinzufügen</value></data>
+  <data name="Add All" xml:space="preserve"><value>Alle hinzufügen</value></data>
+  <data name="Add All %lld Types" xml:space="preserve"><value>Alle {0} Typen hinzufügen</value></data>
+  <data name="Add Member" xml:space="preserve"><value>Mitglied hinzufügen</value></data>
+  <data name="Add Project Reference…" xml:space="preserve"><value>Projektverweis hinzufügen …</value></data>
+  <data name="Add Project to %@" xml:space="preserve"><value>Projekt zu {0} hinzufügen</value></data>
+  <data name="Add Project…" xml:space="preserve"><value>Projekt hinzufügen …</value></data>
+  <data name="Add Types" xml:space="preserve"><value>Typen hinzufügen</value></data>
+  <data name="Add a test project (xUnit)" xml:space="preserve"><value>Testprojekt anlegen (xUnit)</value></data>
+  <data name="Add an xUnit, NUnit or MSTest project to the solution." xml:space="preserve"><value>Füge der Solution ein xUnit-, NUnit- oder MSTest-Projekt hinzu.</value></data>
+  <data name="Add existing types" xml:space="preserve"><value>Vorhandene Typen hinzufügen</value></data>
+  <data name="Add expression" xml:space="preserve"><value>Ausdruck hinzufügen</value></data>
+  <data name="All" xml:space="preserve"><value>Alle</value></data>
+  <data name="All references are updated." xml:space="preserve"><value>Alle Verweise werden angepasst.</value></data>
+  <data name="All types are on the diagram" xml:space="preserve"><value>Alle Typen sind im Diagramm</value></data>
+  <data name="Analysis" xml:space="preserve"><value>Analyse</value></data>
+  <data name="Analysis idle" xml:space="preserve"><value>Analyse inaktiv</value></data>
+  <data name="Analysis stopped" xml:space="preserve"><value>Analyse beendet</value></data>
+  <data name="Analysis unavailable" xml:space="preserve"><value>Analyse nicht verfügbar</value></data>
+  <data name="Appearance" xml:space="preserve"><value>Erscheinungsbild</value></data>
+  <data name="Arrange" xml:space="preserve"><value>Anordnen</value></data>
+  <data name="Arrange automatically" xml:space="preserve"><value>Automatisch anordnen</value></data>
+  <data name="Base Types" xml:space="preserve"><value>Basistypen</value></data>
+  <data name="Base class" xml:space="preserve"><value>Basisklasse</value></data>
+  <data name="Breakpoint Condition" xml:space="preserve"><value>Haltepunkt-Bedingung</value></data>
+  <data name="Breakpoints" xml:space="preserve"><value>Haltepunkte</value></data>
+  <data name="Browse" xml:space="preserve"><value>Durchsuchen</value></data>
+  <data name="Build" xml:space="preserve"><value>Build</value></data>
+  <data name="Build (⌘B)" xml:space="preserve"><value>Bauen (⌘B)</value></data>
+  <data name="Build Solution" xml:space="preserve"><value>Solution bauen</value></data>
+  <data name="Build cancelled" xml:space="preserve"><value>Build abgebrochen</value></data>
+  <data name="Build failed · %lld errors" xml:space="preserve"><value>Build fehlgeschlagen · {0} Fehler</value></data>
+  <data name="Build succeeded · %lld warnings · %@ s" xml:space="preserve"><value>Build erfolgreich · {0} Warnungen · {1} s</value></data>
+  <data name="Building" xml:space="preserve"><value>Baue</value></data>
+  <data name="C# for the Mac" xml:space="preserve"><value>C# für den Mac</value></data>
+  <data name="Call Stack" xml:space="preserve"><value>Aufrufliste</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Cannot open file" xml:space="preserve"><value>Datei kann nicht geöffnet werden</value></data>
+  <data name="Change %@" xml:space="preserve"><value>{0} ändern</value></data>
+  <data name="Change Base Types" xml:space="preserve"><value>Basistypen ändern</value></data>
+  <data name="Change Modifiers" xml:space="preserve"><value>Modifizierer ändern</value></data>
+  <data name="Choose a solution, project, folder or C# file" xml:space="preserve"><value>Wähle eine Solution, ein Projekt, einen Ordner oder eine C#-Datei</value></data>
+  <data name="Choose where the solution folder is created" xml:space="preserve"><value>Wähle, wo der Solution-Ordner angelegt wird</value></data>
+  <data name="Choose…" xml:space="preserve"><value>Auswählen …</value></data>
+  <data name="Class Diagram" xml:space="preserve"><value>Klassendiagramm</value></data>
+  <data name="Class Diagram (⇧⌘D)" xml:space="preserve"><value>Klassendiagramm (⇧⌘D)</value></data>
+  <data name="Clean Solution" xml:space="preserve"><value>Solution bereinigen</value></data>
+  <data name="Clean succeeded" xml:space="preserve"><value>Bereinigen erfolgreich</value></data>
+  <data name="Cleaning" xml:space="preserve"><value>Bereinige</value></data>
+  <data name="Clear" xml:space="preserve"><value>Leeren</value></data>
+  <data name="Click a line number to add one." xml:space="preserve"><value>Klicke auf eine Zeilennummer, um einen zu setzen.</value></data>
+  <data name="Click a type on the diagram to edit it." xml:space="preserve"><value>Klicke im Diagramm auf einen Typ, um ihn zu bearbeiten.</value></data>
+  <data name="Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Close Others" xml:space="preserve"><value>Andere schließen</value></data>
+  <data name="Close Solution" xml:space="preserve"><value>Solution schließen</value></data>
+  <data name="Close Tab" xml:space="preserve"><value>Tab schließen</value></data>
+  <data name="Close brackets and quotes automatically" xml:space="preserve"><value>Klammern und Anführungszeichen automatisch schließen</value></data>
+  <data name="Code" xml:space="preserve"><value>Code</value></data>
+  <data name="Collapse" xml:space="preserve"><value>Einklappen</value></data>
+  <data name="Command Palette" xml:space="preserve"><value>Befehlspalette</value></data>
+  <data name="Command Palette…" xml:space="preserve"><value>Befehlspalette …</value></data>
+  <data name="Configuration" xml:space="preserve"><value>Konfiguration</value></data>
+  <data name="Console app, library, tests, web …" xml:space="preserve"><value>Konsolen-App, Bibliothek, Tests, Web …</value></data>
+  <data name="Constructor" xml:space="preserve"><value>Konstruktor</value></data>
+  <data name="Continue" xml:space="preserve"><value>Fortsetzen</value></data>
+  <data name="Continue (⌘R)" xml:space="preserve"><value>Fortsetzen (⌘R)</value></data>
+  <data name="Copy" xml:space="preserve"><value>Kopieren</value></data>
+  <data name="Copy Message" xml:space="preserve"><value>Meldung kopieren</value></data>
+  <data name="Copy Path" xml:space="preserve"><value>Pfad kopieren</value></data>
+  <data name="Create" xml:space="preserve"><value>Anlegen</value></data>
+  <data name="Create %@" xml:space="preserve"><value>{0} anlegen</value></data>
+  <data name="Creates a file in %@ with the namespace of the folder." xml:space="preserve"><value>Legt eine Datei in {0} mit dem Namespace des Ordners an.</value></data>
+  <data name="Creating…" xml:space="preserve"><value>Wird angelegt …</value></data>
+  <data name="Cut" xml:space="preserve"><value>Ausschneiden</value></data>
+  <data name="Dark" xml:space="preserve"><value>Dunkel</value></data>
+  <data name="Debug" xml:space="preserve"><value>Debuggen</value></data>
+  <data name="Debug Console" xml:space="preserve"><value>Debug-Konsole</value></data>
+  <data name="Debugger" xml:space="preserve"><value>Debugger</value></data>
+  <data name="Debugging %@" xml:space="preserve"><value>Debugge {0}</value></data>
+  <data name="Debugging ended" xml:space="preserve"><value>Debuggen beendet</value></data>
+  <data name="Definitions" xml:space="preserve"><value>Definitionen</value></data>
+  <data name="Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Delete %@" xml:space="preserve"><value>{0} löschen</value></data>
+  <data name="Delete %@?" xml:space="preserve"><value>{0} löschen?</value></data>
+  <data name="Delete from Code…" xml:space="preserve"><value>Aus dem Code löschen …</value></data>
+  <data name="Delete member" xml:space="preserve"><value>Mitglied löschen</value></data>
+  <data name="Dependencies" xml:space="preserve"><value>Abhängigkeiten</value></data>
+  <data name="Discover Tests" xml:space="preserve"><value>Tests suchen</value></data>
+  <data name="Discovering tests…" xml:space="preserve"><value>Suche Tests …</value></data>
+  <data name="Don&#x27;t Save" xml:space="preserve"><value>Nicht sichern</value></data>
+  <data name="Done" xml:space="preserve"><value>Fertig</value></data>
+  <data name="Download the .NET SDK" xml:space="preserve"><value>.NET SDK herunterladen</value></data>
+  <data name="Each solution remembers its own setting in .vslike/settings.json; the toolbar button switches it." xml:space="preserve"><value>Jede Solution merkt sich ihre Einstellung in .vslike/settings.json; der Knopf in der Toolbar schaltet sie um.</value></data>
+  <data name="Editor" xml:space="preserve"><value>Editor</value></data>
+  <data name="Empty diagram" xml:space="preserve"><value>Leeres Diagramm</value></data>
+  <data name="Enum Value" xml:space="preserve"><value>Enum-Wert</value></data>
+  <data name="Errors" xml:space="preserve"><value>Fehler</value></data>
+  <data name="Errors %lld" xml:space="preserve"><value>Fehler {0}</value></data>
+  <data name="Evaluate expression" xml:space="preserve"><value>Ausdruck auswerten</value></data>
+  <data name="Event" xml:space="preserve"><value>Ereignis</value></data>
+  <data name="Export" xml:space="preserve"><value>Exportieren</value></data>
+  <data name="Export as PNG…" xml:space="preserve"><value>Als PNG exportieren …</value></data>
+  <data name="Export as SVG…" xml:space="preserve"><value>Als SVG exportieren …</value></data>
+  <data name="External code" xml:space="preserve"><value>Externer Code</value></data>
+  <data name="External type (read-only)" xml:space="preserve"><value>Externer Typ (schreibgeschützt)</value></data>
+  <data name="Field" xml:space="preserve"><value>Feld</value></data>
+  <data name="File" xml:space="preserve"><value>Datei</value></data>
+  <data name="Files" xml:space="preserve"><value>Dateien</value></data>
+  <data name="Filter" xml:space="preserve"><value>Filtern</value></data>
+  <data name="Find References" xml:space="preserve"><value>Verweise suchen</value></data>
+  <data name="Find in Files" xml:space="preserve"><value>In Dateien suchen</value></data>
+  <data name="Fit to window" xml:space="preserve"><value>An Fenster anpassen</value></data>
+  <data name="Fix All" xml:space="preserve"><value>Alle beheben</value></data>
+  <data name="Fix All StyleCop Issues" xml:space="preserve"><value>Alle StyleCop-Meldungen beheben</value></data>
+  <data name="Fix All StyleCop Issues in File" xml:space="preserve"><value>Alle StyleCop-Meldungen der Datei beheben</value></data>
+  <data name="Fixed %lld StyleCop rules" xml:space="preserve"><value>{0} StyleCop-Regeln behoben</value></data>
+  <data name="Fixes" xml:space="preserve"><value>Korrekturen</value></data>
+  <data name="Font size" xml:space="preserve"><value>Schriftgröße</value></data>
+  <data name="Format Document" xml:space="preserve"><value>Dokument formatieren</value></data>
+  <data name="Format document on save" xml:space="preserve"><value>Beim Sichern formatieren</value></data>
+  <data name="General" xml:space="preserve"><value>Allgemein</value></data>
+  <data name="Go" xml:space="preserve"><value>Los</value></data>
+  <data name="Go to Definition" xml:space="preserve"><value>Gehe zu Definition</value></data>
+  <data name="Go to Line" xml:space="preserve"><value>Gehe zu Zeile</value></data>
+  <data name="Go to Line…" xml:space="preserve"><value>Gehe zu Zeile …</value></data>
+  <data name="Go to Location" xml:space="preserve"><value>Zur Stelle springen</value></data>
+  <data name="Go to Test" xml:space="preserve"><value>Zum Test springen</value></data>
+  <data name="Grid and snapping" xml:space="preserve"><value>Raster und Einrasten</value></data>
+  <data name="Hide Panel" xml:space="preserve"><value>Panel ausblenden</value></data>
+  <data name="Hide Panel (⌘J)" xml:space="preserve"><value>Panel ausblenden (⌘J)</value></data>
+  <data name="In %@. A name without extension creates a C# class." xml:space="preserve"><value>In {0}. Ein Name ohne Endung legt eine C#-Klasse an.</value></data>
+  <data name="Inherit or implement: drag from the derived type to the base type" xml:space="preserve"><value>Ableiten oder implementieren: vom abgeleiteten Typ zum Basistyp ziehen</value></data>
+  <data name="Inspector" xml:space="preserve"><value>Inspektor</value></data>
+  <data name="Installed" xml:space="preserve"><value>Installiert</value></data>
+  <data name="Installed: %@" xml:space="preserve"><value>Installiert: {0}</value></data>
+  <data name="IntelliSense ready" xml:space="preserve"><value>IntelliSense bereit</value></data>
+  <data name="Invalid regular expression" xml:space="preserve"><value>Ungültiger regulärer Ausdruck</value></data>
+  <data name="Language" xml:space="preserve"><value>Sprache</value></data>
+  <data name="Larger Text" xml:space="preserve"><value>Größere Schrift</value></data>
+  <data name="Launch Profile" xml:space="preserve"><value>Startprofil</value></data>
+  <data name="Light" xml:space="preserve"><value>Hell</value></data>
+  <data name="Line %lld" xml:space="preserve"><value>Zeile {0}</value></data>
+  <data name="Line %lld. The program stops only when the expression is true; leave empty to always stop." xml:space="preserve"><value>Zeile {0}. Das Programm hält nur, wenn der Ausdruck wahr ist; leer lassen, um immer zu halten.</value></data>
+  <data name="Line 1 – %lld" xml:space="preserve"><value>Zeile 1 – {0}</value></data>
+  <data name="Lines" xml:space="preserve"><value>Zeilen</value></data>
+  <data name="Loading %@…" xml:space="preserve"><value>Lade {0} …</value></data>
+  <data name="Loading StyleCop…" xml:space="preserve"><value>Lade StyleCop …</value></data>
+  <data name="Loading solution…" xml:space="preserve"><value>Lade Solution …</value></data>
+  <data name="Location" xml:space="preserve"><value>Ort</value></data>
+  <data name="Manage NuGet Packages…" xml:space="preserve"><value>NuGet-Pakete verwalten …</value></data>
+  <data name="Match Case" xml:space="preserve"><value>Groß-/Kleinschreibung</value></data>
+  <data name="Members" xml:space="preserve"><value>Mitglieder</value></data>
+  <data name="Method" xml:space="preserve"><value>Methode</value></data>
+  <data name="Move" xml:space="preserve"><value>Verschieben</value></data>
+  <data name="Move to Trash" xml:space="preserve"><value>In den Papierkorb</value></data>
+  <data name="Move “%@” to the Trash?" xml:space="preserve"><value>„{0}“ in den Papierkorb legen?</value></data>
+  <data name="Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Navigate" xml:space="preserve"><value>Navigieren</value></data>
+  <data name="New %@" xml:space="preserve"><value>Neu: {0}</value></data>
+  <data name="New File" xml:space="preserve"><value>Neue Datei</value></data>
+  <data name="New File…" xml:space="preserve"><value>Neue Datei …</value></data>
+  <data name="New Folder" xml:space="preserve"><value>Neuer Ordner</value></data>
+  <data name="New Folder…" xml:space="preserve"><value>Neuer Ordner …</value></data>
+  <data name="New Solution" xml:space="preserve"><value>Neue Solution</value></data>
+  <data name="New Solution…" xml:space="preserve"><value>Neue Solution …</value></data>
+  <data name="New Terminal" xml:space="preserve"><value>Neues Terminal</value></data>
+  <data name="New class (click on the canvas)" xml:space="preserve"><value>Neue Klasse (auf die Fläche klicken)</value></data>
+  <data name="New enum" xml:space="preserve"><value>Neues Enum</value></data>
+  <data name="New interface" xml:space="preserve"><value>Neues Interface</value></data>
+  <data name="New record" xml:space="preserve"><value>Neuer Record</value></data>
+  <data name="New struct" xml:space="preserve"><value>Neue Struct</value></data>
+  <data name="No Selection" xml:space="preserve"><value>Keine Auswahl</value></data>
+  <data name="No StyleCop issues to fix in this file" xml:space="preserve"><value>Keine StyleCop-Meldungen in dieser Datei</value></data>
+  <data name="No Type Selected" xml:space="preserve"><value>Kein Typ ausgewählt</value></data>
+  <data name="No definition found" xml:space="preserve"><value>Keine Definition gefunden</value></data>
+  <data name="No matching problems" xml:space="preserve"><value>Keine passenden Probleme</value></data>
+  <data name="No problems" xml:space="preserve"><value>Keine Probleme</value></data>
+  <data name="No quick actions here" xml:space="preserve"><value>Hier gibt es keine Quick-Actions</value></data>
+  <data name="No results" xml:space="preserve"><value>Keine Treffer</value></data>
+  <data name="No solution loaded" xml:space="preserve"><value>Keine Solution geladen</value></data>
+  <data name="No startable project" xml:space="preserve"><value>Kein startbares Projekt</value></data>
+  <data name="No target" xml:space="preserve"><value>Kein Ziel</value></data>
+  <data name="No terminal" xml:space="preserve"><value>Kein Terminal</value></data>
+  <data name="No test projects" xml:space="preserve"><value>Keine Testprojekte</value></data>
+  <data name="None" xml:space="preserve"><value>Keine</value></data>
+  <data name="Not debugging" xml:space="preserve"><value>Kein Debuggen aktiv</value></data>
+  <data name="Not found" xml:space="preserve"><value>Nicht gefunden</value></data>
+  <data name="Nothing to rename here" xml:space="preserve"><value>Hier gibt es nichts umzubenennen</value></data>
+  <data name="NuGet Packages · %@" xml:space="preserve"><value>NuGet-Pakete · {0}</value></data>
+  <data name="Open" xml:space="preserve"><value>Öffnen</value></data>
+  <data name="Open Class Diagram" xml:space="preserve"><value>Klassendiagramm öffnen</value></data>
+  <data name="Open Documentation" xml:space="preserve"><value>Dokumentation öffnen</value></data>
+  <data name="Open Project File" xml:space="preserve"><value>Projektdatei öffnen</value></data>
+  <data name="Open Recent" xml:space="preserve"><value>Zuletzt geöffnet</value></data>
+  <data name="Open in Editor" xml:space="preserve"><value>Im Editor öffnen</value></data>
+  <data name="Open in Terminal" xml:space="preserve"><value>Im Terminal öffnen</value></data>
+  <data name="Open…" xml:space="preserve"><value>Öffnen …</value></data>
+  <data name="Output" xml:space="preserve"><value>Ausgabe</value></data>
+  <data name="Panel" xml:space="preserve"><value>Panel</value></data>
+  <data name="Parameter Info" xml:space="preserve"><value>Parameterinfo</value></data>
+  <data name="Paste" xml:space="preserve"><value>Einsetzen</value></data>
+  <data name="Pause" xml:space="preserve"><value>Anhalten</value></data>
+  <data name="Paused: %@" xml:space="preserve"><value>Angehalten: {0}</value></data>
+  <data name="Pick a type tool above and click on the canvas, or add the existing types." xml:space="preserve"><value>Wähle oben ein Typ-Werkzeug und klicke auf die Fläche, oder füge die vorhandenen Typen hinzu.</value></data>
+  <data name="Plain Text" xml:space="preserve"><value>Text</value></data>
+  <data name="Pre-release" xml:space="preserve"><value>Vorabversionen</value></data>
+  <data name="Problems" xml:space="preserve"><value>Probleme</value></data>
+  <data name="Project" xml:space="preserve"><value>Projekt</value></data>
+  <data name="Project References" xml:space="preserve"><value>Projektverweise</value></data>
+  <data name="Project name" xml:space="preserve"><value>Projektname</value></data>
+  <data name="Properties" xml:space="preserve"><value>Eigenschaften</value></data>
+  <data name="Properties…" xml:space="preserve"><value>Eigenschaften …</value></data>
+  <data name="Property" xml:space="preserve"><value>Property</value></data>
+  <data name="Quick Actions" xml:space="preserve"><value>Quick-Actions</value></data>
+  <data name="Quick Actions and Fixes" xml:space="preserve"><value>Quick-Actions und Korrekturen</value></data>
+  <data name="Quick Actions and Fixes…" xml:space="preserve"><value>Quick-Actions und Korrekturen …</value></data>
+  <data name="Quick Open" xml:space="preserve"><value>Schnell öffnen</value></data>
+  <data name="Quick Open…" xml:space="preserve"><value>Schnell öffnen …</value></data>
+  <data name="Ready" xml:space="preserve"><value>Bereit</value></data>
+  <data name="Reading types…" xml:space="preserve"><value>Lese Typen …</value></data>
+  <data name="Rebuild Solution" xml:space="preserve"><value>Solution neu bauen</value></data>
+  <data name="Rebuilding" xml:space="preserve"><value>Baue neu</value></data>
+  <data name="Recent" xml:space="preserve"><value>Zuletzt geöffnet</value></data>
+  <data name="Redo" xml:space="preserve"><value>Wiederholen</value></data>
+  <data name="Redo (⇧⌘Z)" xml:space="preserve"><value>Wiederholen (⇧⌘Z)</value></data>
+  <data name="Refactorings" xml:space="preserve"><value>Refactorings</value></data>
+  <data name="Regular Expression" xml:space="preserve"><value>Regulärer Ausdruck</value></data>
+  <data name="Relations" xml:space="preserve"><value>Beziehungen</value></data>
+  <data name="Reload" xml:space="preserve"><value>Neu laden</value></data>
+  <data name="Remove Project" xml:space="preserve"><value>Projekt entfernen</value></data>
+  <data name="Remove Reference" xml:space="preserve"><value>Verweis entfernen</value></data>
+  <data name="Remove from Diagram" xml:space="preserve"><value>Aus dem Diagramm entfernen</value></data>
+  <data name="Remove from List" xml:space="preserve"><value>Aus der Liste entfernen</value></data>
+  <data name="Remove from Solution" xml:space="preserve"><value>Aus der Solution entfernen</value></data>
+  <data name="Rename" xml:space="preserve"><value>Umbenennen</value></data>
+  <data name="Rename %@" xml:space="preserve"><value>{0} umbenennen</value></data>
+  <data name="Rename Symbol…" xml:space="preserve"><value>Symbol umbenennen …</value></data>
+  <data name="Rename…" xml:space="preserve"><value>Umbenennen …</value></data>
+  <data name="Replace" xml:space="preserve"><value>Ersetzen</value></data>
+  <data name="Replace All" xml:space="preserve"><value>Alle ersetzen</value></data>
+  <data name="Restart Analysis" xml:space="preserve"><value>Analyse neu starten</value></data>
+  <data name="Retry" xml:space="preserve"><value>Erneut versuchen</value></data>
+  <data name="Reveal in Finder" xml:space="preserve"><value>Im Finder zeigen</value></data>
+  <data name="Run" xml:space="preserve"><value>Starten</value></data>
+  <data name="Run with debugger (⌘R)" xml:space="preserve"><value>Mit Debugger starten (⌘R)</value></data>
+  <data name="Run All Tests" xml:space="preserve"><value>Alle Tests ausführen</value></data>
+  <data name="Run All Tests (⌘U)" xml:space="preserve"><value>Alle Tests ausführen (⌘U)</value></data>
+  <data name="Run Failed Tests" xml:space="preserve"><value>Fehlgeschlagene Tests ausführen</value></data>
+  <data name="Run Tests" xml:space="preserve"><value>Tests ausführen</value></data>
+  <data name="Run Without Debugging" xml:space="preserve"><value>Ohne Debugger starten</value></data>
+  <data name="Run starts your program here, so it can read input." xml:space="preserve"><value>Starten führt dein Programm hier aus, damit es Eingaben lesen kann.</value></data>
+  <data name="Run with Debugger" xml:space="preserve"><value>Mit Debugger starten</value></data>
+  <data name="Run: %@" xml:space="preserve"><value>Start: {0}</value></data>
+  <data name="Running %@" xml:space="preserve"><value>{0} läuft</value></data>
+  <data name="Running tests in %@…" xml:space="preserve"><value>Führe Tests in {0} aus …</value></data>
+  <data name="Running…" xml:space="preserve"><value>Läuft …</value></data>
+  <data name="Save" xml:space="preserve"><value>Sichern</value></data>
+  <data name="Save All" xml:space="preserve"><value>Alle sichern</value></data>
+  <data name="Save changes to %@?" xml:space="preserve"><value>Änderungen an {0} sichern?</value></data>
+  <data name="Save changes to %lld files?" xml:space="preserve"><value>Änderungen an {0} Dateien sichern?</value></data>
+  <data name="Saved %@" xml:space="preserve"><value>{0} gesichert</value></data>
+  <data name="Saving failed" xml:space="preserve"><value>Sichern fehlgeschlagen</value></data>
+  <data name="Search" xml:space="preserve"><value>Suchen</value></data>
+  <data name="Search nuget.org" xml:space="preserve"><value>nuget.org durchsuchen</value></data>
+  <data name="Select a package" xml:space="preserve"><value>Wähle ein Paket</value></data>
+  <data name="Select and move" xml:space="preserve"><value>Auswählen und verschieben</value></data>
+  <data name="Set" xml:space="preserve"><value>Setzen</value></data>
+  <data name="Set as Startup Project" xml:space="preserve"><value>Als Startprojekt festlegen</value></data>
+  <data name="Settings…" xml:space="preserve"><value>Einstellungen …</value></data>
+  <data name="Show Completions" xml:space="preserve"><value>Vervollständigung zeigen</value></data>
+  <data name="Show Output" xml:space="preserve"><value>Ausgabe zeigen</value></data>
+  <data name="Show Panel" xml:space="preserve"><value>Panel einblenden</value></data>
+  <data name="Show Problems" xml:space="preserve"><value>Probleme zeigen</value></data>
+  <data name="Show Problems (⇧⌘M)" xml:space="preserve"><value>Probleme zeigen (⇧⌘M)</value></data>
+  <data name="Show external types" xml:space="preserve"><value>Externe Typen zeigen</value></data>
+  <data name="Show in code" xml:space="preserve"><value>Im Code zeigen</value></data>
+  <data name="Show or hide the panel (⌘J)" xml:space="preserve"><value>Panel ein- oder ausblenden (⌘J)</value></data>
+  <data name="Show problems and breakpoints in the scroll bar" xml:space="preserve"><value>Probleme und Haltepunkte in der Scrollleiste zeigen</value></data>
+  <data name="Smaller Text" xml:space="preserve"><value>Kleinere Schrift</value></data>
+  <data name="Solution" xml:space="preserve"><value>Solution</value></data>
+  <data name="Solution, project, folder or file" xml:space="preserve"><value>Solution, Projekt, Ordner oder Datei</value></data>
+  <data name="Solutions you open appear here." xml:space="preserve"><value>Geöffnete Solutions erscheinen hier.</value></data>
+  <data name="Starting analysis…" xml:space="preserve"><value>Starte Analyse …</value></data>
+  <data name="Start Debugging" xml:space="preserve"><value>Debuggen starten</value></data>
+  <data name="Startup project" xml:space="preserve"><value>Startprojekt</value></data>
+  <data name="Step Into" xml:space="preserve"><value>Hineinspringen</value></data>
+  <data name="Step Into (F11)" xml:space="preserve"><value>Hineinspringen (F11)</value></data>
+  <data name="Step Out" xml:space="preserve"><value>Herausspringen</value></data>
+  <data name="Step Out (⇧F11)" xml:space="preserve"><value>Herausspringen (⇧F11)</value></data>
+  <data name="Step Over" xml:space="preserve"><value>Überspringen</value></data>
+  <data name="Step Over (F10)" xml:space="preserve"><value>Überspringen (F10)</value></data>
+  <data name="Stop" xml:space="preserve"><value>Stoppen</value></data>
+  <data name="Stop (⌘.)" xml:space="preserve"><value>Stoppen (⌘.)</value></data>
+  <data name="StyleCop %lld" xml:space="preserve"><value>StyleCop {0}</value></data>
+  <data name="StyleCop Analysis" xml:space="preserve"><value>StyleCop-Analyse</value></data>
+  <data name="StyleCop could not be downloaded. Check your internet connection and try again." xml:space="preserve"><value>StyleCop konnte nicht geladen werden. Prüfe die Internetverbindung und versuche es erneut.</value></data>
+  <data name="StyleCop for new solutions" xml:space="preserve"><value>StyleCop für neue Solutions</value></data>
+  <data name="StyleCop is off for this solution" xml:space="preserve"><value>StyleCop ist für diese Solution aus</value></data>
+  <data name="StyleCop is on for this solution" xml:space="preserve"><value>StyleCop ist für diese Solution an</value></data>
+  <data name="StyleCop off" xml:space="preserve"><value>StyleCop aus</value></data>
+  <data name="StyleCop on" xml:space="preserve"><value>StyleCop an</value></data>
+  <data name="System" xml:space="preserve"><value>System</value></data>
+  <data name="Terminal" xml:space="preserve"><value>Terminal</value></data>
+  <data name="Terminal (⌃`)" xml:space="preserve"><value>Terminal (⌃`)</value></data>
+  <data name="Tests" xml:space="preserve"><value>Tests</value></data>
+  <data name="The action made no changes" xml:space="preserve"><value>Die Aktion hat nichts geändert</value></data>
+  <data name="The analysis engine stopped (exit %d)." xml:space="preserve"><value>Der Analyse-Prozess wurde beendet (Code {0}).</value></data>
+  <data name="The built program was not found." xml:space="preserve"><value>Das gebaute Programm wurde nicht gefunden.</value></data>
+  <data name="The language changes after restarting VsLike." xml:space="preserve"><value>Die Sprache wechselt nach einem Neustart von VsLike.</value></data>
+  <data name="The program exited with code %lld." xml:space="preserve"><value>Das Programm wurde mit Code {0} beendet.</value></data>
+  <data name="The program is not paused." xml:space="preserve"><value>Das Programm ist nicht angehalten.</value></data>
+  <data name="The solution has no other projects." xml:space="preserve"><value>Die Solution hat keine weiteren Projekte.</value></data>
+  <data name="The type is removed from the code." xml:space="preserve"><value>Der Typ wird aus dem Code entfernt.</value></data>
+  <data name="The type is removed from the code. %lld references to it will no longer compile." xml:space="preserve"><value>Der Typ wird aus dem Code entfernt. {0} Verweise darauf lassen sich danach nicht mehr kompilieren.</value></data>
+  <data name="This solution has no project that can be started." xml:space="preserve"><value>Diese Solution hat kein startbares Projekt.</value></data>
+  <data name="This symbol cannot be renamed." xml:space="preserve"><value>Dieses Symbol kann nicht umbenannt werden.</value></data>
+  <data name="Threads" xml:space="preserve"><value>Threads</value></data>
+  <data name="Toggle Breakpoint" xml:space="preserve"><value>Haltepunkt umschalten</value></data>
+  <data name="Toggle Comment" xml:space="preserve"><value>Kommentar umschalten</value></data>
+  <data name="Turn StyleCop Off" xml:space="preserve"><value>StyleCop ausschalten</value></data>
+  <data name="Turn StyleCop On" xml:space="preserve"><value>StyleCop einschalten</value></data>
+  <data name="Type a command" xml:space="preserve"><value>Befehl eingeben</value></data>
+  <data name="Go to file" xml:space="preserve"><value>Gehe zu Datei</value></data>
+  <data name="Types" xml:space="preserve"><value>Typen</value></data>
+  <data name="UML notation: + public, - private, # protected, ~ internal. Example: %@" xml:space="preserve"><value>UML-Schreibweise: + public, - private, # protected, ~ internal. Beispiel: {0}</value></data>
+  <data name="Undo" xml:space="preserve"><value>Widerrufen</value></data>
+  <data name="Undo (⌘Z)" xml:space="preserve"><value>Widerrufen (⌘Z)</value></data>
+  <data name="Uninstall" xml:space="preserve"><value>Deinstallieren</value></data>
+  <data name="Install" xml:space="preserve"><value>Installieren</value></data>
+  <data name="Install Version" xml:space="preserve"><value>Version installieren</value></data>
+  <data name="Update available: %@" xml:space="preserve"><value>Update verfügbar: {0}</value></data>
+  <data name="Updates" xml:space="preserve"><value>Updates</value></data>
+  <data name="Variables" xml:space="preserve"><value>Variablen</value></data>
+  <data name="Version" xml:space="preserve"><value>Version</value></data>
+  <data name="View" xml:space="preserve"><value>Darstellung</value></data>
+  <data name="Wait until the solution is loaded" xml:space="preserve"><value>Warte, bis die Solution geladen ist</value></data>
+  <data name="Warnings" xml:space="preserve"><value>Warnungen</value></data>
+  <data name="Watch" xml:space="preserve"><value>Überwachen</value></data>
+  <data name="Whole Word" xml:space="preserve"><value>Ganzes Wort</value></data>
+  <data name="Your changes will be lost if you don&#x27;t save them." xml:space="preserve"><value>Deine Änderungen gehen verloren, wenn du sie nicht sicherst.</value></data>
+  <data name="Zoom in" xml:space="preserve"><value>Vergrößern</value></data>
+  <data name="Zoom out" xml:space="preserve"><value>Verkleinern</value></data>
+  <data name="projects" xml:space="preserve"><value>Projekte</value></data>
+  <data name="“%@” is not a valid member." xml:space="preserve"><value>„{0}“ ist kein gültiges Mitglied.</value></data>
+  <data name="“%@” is not a valid member. Example: + Total(withTax: bool): decimal" xml:space="preserve"><value>„{0}“ ist kein gültiges Mitglied. Beispiel: + Total(withTax: bool): decimal</value></data>
+  <data name="Empty folder" xml:space="preserve"><value>Leerer Ordner</value></data>
+  <data name="Errors, warnings and StyleCop findings appear here while you type." xml:space="preserve"><value>Fehler, Warnungen und StyleCop-Meldungen erscheinen hier schon beim Tippen.</value></data>
+  <data name="Change the filter to see more." xml:space="preserve"><value>Ändere den Filter, um mehr zu sehen.</value></data>
+  <data name="Debug: %@" xml:space="preserve"><value>Debuggen: {0}</value></data>
+  <data name="Attaching netcoredbg to %@ (process %d)…" xml:space="preserve"><value>Verbinde netcoredbg mit {0} (Prozess {1}) …</value></data>
+  <data name="The debug startup hook is missing from the app bundle." xml:space="preserve"><value>Der Debug-Starthelfer fehlt im App-Paket.</value></data>
+  <data name="Folder for new solutions" xml:space="preserve"><value>Ordner für neue Solutions</value></data>
+  <data name="Choose where new solutions are created" xml:space="preserve"><value>Ordner wählen, in dem neue Solutions angelegt werden</value></data>
+  <data name="The folder is remembered for new solutions" xml:space="preserve"><value>Der Ordner wird für neue Solutions gemerkt</value></data>
+  <data name="Extends Interfaces" xml:space="preserve"><value>Erweitert Interfaces</value></data>
+  <data name="Implements Interfaces" xml:space="preserve"><value>Implementiert Interfaces</value></data>
+  <data name="The project has no interfaces" xml:space="preserve"><value>Das Projekt hat keine Interfaces</value></data>
+  <data name="New Class…" xml:space="preserve"><value>Neue Klasse …</value></data>
+  <data name="New Interface…" xml:space="preserve"><value>Neues Interface …</value></data>
+  <data name="New Record…" xml:space="preserve"><value>Neuer Record …</value></data>
+  <data name="New Struct…" xml:space="preserve"><value>Neue Struct …</value></data>
+  <data name="New Enum…" xml:space="preserve"><value>Neue Enum …</value></data>
+  <data name="Add Existing Type" xml:space="preserve"><value>Vorhandenen Typ hinzufügen</value></data>
+  <data name="Only the name is required (default: public, int, methods void). Optional: + public  - private  # protected  ~ internal" xml:space="preserve"><value>Nur der Name ist Pflicht (Standard: public, int, Methoden void). Optional: + public  - private  # protected  ~ internal</value></data>
+  <data name="Only the name is required: without a type it becomes int (methods: void, events: EventHandler), without a symbol public. Optional UML notation: + public, - private, # protected, ~ internal. Example: %@" xml:space="preserve"><value>Nur der Name ist Pflicht: ohne Typ wird es int (Methoden: void, Ereignisse: EventHandler), ohne Zeichen public. Optional in UML-Schreibweise: + public, - private, # protected, ~ internal. Beispiel: {0}</value></data>
+  <data name="StyleCop Settings…" xml:space="preserve"><value>StyleCop-Einstellungen …</value></data>
+  <data name="StyleCop settings loaded" xml:space="preserve"><value>StyleCop-Einstellungen geladen</value></data>
+  <data name="Company name" xml:space="preserve"><value>Firmenname</value></data>
+  <data name="Copyright text" xml:space="preserve"><value>Copyright-Text</value></data>
+  <data name="Used when VsLike creates a stylecop.json for a solution (Code › StyleCop Settings…). {companyName} and {fileName} are replaced by StyleCop. An existing stylecop.json is edited directly and applies after saving." xml:space="preserve"><value>Wird verwendet, wenn VsLike für eine Solution eine stylecop.json anlegt (Code › StyleCop-Einstellungen …). {{companyName}} und {{fileName}} ersetzt StyleCop. Eine vorhandene stylecop.json bearbeitest du direkt; sie gilt nach dem Speichern.</value></data>
+</root>

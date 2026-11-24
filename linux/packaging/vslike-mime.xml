@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- File types VsLike opens, as in the macOS Info.plist (Solution, C# Project, Class Diagram; C# Source is text/x-csharp). -->
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-vslike-solution">
+    <comment>.NET solution</comment>
+    <comment xml:lang="de">.NET-Projektmappe</comment>
+    <glob pattern="*.sln"/>
+    <glob pattern="*.slnx"/>
+  </mime-type>
+  <mime-type type="application/x-vslike-csproj">
+    <comment>C# project</comment>
+    <comment xml:lang="de">C#-Projekt</comment>
+    <sub-class-of type="application/xml"/>
+    <glob pattern="*.csproj"/>
+  </mime-type>
+  <mime-type type="application/x-vslike-classdiagram">
+    <comment>Class diagram</comment>
+    <comment xml:lang="de">Klassendiagramm</comment>
+    <sub-class-of type="application/xml"/>
+    <glob pattern="*.cd"/>
+  </mime-type>
+</mime-info>

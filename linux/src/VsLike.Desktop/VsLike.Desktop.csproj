@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Port of Sources/VsLike: the Linux app (Avalonia). -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>VsLike.Desktop</RootNamespace>
+    <AssemblyName>vslike</AssemblyName>
+    <RollForward>Major</RollForward>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="VsLike.Desktop.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Iciclecreek.Avalonia.Terminal" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VsLike.Kit\VsLike.Kit.csproj" />
+  </ItemGroup>
+</Project>

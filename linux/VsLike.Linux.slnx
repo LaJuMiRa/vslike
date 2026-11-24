@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VsLike.Kit/VsLike.Kit.csproj" />
+    <Project Path="src/VsLike.Desktop/VsLike.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/VsLike.Kit.Tests/VsLike.Kit.Tests.csproj" />
+    <Project Path="tests/VsLike.Desktop.Tests/VsLike.Desktop.Tests.csproj" />
+  </Folder>
+</Solution>
