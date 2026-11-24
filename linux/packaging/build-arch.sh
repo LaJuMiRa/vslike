@@ -24,9 +24,8 @@ sed -e "s/__VERSION__/$VERSION/" -e "s/__SHA256_X64__/$SHA_X64/" -e "s/__SHA256_
 
 # makepkg must not run as root; the local tarball has the same name as the release download, so it is not fetched.
 INNER='set -euo pipefail
-# pacman cannot switch to its sandbox user under emulation (x86_64 container on an arm64 host).
-grep -q "^DisableSandbox" /etc/pacman.conf || sed -i "/^\[options\]/a DisableSandbox" /etc/pacman.conf
-pacman -Sy --noconfirm --needed base-devel >/dev/null
+# pacman cannot use its sandbox under emulation (x86_64 container on an arm64 host).
+pacman -Sy --disable-sandbox --noconfirm --needed base-devel >/dev/null
 useradd -m builder
 work=/home/builder/pkg
 mkdir -p "$work"

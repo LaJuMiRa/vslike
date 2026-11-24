@@ -51,3 +51,7 @@ cp -a usr %{buildroot}/
 /usr/share/applications/vslike.desktop
 /usr/share/mime/packages/vslike.xml
 /usr/share/icons/hicolor/*/apps/vslike.png
+
+%changelog
+* Tue Nov 24 2026 VsLike contributors - 1.1.1-1
+- First Linux release, same features as VsLike 1.1.1 for macOS
