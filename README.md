@@ -1,8 +1,8 @@
 # VsLike
 
-**Eine native C#-IDE für macOS.** Editor mit IntelliSense, Build, Tests, Debugger, StyleCop und ein Klassendiagramm,
-das direkt in den Code schreibt. Die Oberfläche ist in Swift geschrieben (SwiftUI und AppKit), die C#-Analyse übernimmt
-Roslyn in einem Hintergrundprozess. Keine Telemetrie, Lizenz MIT.
+**Eine native C#-IDE für macOS und Linux.** Editor mit IntelliSense, Build, Tests, Debugger, StyleCop und ein Klassendiagramm,
+das direkt in den Code schreibt. Die macOS-Oberfläche ist in Swift geschrieben (SwiftUI und AppKit), die Linux-Oberfläche mit Avalonia; die C#-Analyse
+übernimmt auf beiden Roslyn in einem Hintergrundprozess. Keine Telemetrie, Lizenz MIT.
 
 ![Editor mit Live-Diagnosen und Probleme-Panel](docs/images/editor.png)
 
@@ -32,6 +32,10 @@ umfasst Diagramm und Code gemeinsam, Export als SVG oder PNG.
 
 ## Installation
 
+VsLike gibt es für macOS und für Linux (Fedora, Arch). Die Linux-Anleitung steht [weiter unten](#linux-fedora-arch).
+
+### macOS
+
 Voraussetzungen: Mac mit Apple Silicon, macOS 26 oder neuer und ein .NET SDK ab Version 10
 (`brew install --cask dotnet-sdk`). Der Startbildschirm zeigt an, ob ein passendes SDK gefunden wurde.
 
@@ -45,6 +49,42 @@ einmal unter *Systemeinstellungen › Datenschutz & Sicherheit › „Dennoch ö
 ```sh
 xattr -dr com.apple.quarantine /Applications/VsLike.app
 ```
+
+### Linux (Fedora, Arch)
+
+Voraussetzungen: x86_64 oder arm64 (Arch-Paket nur x86_64), ein Desktop mit X11 (die App nutzt die X11-Bibliotheken) und ein .NET SDK ab
+Version 10. Fedora- und Arch-Pakete ziehen das SDK automatisch nach. Die Pakete liegen bei den
+[GitHub-Releases](../../releases) mit dem Tag `linux-vX.Y.Z` (Release „VsLike for Linux“), getrennt von den macOS-Releases.
+
+**Fedora** (RPM für x86_64 und aarch64, Installation und Start getestet auf Fedora 43 arm64):
+
+```sh
+sudo dnf install ./vslike-<version>-1.fc43.x86_64.rpm      # auf arm64: ...aarch64.rpm
+```
+
+**Arch Linux** (Paket `vslike-bin`, x86_64):
+
+```sh
+sudo pacman -U vslike-bin-<version>-1-x86_64.pkg.tar.zst
+```
+
+**Andere Distributionen** (Tarball für x64 und arm64; das .NET SDK 10 oder neuer, `fontconfig` und die X11-Bibliotheken
+`libX11`, `libICE`, `libSM`, `libXcursor`, `libXi`, `libXrandr` müssen vorhanden sein):
+
+```sh
+sha256sum -c vslike-<version>-linux-x64.tar.gz.sha256
+sudo tar -xzf vslike-<version>-linux-x64.tar.gz -C /
+```
+
+Das Archiv enthält einen fertigen `usr/`-Baum (Starter `/usr/bin/vslike`, App in `/usr/lib/vslike`). Der Pfad ist im Starter
+fest eingetragen, das Archiv muss deshalb nach `/` entpackt werden. Zum Entfernen die Dateien unter `/usr/bin/vslike`,
+`/usr/lib/vslike` und `/usr/share/{applications,icons,mime,licenses}` mit dem Namen `vslike` löschen.
+
+Gestartet wird über den Anwendungsmenü-Eintrag „VsLike“ oder im Terminal mit `vslike [Solution, Projekt, Ordner oder Datei]`.
+Der Startbildschirm zeigt an, ob ein passendes SDK gefunden wurde. Einstellungen liegen unter `~/.config/vslike`, der
+Zwischenspeicher unter `~/.cache/vslike`. Tastenkürzel: ⌘ wird zu Strg, ⌥ zu Alt, ⌃⌘R zu Strg+Alt+R.
+
+Die Pakete sind nicht signiert. Deinstallieren: `sudo dnf remove vslike` bzw. `sudo pacman -R vslike-bin`.
 
 ## Aus dem Quellcode bauen
 
