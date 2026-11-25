@@ -1,8 +1,84 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="VsLike.Desktop.App"
+             Name="VsLike"
              RequestedThemeVariant="Default">
+  <!--
+    VsLike's own look (port of the Palette in EditorTheme.swift plus the macOS system colours the SwiftUI views use):
+    slate surfaces with an amber accent, every colour for light and dark.
+  -->
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <Color x:Key="SystemAccentColor">#CC8514</Color>
+          <SolidColorBrush x:Key="VsAccent" Color="#CC8514" />
+          <SolidColorBrush x:Key="EditorBackground" Color="#FEFEFF" />
+          <SolidColorBrush x:Key="WindowBackground" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="SidebarBackground" Color="#EDEDEF" />
+          <SolidColorBrush x:Key="BarBackground" Color="#F7F7F8" />
+          <SolidColorBrush x:Key="Separator" Color="#1A000000" />
+          <SolidColorBrush x:Key="TextPrimary" Color="#E0000000" />
+          <SolidColorBrush x:Key="TextSecondary" Color="#85000000" />
+          <SolidColorBrush x:Key="TextTertiary" Color="#45000000" />
+          <SolidColorBrush x:Key="FillQuaternary" Color="#12000000" />
+          <SolidColorBrush x:Key="FillCapsule" Color="#0C000000" />
+          <SolidColorBrush x:Key="FillHover" Color="#0F000000" />
+          <SolidColorBrush x:Key="FillSelected" Color="#14000000" />
+          <SolidColorBrush x:Key="RowAlternate" Color="#08000000" />
+          <SolidColorBrush x:Key="ControlBackground" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="IconKnockout" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PopupBackground" Color="#F2F7F7F8" />
+          <SolidColorBrush x:Key="Scrim" Color="#1F000000" />
+          <SolidColorBrush x:Key="FolderTint" Color="#D930B0C7" />
+          <SolidColorBrush x:Key="SyntaxText" Color="#1F2329" />
+          <SolidColorBrush x:Key="SyntaxType" Color="#00796B" />
+          <SolidColorBrush x:Key="SyntaxParameter" Color="#7A4F12" />
+          <SolidColorBrush x:Key="SyntaxString" Color="#A35A00" />
+          <SolidColorBrush x:Key="InputBackground" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="InputBorder" Color="#26000000" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <Color x:Key="SystemAccentColor">#F2B34A</Color>
+          <SolidColorBrush x:Key="VsAccent" Color="#F2B34A" />
+          <SolidColorBrush x:Key="EditorBackground" Color="#1B1D22" />
+          <SolidColorBrush x:Key="WindowBackground" Color="#1E1F22" />
+          <SolidColorBrush x:Key="SidebarBackground" Color="#26272A" />
+          <SolidColorBrush x:Key="BarBackground" Color="#232428" />
+          <SolidColorBrush x:Key="Separator" Color="#1FFFFFFF" />
+          <SolidColorBrush x:Key="TextPrimary" Color="#E6FFFFFF" />
+          <SolidColorBrush x:Key="TextSecondary" Color="#8CFFFFFF" />
+          <SolidColorBrush x:Key="TextTertiary" Color="#45FFFFFF" />
+          <SolidColorBrush x:Key="FillQuaternary" Color="#14FFFFFF" />
+          <SolidColorBrush x:Key="FillCapsule" Color="#12FFFFFF" />
+          <SolidColorBrush x:Key="FillHover" Color="#12FFFFFF" />
+          <SolidColorBrush x:Key="FillSelected" Color="#1AFFFFFF" />
+          <SolidColorBrush x:Key="RowAlternate" Color="#08FFFFFF" />
+          <SolidColorBrush x:Key="ControlBackground" Color="#3A3B3F" />
+          <SolidColorBrush x:Key="IconKnockout" Color="#1E1F22" />
+          <SolidColorBrush x:Key="PopupBackground" Color="#F22A2B2F" />
+          <SolidColorBrush x:Key="Scrim" Color="#38000000" />
+          <SolidColorBrush x:Key="FolderTint" Color="#D940C8E0" />
+          <SolidColorBrush x:Key="SyntaxText" Color="#DCDFE6" />
+          <SolidColorBrush x:Key="SyntaxType" Color="#6CD4C4" />
+          <SolidColorBrush x:Key="SyntaxParameter" Color="#F2D7A6" />
+          <SolidColorBrush x:Key="SyntaxString" Color="#F2C97D" />
+          <SolidColorBrush x:Key="InputBackground" Color="#2A2B2F" />
+          <SolidColorBrush x:Key="InputBorder" Color="#26FFFFFF" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+      <SolidColorBrush x:Key="VsError" Color="#ED544F" />
+      <SolidColorBrush x:Key="VsWarning" Color="#EDAD33" />
+      <SolidColorBrush x:Key="VsInfo" Color="#5C9EF2" />
+      <SolidColorBrush x:Key="VsStyleCop" Color="#54B8AD" />
+      <SolidColorBrush x:Key="VsSuccess" Color="#4DBD73" />
+      <SolidColorBrush x:Key="Breakpoint" Color="#E64D45" />
+      <x:Double x:Key="ControlContentThemeFontSize">13</x:Double>
+    </ResourceDictionary>
+  </Application.Resources>
   <Application.Styles>
     <FluentTheme />
+    <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    <StyleInclude Source="avares://vslike/App/Styles.axaml" />
   </Application.Styles>
 </Application>

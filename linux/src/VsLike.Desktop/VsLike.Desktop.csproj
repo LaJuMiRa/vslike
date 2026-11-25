@@ -20,6 +20,10 @@
     <PackageReference Include="Iciclecreek.Avalonia.Terminal" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Window icon: the same PNG the packages install into the icon theme. -->
+    <AvaloniaResource Include="..\..\packaging\icons\vslike-256.png" Link="Assets/vslike-256.png" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\VsLike.Kit\VsLike.Kit.csproj" />
   </ItemGroup>
 </Project>

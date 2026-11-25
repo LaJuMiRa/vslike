@@ -1,0 +1,1 @@
+- CHANGELOG: Vor einem Eintrag `git tag --sort=-creatordate | head -1` prüfen. Ist die oberste Version schon getaggt, neue Einträge unter `## [Unreleased]` statt unter die veröffentlichte Version schreiben (Fehler vom 2026-11-22: Fixes nach v1.1.0 landeten im 1.1.0-Abschnitt).

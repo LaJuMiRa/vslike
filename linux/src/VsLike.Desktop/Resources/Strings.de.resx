@@ -56,7 +56,7 @@
   <data name="Build failed · %lld errors" xml:space="preserve"><value>Build fehlgeschlagen · {0} Fehler</value></data>
   <data name="Build succeeded · %lld warnings · %@ s" xml:space="preserve"><value>Build erfolgreich · {0} Warnungen · {1} s</value></data>
   <data name="Building" xml:space="preserve"><value>Baue</value></data>
-  <data name="C# for the Mac" xml:space="preserve"><value>C# für den Mac</value></data>
+  <data name="C# for the Mac" xml:space="preserve"><value>C# für Linux</value></data>
   <data name="Call Stack" xml:space="preserve"><value>Aufrufliste</value></data>
   <data name="Cancel" xml:space="preserve"><value>Abbrechen</value></data>
   <data name="Cannot open file" xml:space="preserve"><value>Datei kann nicht geöffnet werden</value></data>
@@ -392,4 +392,22 @@
   <data name="Company name" xml:space="preserve"><value>Firmenname</value></data>
   <data name="Copyright text" xml:space="preserve"><value>Copyright-Text</value></data>
   <data name="Used when VsLike creates a stylecop.json for a solution (Code › StyleCop Settings…). {companyName} and {fileName} are replaced by StyleCop. An existing stylecop.json is edited directly and applies after saving." xml:space="preserve"><value>Wird verwendet, wenn VsLike für eine Solution eine stylecop.json anlegt (Code › StyleCop-Einstellungen …). {{companyName}} und {{fileName}} ersetzt StyleCop. Eine vorhandene stylecop.json bearbeitest du direkt; sie gilt nach dem Speichern.</value></data>
+  <data name="Edit" xml:space="preserve"><value>Bearbeiten</value></data>
+  <data name="Quit VsLike" xml:space="preserve"><value>VsLike beenden</value></data>
+  <data name="Hide Sidebar" xml:space="preserve"><value>Seitenleiste ausblenden</value></data>
+  <data name="Show Sidebar" xml:space="preserve"><value>Seitenleiste einblenden</value></data>
+  <data name="Menu" xml:space="preserve"><value>Menü</value></data>
+  <data name="Minimize" xml:space="preserve"><value>Minimieren</value></data>
+  <data name="Zoom" xml:space="preserve"><value>Zoomen</value></data>
+  <data name="OK" xml:space="preserve"><value>OK</value></data>
+  <data name="Open Folder…" xml:space="preserve"><value>Ordner öffnen…</value></data>
+  <data name="Solutions, projects and C# files" xml:space="preserve"><value>Solutions, Projekte und C#-Dateien</value></data>
+  <data name="Show in File Manager" xml:space="preserve"><value>Im Dateimanager anzeigen</value></data>
+  <data name="Message" xml:space="preserve"><value>Meldung</value></data>
+  <data name="Diagram" xml:space="preserve"><value>Diagramm</value></data>
+  <data name="Expand" xml:space="preserve"><value>Einblenden</value></data>
+  <data name="Thread %lld" xml:space="preserve"><value>Thread {0}</value></data>
+  <data name=".NET SDK %@" xml:space="preserve"><value>.NET SDK {0}</value></data>
+  <data name="The .NET SDK is not installed" xml:space="preserve"><value>Das .NET SDK ist nicht installiert</value></data>
+  <data name="VsLike needs the .NET SDK 10 or newer (found %@)" xml:space="preserve"><value>VsLike braucht das .NET SDK 10 oder neuer (gefunden: {0})</value></data>
 </root>

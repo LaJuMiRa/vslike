@@ -1,0 +1,211 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Control styles that give the Fluent controls the compact macOS look of the SwiftUI views. -->
+
+  <Style Selector="Window">
+    <Setter Property="FontFamily" Value="fonts:Inter#Inter" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+
+  <Style Selector="TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="TextBlock.secondary">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+  </Style>
+  <Style Selector="TextBlock.tertiary">
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
+  </Style>
+
+  <!-- Plain buttons (SwiftUI .buttonStyle(.plain)): no chrome at all. -->
+  <Style Selector="Button.plain">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="Cursor" Value="Arrow" />
+  </Style>
+  <Style Selector="Button.plain:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="Button.plain:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="Button.plain:pressed">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+  <Style Selector="Button.plain:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <!-- Borderless buttons (toolbar items, .borderless): a soft rounded highlight on hover. -->
+  <Style Selector="Button.borderless">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="6,4" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+  </Style>
+  <Style Selector="Button.borderless:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource FillHover}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="Button.borderless:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource FillSelected}" />
+  </Style>
+  <Style Selector="Button.borderless:pressed">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+  <Style Selector="Button.borderless:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="Button.borderless:disabled">
+    <Setter Property="Opacity" Value="0.35" />
+  </Style>
+
+  <!-- Toolbar icon buttons: 30 × 28, rounded hover like the unified macOS toolbar. -->
+  <Style Selector="Button.toolbar">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Regular push buttons (.bordered, small): compact and rounded. -->
+  <Style Selector="Button">
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="10,3" />
+    <Setter Property="MinHeight" Value="24" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+  <!-- .borderedProminent: accent background with white text. -->
+  <Style Selector="Button.prominent">
+    <Setter Property="Background" Value="{DynamicResource VsAccent}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="Button.prominent:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource VsAccent}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="Opacity" Value="0.9" />
+  </Style>
+  <Style Selector="Button.prominent:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource VsAccent}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="Opacity" Value="0.45" />
+  </Style>
+  <!-- Link buttons (.link). -->
+  <Style Selector="Button.link">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource VsAccent}" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.link:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource VsAccent}" />
+  </Style>
+
+  <!-- Text fields (.roundedBorder, small). -->
+  <Style Selector="TextBox">
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="MinHeight" Value="24" />
+    <Setter Property="Padding" Value="7,3" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Background" Value="{DynamicResource InputBackground}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource InputBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+    <Setter Property="BorderBrush" Value="{DynamicResource VsAccent}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+  </Style>
+  <!-- Plain text fields (.plain): no border, no background. -->
+  <Style Selector="TextBox.plain">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+  <Style Selector="TextBox.plain:pointerover /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="TextBox.plain:focus /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="MinHeight" Value="24" />
+    <Setter Property="Padding" Value="8,2,0,2" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+  <Style Selector="CheckBox">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="MinHeight" Value="22" />
+  </Style>
+  <Style Selector="ToggleSwitch">
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+
+  <!-- Sidebar-style lists and trees: compact rows with a rounded selection. -->
+  <Style Selector="TreeView">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="TreeViewItem">
+    <Setter Property="MinHeight" Value="26" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+  <Style Selector="TreeViewItem /template/ Border#PART_LayoutRoot">
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Margin" Value="8,0" />
+  </Style>
+  <Style Selector="TreeViewItem:selected /template/ Border#PART_LayoutRoot">
+    <Setter Property="Background" Value="{DynamicResource FillSelected}" />
+  </Style>
+  <Style Selector="TreeViewItem:selected:focus /template/ Border#PART_LayoutRoot">
+    <Setter Property="Background" Value="{DynamicResource FillSelected}" />
+  </Style>
+  <Style Selector="TreeViewItem:pointerover /template/ Border#PART_LayoutRoot">
+    <Setter Property="Background" Value="{DynamicResource FillHover}" />
+  </Style>
+  <Style Selector="ListBox">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="ListBoxItem">
+    <Setter Property="Padding" Value="8,3" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+  <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource FillSelected}" />
+  </Style>
+  <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource FillHover}" />
+  </Style>
+
+  <Style Selector="ToolTip">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+  <Style Selector="MenuItem">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Padding" Value="10,4" />
+  </Style>
+  <Style Selector="Separator">
+    <Setter Property="Background" Value="{DynamicResource Separator}" />
+  </Style>
+  <Style Selector="GridSplitter">
+    <Setter Property="Background" Value="{DynamicResource Separator}" />
+  </Style>
+</Styles>
